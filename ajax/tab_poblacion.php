@@ -207,7 +207,7 @@
                         </table>
                         </div>
                         <button class="btn" type="button" id="agregar">Agregar paralelo</button>
-                        <button class="btn" type="button" id="quitar">Quitar paralelo</button>
+                        <button class="btn d-none" type="button" id="quitar">Quitar paralelo</button>
                         <input type="hidden" name="id_colegio" value='<?php echo $_GET['colegio'] ?>'>
                         <input type="hidden" name="periodo" value="<?php echo $_GET['periodo'] ?>">
                         <input type="hidden" name="cod_colegio" value="<?php echo $_GET['codigo'] ?>">
@@ -273,40 +273,11 @@
           $('#tabla tbody').append(nuevaFila);
 
           calcularTotales(); // <-- Aquí
+
+          $('#quitar').removeClass("d-none");
         });
 
-        $('#agregar').click(function () {
-          let ultimaFila = $('#tabla tbody tr.fila-datos').last();
-          let nuevaFila = ultimaFila.clone();
-          
-          // Obtener número base desde la primera celda
-          let numActual = parseInt(ultimaFila.find('td:first').text(), 10);
-          let numNuevo = ("0" + (numActual + 1)).slice(-2); // formato 01, 02...
-
-          nuevaFila.find('td:first').text(numNuevo); // actualizar numeración de fila
-
-          // Actualizar name e id de inputs
-          nuevaFila.find('input').each(function () {
-            let input = $(this);
-            let name = input.attr('name');
-            let id = input.attr('id');
-
-            if (name) {
-              let baseName = name.replace(/\d+$/, '');
-              input.attr('name', baseName + numNuevo);
-            }
-
-            if (id) {
-              let baseId = id.replace(/\d+$/, '');
-              input.attr('id', baseId + numNuevo);
-            }
-
-            input.val(''); // limpiar valor
-          });
-
-          $('#tabla tbody').append(nuevaFila);
-         calcularTotales(); // <-- Aquí
-        });
+        
 
   
         $('#quitar').click(function () {

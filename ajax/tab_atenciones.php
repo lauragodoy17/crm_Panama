@@ -33,8 +33,9 @@
                                   ×
                                 </button>
                               </div>
+                              <form action="php/solicitud_recurso.php" method="POST" enctype="multipart/form-data">
                               <div class="modal-body">
-                                <form action="php/solicitud_recurso.php" method="POST" enctype="multipart/form-data">
+                               
                                 <div class="row">
                                   
                                   <div class="form-group col-sm-4">

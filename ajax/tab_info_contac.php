@@ -99,8 +99,9 @@
                                   ×
                                 </button>
                               </div>
+                              <form action="php/guardar_adm.php" method="POST">
                               <div class="modal-body">
-                                <form action="php/guardar_adm.php" method="POST">
+                                
                                 <div class="otro_adm">
 
                                   <diw class="row">
@@ -342,8 +343,9 @@
                                   ×
                                 </button>
                               </div>
+                              <form action="php/guardar_profe.php" method="POST">
                               <div class="modal-body">
-                                <form action="php/guardar_profe.php" method="POST">
+                                
                                 <div class="otro_profe">
 
                                   <diw class="row">
