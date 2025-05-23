@@ -7,7 +7,7 @@
 	include("../conexion/bdd.php");
 
 	foreach ($_POST as $key => $value) {
-	    if (!empty($value)) {
+	    if ($value !="") {
 
 	    	if ($key !="id_colegio" && $key !="periodo" && $key !="cod_colegio") {
 	    		

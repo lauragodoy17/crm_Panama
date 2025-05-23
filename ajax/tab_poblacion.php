@@ -49,7 +49,7 @@
 
                             <?php
 
-                              $sql = "SELECT MAX(paralelos) as nunfila FROM `grados_paralelos` WHERE id_colegio='{$_GET['colegio']}' AND id_periodo='{$_GET['periodo']}'";
+                              $sql = "SELECT MAX(paralelos) as nunfila FROM `grados_paralelos` WHERE id_colegio='{$_GET['colegio']}' AND id_periodo='{$_GET['periodo']}' AND alumnos > 0";
                               $req = $bdd->prepare($sql);
                               $req->execute();
                               $nunfila = $req->fetch();
@@ -313,6 +313,12 @@
 
         // Detectar cambios en cualquier input de la tabla
         $('#tabla').on('input', 'input', function () {
+          let val = $(this).val();
+
+          // Si el valor está vacío o solo tiene espacios
+          if (val.trim() === '') {
+            $(this).val(0);
+          }
           calcularTotales(); // <-- Aquí
         });
                       </script>
