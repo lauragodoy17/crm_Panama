@@ -173,7 +173,7 @@ foreach ($solicitudes as $solicitud) {
     $req->execute();
     $tipo_e = $req->fetch();
 
-    $sql = "SELECT SUM(r.legaliza) as total FROM solicitudes_recursos s JOIN recursos_solicitados r ON s.id=r.id_solicitud WHERE s.id_colegio='".$solicitud["cid"]."' AND s.id_periodo='".$_POST["periodo"]."' AND s.estado='4';";
+    $sql = "SELECT SUM(r.valor_e) as total_e FROM solicitudes_recursos s JOIN recursos_solicitados r ON s.id=r.id_solicitud WHERE s.id_colegio='".$solicitud["cid"]."' AND s.id_periodo='".$_POST["periodo"]."' AND s.estado='4';";
 
     $req = $bdd->prepare($sql);
     $req->execute();
@@ -194,13 +194,21 @@ foreach ($solicitudes as $solicitud) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$solicitud[categoria]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$solicitud[presupuesto]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$solicitud[estado]");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$total[total]");
+    
+    $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$total[total_e]");
+    
+    
     if (empty($tipo_e["tipo"])) {
         $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "");
     }else{
         $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$tipo_e[tipo]");
     }
-    
+    $objSpreadsheet->getActiveSheet()->getStyle("M$conta")
+          ->getNumberFormat()
+          ->setFormatCode(
+          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+    );
+
     $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$solicitud[valor_e]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$solicitud[fecha_e]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$solicitud[legaliza]");
