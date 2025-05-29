@@ -299,7 +299,7 @@
                             </thead>
                             <tbody>
                             <?php
-                              $sql = "SELECT e.estado, s.id,s.fecha, CONCAT(t.nombre, ' ', t.apellido) as solicitante, c.cargo, s.fecha_entrega, s.conse FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN trabajadores_colegios t ON t.id=s.solicitante JOIN cargos c ON c.id=t.cargo WHERE s.id_colegio='".$_GET['colegio']."' AND s.id_periodo='".$_GET['periodo']."' ORDER BY s.id DESC";
+                              $sql = "SELECT e.estado, s.id,s.fecha, CONCAT(t.nombre, ' ', t.apellido) as solicitante, c.cargo, s.fecha_entrega, s.conse FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id LEFT JOIN cargos c ON c.id=t.cargo WHERE s.id_colegio='".$_GET['colegio']."' AND s.id_periodo='".$_GET['periodo']."' ORDER BY s.id DESC";
 
                               $req = $bdd->prepare($sql);
                               $req->execute();

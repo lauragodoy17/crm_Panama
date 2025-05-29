@@ -85,7 +85,7 @@
             <?php 
                 include("conexion/bdd.php");
 
-                $sql = "SELECT e.estado, s.estado as idestado ,s.id,s.fecha, CONCAT(t.nombre, ' ', t.apellido) as solicitante, ca.cargo, s.fecha_entrega,s.id_periodo, s.archivo ,s.contab, s.conse, c.colegio, c.codigo FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN colegios c ON c.id=s.id_colegio JOIN trabajadores_colegios t ON t.id=s.solicitante JOIN cargos ca ON ca.id=t.cargo WHERE s.id='".$_GET["id"]."'";
+                $sql = "SELECT e.estado, s.estado as idestado ,s.id,s.fecha, CONCAT(t.nombre, ' ', t.apellido) as solicitante, ca.cargo, s.fecha_entrega,s.id_periodo, s.archivo ,s.contab, s.conse, c.colegio, c.codigo FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN colegios c ON c.id=s.id_colegio LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id LEFT JOIN cargos ca ON ca.id=t.cargo WHERE s.id='".$_GET["id"]."'";
 
                 $req = $bdd->prepare($sql);
                 $req->execute();
