@@ -11,7 +11,7 @@
 
                           <?php
 
-                            $sql = "SELECT SUM(r.legaliza) as total FROM solicitudes_recursos s JOIN recursos_solicitados r ON s.id=r.id_solicitud WHERE s.id_colegio='".$_GET['colegio']."' AND s.id_periodo='".$_GET['periodo']."' AND s.estado='4';";
+                            $sql = "SELECT SUM(r.valor_e) as total FROM solicitudes_recursos s JOIN recursos_solicitados r ON s.id=r.id_solicitud WHERE s.id_colegio='".$_GET['colegio']."' AND s.id_periodo='".$_GET['periodo']."' AND s.estado='4';";
 
                             $req = $bdd->prepare($sql);
                             $req->execute();
