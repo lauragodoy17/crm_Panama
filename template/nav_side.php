@@ -313,7 +313,7 @@
 							</a>
 						</li>
 						
-						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5 || $_SESSION["tipo"] ==7 || $_SESSION["tipo"] ==9 ) {?>
+						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==7 || $_SESSION["tipo"] ==9 ) {?>
 							<li class="dropdown">
 								<a href="javascript:;" class="dropdown-toggle">
 									<span class="micon bi bi-gift"></span
@@ -336,7 +336,7 @@
 									><span class="mtext">Reportes</span>
 								</a>
 								<ul class="submenu">
-									<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {?>
+									<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5) {?>
 									
 										<li><a href="reporte_zonificacion.php">Zonificación</a></li>
 										<li><a href="reporte_cubrimiento.php">Cubrimiento</a></li>
@@ -350,11 +350,11 @@
 										
 									<?php } ?>
 									
-									<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9) {?>
+									<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) {?>
 										<li><a href="reporte_atenciones.php">Atenciones a clientes</a></li>
 									<?php } ?>
 
-									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==3 || $_SESSION["tipo"]==4 || $_SESSION["tipo"]==7) {?>
+									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==3 || $_SESSION["tipo"]==4 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==5) {?>
 										<li><a href="calendar_ti.php">Calendario consultorias</a></li>
 									<?php } ?>
 

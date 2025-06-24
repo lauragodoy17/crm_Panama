@@ -86,7 +86,7 @@ $periodo2=$periodo1["id"];
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $colegio) {
 
-    if ($_SESSION['tipo'] == 1 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10) {
+    if ($_SESSION['tipo'] == 1 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5) {
 
         $sql_zona="SELECT zona, CONCAT(nombres,' ',apellidos) as promotor, u.tipo FROM zonas z JOIN usuarios u ON z.codigo=u.cod_zona WHERE z.codigo='".$colegio['cod_zona']."'";
         $req_zona = $bdd->prepare($sql_zona);

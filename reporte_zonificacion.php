@@ -74,13 +74,13 @@
             </div>
           </div>
           <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-            <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {?>
+            <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5) {?>
               <form action="php/zonificacion_excel.php" method="POST">
             <?php }else{ ?>
               <form action="php/zonificacion_excel2.php" method="POST">
             <?php } ?>
               <div class="row">
-                <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {?>
+                <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5) {?>
                   <div class="col-sm-6">
                     
                     <div class="form-group">
