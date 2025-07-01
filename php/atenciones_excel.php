@@ -232,14 +232,16 @@ foreach ($solicitudes as $solicitud) {
 
 }	
 $conta++;
-
-$total_p=array_sum($total_p);
+if (isset($total_p)) {
+    $total_p=array_sum($total_p);
+}
 
 if (isset($total_a)) {
     $total_a=array_sum($total_a);
 }
-
-$total_l=array_sum($total_l);
+if (isset($total_l)) {
+    $total_l=array_sum($total_l);
+}
 
 $objSpreadsheet->getActiveSheet()->getStyle('H'.$conta)->applyFromArray($estilo_negrita);
 $objSpreadsheet->getActiveSheet()->getStyle('I'.$conta)->applyFromArray($estilo_negrita);
