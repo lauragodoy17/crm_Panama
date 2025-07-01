@@ -163,7 +163,7 @@
                         data-toggle="tab"
                         href="#presupuesto"
                         role="tab"
-                        aria-selected="false"
+                        aria-selected="false" data-url="ajax/tab_presup.php"
                         >Presupuesto</a
                       >
                     </li>
@@ -502,11 +502,7 @@
                     <div class="tab-pane" id="info_contac" role="tabpanel"></div>
                     <div class="tab-pane" id="poblacion" role="tabpanel"></div>
 
-                    <div class="tab-pane" id="presupuesto" role="tabpanel">
-                      <div class="pd-20">
-                         <h5>En construcción</h5>
-                      </div>
-                    </div>
+                    <div class="tab-pane" id="presupuesto" role="tabpanel"></div>
 
                     <div class="tab-pane" id="adopciones" role="tabpanel">
                       <div class="pd-20">
@@ -551,14 +547,20 @@
           var baseUrl = $(e.target).data("url");
           var codigo = <?php echo json_encode($colegio["codigo"]); ?>;
           // Agrega parámetros dinámicos
-          var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&id_calendario='+ <?php echo $colegio['id_calendario'] ?>;
+          if (target !="#presupuesto") {
+            var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&id_calendario='+ <?php echo $colegio['id_calendario'] ?>;
+          }else{
+            var responsable = <?php echo json_encode($responsable["codigo"]); ?>;
+            var f_cierre = <?php echo json_encode($gp_periodo["f_cierre"]); ?>;
+            var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&cod_zona='+ <?php echo $colegio['cod_zona'] ?>+ '&sub_zona='+ <?php echo $colegio['sub_zona'] ?>+ '&responsable='+encodeURIComponent(responsable)+ '&promotor='+ <?php echo $promotor['id'] ?>+ '&f_cierre='+encodeURIComponent(f_cierre);
+          }
+          
 
           if ($(target).is(':empty')) {
             $(target).load(urlConParametros);
 
             setTimeout(function () {
               const selects = $(target).find('select.custom-select2');
-
               if (selects.length) {
                 selects.select2({ width: '100%' });
                 $("#modal_atenciones .custom-select2").select2({
@@ -568,8 +570,12 @@
                 $("#modal_profes .custom-select2").select2({
                    dropdownParent: $('#modal_profes')
                 });
+
+                $("#modal_presupuesto .custom-select2").select2({
+                   dropdownParent: $('#modal_presupuesto')
+                });
               }
-            }, 200); // Pequeña espera para asegurar que el DOM ya fue insertado
+            }, 1000); // Pequeña espera para asegurar que el DOM ya fue insertado
 
           }
         });
