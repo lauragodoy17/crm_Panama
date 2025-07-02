@@ -358,6 +358,11 @@
 										<li><a href="calendar_ti.php">Calendario consultorias</a></li>
 									<?php } ?>
 
+									<?php if ($_SESSION["tipo"]!=4) {?>
+										<li><a href="reporte_valoriza.php">Valorización libro a libro</a></li>
+									<?php } ?>
+
+
 								</ul>
 							</li>
 						<?php } ?>
