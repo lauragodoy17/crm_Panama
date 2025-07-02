@@ -8,6 +8,13 @@ error_reporting(E_ALL);
 
   require_once("../php/aut.php");
   include("../conexion/bdd.php");
+
+$sql_periodo="SELECT * FROM periodos WHERE id='".$_GET['periodo']."'";
+
+$req_periodo = $bdd->prepare($sql_periodo);
+$req_periodo->execute();
+$gp_periodo = $req_periodo->fetch();
+
 ?>
 
 <div class="pd-20">
@@ -227,11 +234,10 @@ error_reporting(E_ALL);
     </div>
 
 	</div>
-    <script src="../src/vendors/scripts/jquery-2.1.4.min.js"></script>
 
      <?php
                             
-        $sql = "SELECT p.id, p.cod_area, b.materia, c.grado,l.id, l.libro,l.id_materia, l.id_grado, l.pri_sec, l.precio FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN materias b ON l.id_materia=b.id JOIN grados c ON l.id_grado=c.id WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$_GET["periodo"]."' AND p.pre_aprob=1";
+        $sql = "SELECT p.id as pid, p.cod_area, b.materia, c.grado,l.id, l.libro,l.id_materia, l.id_grado, l.pri_sec, l.precio FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN materias b ON l.id_materia=b.id JOIN grados c ON l.id_grado=c.id WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$_GET["periodo"]."' AND p.pre_aprob=1";
                             
         $req = $bdd->prepare($sql);
         $req->execute();
@@ -259,7 +265,8 @@ error_reporting(E_ALL);
                     <th>Descuento</th>
                     <th>Precio neto</th>
                     <th>Venta potencial</th>
-                    <th>Probabilidad</th>";
+                    <th>Probabilidad</th>
+                    <th>Borrar</th>";
                                       
                      /*if ($_SESSION
                         ["tipo"] != 1) {
@@ -343,11 +350,6 @@ error_reporting(E_ALL);
                             echo "<td><input type='text' size='2' name='tasa[]' id='tasa_p".$libro_p["id"]."' value='".$presup["tasa_compra"]."'> %</td>";
                         }else {
                                         
-                            $sql_periodo="SELECT * FROM periodos WHERE id='".$_GET['periodo']."'";
-
-							$req_periodo = $bdd->prepare($sql_periodo);
-							$req_periodo->execute();
-							$gp_periodo = $req_periodo->fetch();
                             //tasa de compra nueva
                             if ($libro_p["id_grado"] < 4) {
                                 echo "<td><input type='text' size='2' name='tasa[]' id='tasa_p".$libro_p["id"]."' value='".$gp_periodo["t_preescolar"]."' required> %</td>";
@@ -430,7 +432,7 @@ error_reporting(E_ALL);
                                     echo'</select>
                                 </td>';
                             }
-
+                            echo "<td><input type='checkbox' name='b_presup[]' value='".$libro_p["pid"]."'></td>";
                             /*if ($_SESSION["tipo"] !=1) {
                                 if ($presup["aprobado"]==1) {
                                     echo '<td class="text-success">Si</td>'; 
@@ -607,8 +609,11 @@ error_reporting(E_ALL);
                             <td></td>
                             <td></td>
                             <td id='total_vp_p'></td>
-                            <td></td>
-                        </tr>";
+                            <td></td>";
+                            if ($gp_periodo["f_cierre"] > date("Y-m-d")) {
+                            	echo"<td><button id='borrar' class='btn btn-sm btn-danger eliminar' href='#'><i class='fa fa-trash-o bigger-120'></i></button></td>";
+                            }
+                        echo"</tr>";
                     echo '</tbody>
                 </table></div>
                 <input type="hidden" name="id_colegio" id="cole" value="'.$_GET["colegio"].'">
@@ -883,4 +888,12 @@ error_reporting(E_ALL);
 
       var total_vp_d=0;
 
+      $("#borrar").click(function(e) {
+  		e.preventDefault(); // Evita el envío inmediato
+
+	  	if (confirm("¿Estás seguro de que deseas borrar?")) {
+	    	$("#pp").attr("action", "php/borrar_presupuesto.php");
+	    	$("#pp").submit(); // Envía el formulario después de confirmar
+	  	}
+	});
 </script>
