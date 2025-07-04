@@ -127,7 +127,7 @@
             <center><h5 class="h4 text-blue mb-20"><?php echo $colegio["colegio"]; ?></h5></center>
                 <div class="tab">
                   <ul class="nav nav-tabs customtab" role="tablist">
-                    <li class="nav-item">
+                    <li class="nav-item info_b">
                       <a
                         class="nav-link active"
                         data-toggle="tab"
@@ -137,7 +137,7 @@
                         >Información básica</a
                       >
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item info_c">
                       <a
                         class="nav-link"
                         data-toggle="tab"
@@ -147,7 +147,7 @@
                         >Información de contacto</a
                       >
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item pobla">
                       <a
                         class="nav-link"
                         data-toggle="tab"
@@ -157,7 +157,7 @@
                         >Población</a
                       >
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-none presupuesto">
                       <a
                         class="nav-link"
                         data-toggle="tab"
@@ -167,7 +167,7 @@
                         >Presupuesto</a
                       >
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item adop">
                       <a
                         class="nav-link"
                         data-toggle="tab"
@@ -177,7 +177,7 @@
                         >Adopciones</a
                       >
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item atenc">
                       <a
                         class="nav-link"
                         data-toggle="tab"
@@ -553,10 +553,18 @@
             var responsable = <?php echo json_encode($responsable["codigo"]); ?>;
             var f_cierre = <?php echo json_encode($gp_periodo["f_cierre"]); ?>;
             var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&cod_zona='+ <?php echo $colegio['cod_zona'] ?>+ '&sub_zona='+ <?php echo $colegio['sub_zona'] ?>+ '&responsable='+encodeURIComponent(responsable)+ '&promotor='+ <?php echo $promotor['id'] ?>+ '&f_cierre='+encodeURIComponent(f_cierre);
+
+            $(".presupuesto").removeClass("d-none");
+            $(".info_b").addClass("d-none");
+            $(".info_c").addClass("d-none");
+            $(".pobla").addClass("d-none");
+            $(".adop").addClass("d-none");
+            $(".atenc").addClass("d-none");
           }
           
 
           if ($(target).is(':empty')) {
+            $(target).html("<br><br><center style='font-size:30px; color:#E25906'>Cargando...</center>");
             $(target).load(urlConParametros);
 
             setTimeout(function () {

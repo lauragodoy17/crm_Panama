@@ -312,7 +312,15 @@
 								><span class="mtext">Plan de trabajo</span>
 							</a>
 						</li>
-						
+						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==3 ) {?>
+						<li>
+							<a href="colegios_presup.php" class="dropdown-toggle no-arrow" id="plan_trabajo">
+								<span class="micon bi bi-currency-dollar"></span
+								><span class="mtext">Presupuesto</span>
+							</a>
+						</li>
+						<?php }?>
+
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==7 || $_SESSION["tipo"] ==9 ) {?>
 							<li class="dropdown">
 								<a href="javascript:;" class="dropdown-toggle">
