@@ -167,6 +167,8 @@ $colegios = $req->fetchAll();
 
 $conta=7;
 $cache_alumnos = [];
+$cache_calculo_tasa = [];
+$cache_precio_venta = [];
 foreach ($colegios as$colegio) {
 
 	   
@@ -226,24 +228,81 @@ foreach ($colegios as$colegio) {
 
     if ($colegio["pre_definido"] ==1) {
 
-        $alumnos_tasa= floor($alumnos * $colegio["tasa_compra"]);
-        $precio_neto=$colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
-         $venta_ppto=$precio_neto * $alumnos_tasa;
+        // Creamos una clave única con los valores involucrados
+        $key_calc = $alumnos . "_" . $colegio["tasa_compra"];
+
+        if (!isset($cache_calculo_tasa[$key_calc])) {
+            $alumnos_tasa = floor($alumnos * $colegio["tasa_compra"]);
+            $cache_calculo_tasa[$key_calc] = $alumnos_tasa;
+        }
+
+        // Usar siempre el valor desde la caché
+        $alumnos_tasa = $cache_calculo_tasa[$key_calc];
+
+        // Creamos clave única para esta operación
+        $key_precio = $colegio["precio"] . "_" . $colegio["descuento"] . "_" . $alumnos_tasa;
+
+        if (!isset($cache_precio_venta[$key_precio])) {
+            $precio_neto = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
+            $venta_ppto = $precio_neto * $alumnos_tasa;
+
+            $cache_precio_venta[$key_precio] = [
+                'precio_neto' => $precio_neto,
+                'venta_ppto' => $venta_ppto
+            ];
+        }
+
+        $precio_neto = $cache_precio_venta[$key_precio]['precio_neto'];
+        $venta_ppto = $cache_precio_venta[$key_precio]['venta_ppto'];
+
 
         $alumnos_tasa_d=0;
         $precio_neto_d=0;
         $venta_ppto_d=0;
+
     }
 
-
+   
     if ($colegio["definido"] !=0) {
         if ($colegio["tasa_compra_d"] == 0.00) {
-            $alumnos_tasa_d= floor($alumnos * $colegio["tasa_compra"]);
-            $precio_neto_d=$colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
+
+            // Creamos una clave única con los valores involucrados
+            $key_calc = $alumnos . "_" . $colegio["tasa_compra"];
+
+            if (!isset($cache_calculo_tasa[$key_calc])) {
+                $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra"]);
+                $cache_calculo_tasa[$key_calc] = $alumnos_tasa;
+            }
+            // Usar siempre el valor desde la caché
+            $alumnos_tasa_d = $cache_calculo_tasa[$key_calc];
+            
+            $key_precio = $colegio["precio"] . "_" . $colegio["descuento"] . "_" . $alumnos_tasa;
+
+            if (!isset($cache_precio_venta[$key_precio])) {
+                $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
+                      
+            }
+
+            $precio_neto_d = $cache_precio_venta[$key_precio];
+            
            
         }else{
-            $alumnos_tasa_d= floor($alumnos * $colegio["tasa_compra_d"]);
-            $precio_neto_d=$colegio["precio"] - ($colegio["precio"] * $colegio["descuento_d"]);
+            // Creamos una clave única con los valores involucrados
+            $key_calc = $alumnos . "_" . $colegio["tasa_compra_d"];
+
+            if (!isset($cache_calculo_tasa[$key_calc])) {
+                $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra_d"]);
+                $cache_calculo_tasa[$key_calc] = $alumnos_tasa;
+            }
+            // Usar siempre el valor desde la caché
+            $alumnos_tasa_d = $cache_calculo_tasa[$key_calc];
+            
+            if (!isset($cache_precio_venta[$key_precio])) {
+                $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento_d"]);
+                      
+            }
+            
+            $precio_neto_d = $cache_precio_venta[$key_precio];
             
         }
 
@@ -314,6 +373,8 @@ foreach ($colegios as$colegio) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$colegio[editorial]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$colegio[etiqueta]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$n_grado[grado]");
+   
+    
 	$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$colegio[libro]");
     if ($colegio["pre_definido"] ==1) {
     	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$alumnos_tasa");

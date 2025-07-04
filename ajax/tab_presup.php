@@ -237,7 +237,7 @@ $gp_periodo = $req_periodo->fetch();
 
      <?php
                             
-        $sql = "SELECT p.id as pid, p.cod_area, b.materia, c.grado,l.id, l.libro,l.id_materia, l.id_grado, l.pri_sec, l.precio FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN materias b ON l.id_materia=b.id JOIN grados c ON l.id_grado=c.id WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$_GET["periodo"]."' AND p.pre_aprob=1";
+        $sql = "SELECT p.id as pid, p.cod_area, b.materia, c.grado,l.id, l.libro,l.id_materia, l.id_grado, l.pri_sec, l.precio, desc_max, desc_max_dist FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN materias b ON l.id_materia=b.id JOIN grados c ON l.id_grado=c.id WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$_GET["periodo"]."' AND p.pre_aprob=1";
                             
         $req = $bdd->prepare($sql);
         $req->execute();
@@ -461,6 +461,12 @@ $gp_periodo = $req_periodo->fetch();
                                 $('#descuento_p".$libro_p["id"]."').keyup(function(){
                                     var pvp=parseInt($('#pvp_s_p".$libro_p["id"]."').val());
                                     var descuento=parseFloat($('#descuento_p".$libro_p["id"]."').val());";
+                                    if ($_SESSION['tipo']!=6) {
+	                                    echo "var desc_max=parseFloat(".$libro_p["desc_max_dist"].")* 100;";
+	                                }else{
+	                                        	echo "var desc_max=parseFloat(".$libro_p["desc_max"].")* 100;";
+	                                }
+
 
                                      if (isset($libro_101)) {
                                         if ($libro_101 !=3481 && $libro_101 !=3482) {
@@ -469,13 +475,35 @@ $gp_periodo = $req_periodo->fetch();
 	                                            $('#descuento_p".$libro_p["id"]."').val('20');
 	                                            $('#descuento_p".$libro_p["id"]."').focus();
 	                                            descuento=20;
-
+	                                        }
 	                                        ";
+
+
 	                                    }
+                                    }else{
+                                    	echo "if (descuento > 69){
+	                                        alert('el descuento no debe superar el 69%');
+	                                        $('#descuento_p".$libro_p["id"]."').val('20');
+	                                        $('#descuento_p".$libro_p["id"]."').focus();
+	                                        descuento=20;
+	                                    }
+	                                    ";
                                     }
                                             
 
-                                    echo"descuento= descuento/100;
+                                    echo"
+
+                                    if (desc_max > 0){
+                                    	if (descuento > desc_max){
+
+		                                    alert('el descuento no debe superar: '+desc_max);
+		                                    $('#descuento_p".$libro_p["id"]."').val(desc_max);
+		                                    $('#descuento_p".$libro_p["id"]."').focus();
+		                                    descuento=desc_max;
+	                                	}
+                                    }
+                                    
+                                    descuento= descuento/100;
                                     var precio_neto= pvp - (pvp * descuento);
                                     if(isNaN(precio_neto)){
                                         precio_neto=0

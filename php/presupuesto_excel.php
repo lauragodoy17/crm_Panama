@@ -236,7 +236,14 @@ foreach($adopciones as $adopcion) {
 	$sql_go = "SELECT a.id_grado_otro FROM areas_objetivas a WHERE id_periodo='".$_GET["periodo"]."' AND id_colegio='".$_GET["cole"]."' AND codigo='".$adopcion["cod_area"]."'";
 	$req_go = $bdd->prepare($sql_go);
 	$req_go->execute();
-	$go = $req_go->fetch();
+	$n_go = $req_go->rowCount();
+
+	if ($n_go < 1) {
+		$go["id_grado_otro"] =0;
+	}else{
+		$go = $req_go->fetch();
+	}
+	
 
 	if ($go["id_grado_otro"] == 0) {
 
