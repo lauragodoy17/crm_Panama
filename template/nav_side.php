@@ -12,7 +12,7 @@
 			</div>
 		</div>-->
 
-		<div class="header">
+		<div class="header d-print-none">
 			<div class="header-left">
 				<div class="menu-icon bi bi-list"></div>
 				<div
@@ -99,7 +99,7 @@
 			</div>
 		</div>
 
-		<div class="right-sidebar">
+		<div class="right-sidebar d-print-none">
 			<div class="sidebar-title">
 				<h3 class="weight-600 font-16 text-blue">
 					Layout Settings

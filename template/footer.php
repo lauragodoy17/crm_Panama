@@ -1,6 +1,5 @@
-<div class="footer-wrap pd-20 mb-20 card-box">
+<div class="footer-wrap pd-20 mb-20 card-box d-print-none">
 					Ink-pulse - CRM de
-					<a href="https://somoseureka.com.co" target="_blank"
-						>Eureka Contenidos Educativos</a
-					>
+					
+						Eureka Contenidos Educativos
 				</div>
