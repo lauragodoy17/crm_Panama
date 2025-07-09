@@ -130,64 +130,69 @@
     <script>
       
       $(document).ready(function () {
-        $('#dataTables-example').dataTable({
-
-          processing: true,
-          serverSide: true,
-          ajax: "php/colegios_tabla_presup.php", // tu script PHP aquí
-
-          <?php if ($_SESSION['tipo'] == 1  || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5) { ?>
-            columns: [
-              { data: "dane" },
-              { data: "colegio" },
-              { data: "empresa" },
-              { data: "zona" },
-              { data: "responsable" },
-              { data: "direccion" },
-              { data: "status" },
-              { data: "presupuesto" },
-              //{ data: "barrio" },
-              { data: "periodo", "orderable": false },
-            ],
-            <?php }elseif ($_SESSION['tipo']==6) { ?>
-
-              columns: [
-                { data: "dane" },
-                { data: "colegio" },
-                { data: "zona" },
-                { data: "responsable" },
-                { data: "direccion" },
-                { data: "status" },
-                { data: "presupuesto" },
-                //{ data: "barrio" },
-                { data: "periodo", "orderable": false },
-              ],
-              <?php }else{ ?>
-                columns: [
-                  { data: "dane" },
-                  { data: "colegio" },
-                  { data: "direccion" },
-                  { data: "status" },
-                { data: "presupuesto" },
-                  //{ data: "barrio" },
-                  { data: "periodo", "orderable": false },
-                ],
-                <?php } ?>
-                "language": {
-                   "lengthMenu": "Display _MENU_ registros por página",
-                    "zeroRecords": "Nada encontrado, lo siento",
-                    "info": "Mostrando página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay registros disponibles",
-                    "infoFiltered": "(filtrado de _MAX_ registros en total )",
-                    "search": "Buscar&nbsp;:",
-                     paginate: {
-                      first:"Primero",
-                      previous:"Anterior",
-                      next:"Siguiente",
-                      last:"Último"
-                    }
-                  }
-            });
+        var table = $('#dataTables-example').DataTable({ // Usa 'DataTable' con D mayúscula
+  processing: true,
+  serverSide: true,
+  ajax: "php/colegios_tabla_presup.php",
+  <?php if ($_SESSION['tipo'] == 1  || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5) { ?>
+    columns: [
+      { data: "dane" },
+      { data: "colegio" },
+      { data: "empresa" },
+      { data: "zona" },
+      { data: "responsable" },
+      { data: "direccion" },
+      { data: "status" },
+      { data: "presupuesto" },
+      { data: "periodo", "orderable": false },
+    ],
+  <?php } elseif ($_SESSION['tipo'] == 6) { ?>
+    columns: [
+      { data: "dane" },
+      { data: "colegio" },
+      { data: "zona" },
+      { data: "responsable" },
+      { data: "direccion" },
+      { data: "status" },
+      { data: "presupuesto" },
+      { data: "periodo", "orderable": false },
+    ],
+  <?php } else { ?>
+    columns: [
+      { data: "dane" },
+      { data: "colegio" },
+      { data: "direccion" },
+      { data: "status" },
+      { data: "presupuesto" },
+      { data: "periodo", "orderable": false },
+    ],
+  <?php } ?>
+  language: {
+    lengthMenu: "Display _MENU_ registros por página",
+    zeroRecords: "Nada encontrado, lo siento",
+    info: "Mostrando página _PAGE_ de _PAGES_",
+    infoEmpty: "No hay registros disponibles",
+    infoFiltered: "(filtrado de _MAX_ registros en total )",
+    search: "Buscar&nbsp;:",
+    paginate: {
+      first: "Primero",
+      previous: "Anterior",
+      next: "Siguiente",
+      last: "Último"
+    }
+  },
+  initComplete: function () {
+    var api = this.api();
+    $('#dataTables-example_filter input')
+      .off() // elimina cualquier búsqueda automática previa
+      .on('keyup', function () {
+        var valor = this.value;
+        if (valor.length >= 4 || valor.length === 0) {
+          api.search(valor).draw();
+        }
+      });
+  }
+});
         });
 
 
