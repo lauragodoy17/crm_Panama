@@ -82,7 +82,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Calendario");
 
 if ($_POST['promo']!=0) {
 
-	if ($usuario["tipo"]==3 || $usuario["tipo"]==1 || $usuario["tipo"]==10) {
+	if ($usuario["tipo"]==3 || $usuario["tipo"]==1) {
 		$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Empresa");
 	}else{
 		$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Zona / Responsable");
@@ -120,10 +120,15 @@ $gp_periodo = $req_periodo->fetch();
 
 if ($_POST['promo']!=0) {
 
-	$sql = "SELECT c.id, c.dane as codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, z.zona, c.responsable, ca.calendario, sc.status FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN calendarios ca ON ca.id=c.id_calendario LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo='".$usuario["cod_zona"]."' AND c.id_calendario='".$gp_periodo['id_calendario']."' GROUP BY c.id";
+	if ($usuario["tipo"]!=10) {
+		$sql = "SELECT c.id, c.dane as codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, c.zona_madre, z.zona, c.responsable, ca.calendario, sc.status FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN calendarios ca ON ca.id=c.id_calendario LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo='".$usuario["cod_zona"]."' AND c.id_calendario='".$gp_periodo['id_calendario']."' GROUP BY c.id";
+	}else{
+		$sql = "SELECT c.id, c.dane as codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, c.zona_madre, z.zona, c.responsable, ca.calendario, sc.status FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN calendarios ca ON ca.id=c.id_calendario LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE (z.codigo='".$usuario["cod_zona"]."' OR c.zona_madre='".$usuario["cod_zona"]."') AND c.id_calendario='".$gp_periodo['id_calendario']."' GROUP BY c.id";
+	}
+	
 }else{
 
-	$sql = "SELECT c.id, c.dane as codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, z.zona, c.responsable, ca.calendario, sc.status, CONCAT (u.nombres, ' ',u.apellidos) as promotor FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN calendarios ca ON ca.id=c.id_calendario JOIN usuarios u ON u.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo !='74838' AND c.id_calendario='".$gp_periodo['id_calendario']."' GROUP BY c.id ORDER BY u.id";
+	$sql = "SELECT c.id, c.dane as codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, c.zona_madre, z.zona, c.responsable, ca.calendario, sc.status, CONCAT (u.nombres, ' ',u.apellidos) as promotor FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN calendarios ca ON ca.id=c.id_calendario JOIN usuarios u ON u.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo !='74838' AND c.id_calendario='".$gp_periodo['id_calendario']."' GROUP BY c.id ORDER BY u.id";
 }
 
 	$req = $bdd->prepare($sql);
@@ -138,10 +143,25 @@ foreach($coles as $cole) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$cole[calendario]");
 
 	if ($_POST['promo']!=0) {
-		if ($usuario["tipo"]==3 || $usuario["tipo"]==1 || $usuario["tipo"]==10) {
+		if ($usuario["tipo"]==3 || $usuario["tipo"]==1) {
 		
 			$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$empresa");
-		}else{
+		}elseif ($usuario["tipo"]==10) {
+			if ($cole["zona_madre"]=="") {
+				$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$empresa");
+			}else{
+				$sql_sz="SELECT sub_zona FROM sub_zonas WHERE id='".$cole["sub_zona"]."'";
+
+			    $req_sz = $bdd->prepare($sql_sz);
+
+			    $req_sz->execute();
+
+			    $sub_zona = $req_sz->fetch();
+				$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$sub_zona[sub_zona] / $cole[responsable]");
+			}
+		}
+
+		else{
 
 			$sql_sz="SELECT sub_zona FROM sub_zonas WHERE id='".$cole["sub_zona"]."'";
 
