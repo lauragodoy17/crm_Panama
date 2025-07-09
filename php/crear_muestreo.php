@@ -59,8 +59,13 @@
 			$grado = $req_g->fetch();
 
 			
+				if ($_POST['tp']!=2) {
 
-				$sql_p = "INSERT INTO libros_muestreos(cod_muestreo,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
+					$sql_p = "INSERT INTO libros_muestreos(cod_muestreo,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
+				}else{
+					$sql_p = "INSERT INTO libros_muestreos_e(cod_muestreo,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
+				}
+				
 
 				$query_p = $bdd->prepare( $sql_p );
 				if ($query_p == false) {
@@ -89,9 +94,12 @@
 
 			$grado = $req_g->fetch();
 
-			
+				if ($_POST['tp']!=2) {
 
-				$sql_p = "INSERT INTO libros_muestreos(cod_muestreo,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
+					$sql_p = "INSERT INTO libros_muestreos(cod_muestreo,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
+				}else{
+					$sql_p = "INSERT INTO libros_muestreos_e(cod_muestreo,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
+				}
 
 				$query_p = $bdd->prepare( $sql_p );
 				if ($query_p == false) {
@@ -109,7 +117,13 @@
 
 	$_POST["observaciones"]=str_replace("'", " ", $_POST["observaciones"]);
 
-	$sql_p2 = "INSERT INTO muestreos(codigo,id_periodo,id_colegio,id_usuario,observaciones,estado) VALUES('".$cod_pedido."','".$gp_periodo["id"]."','".$colegio."','".$_SESSION["id"]."','".$_POST["observaciones"]."','1')";
+	if ($_POST['tp']!=2) {
+
+		$sql_p2 = "INSERT INTO muestreos(codigo,id_periodo,id_colegio,id_usuario,observaciones,estado) VALUES('".$cod_pedido."','".$gp_periodo["id"]."','".$colegio."','".$_SESSION["id"]."','".$_POST["observaciones"]."','1')";
+	}else{
+
+		$sql_p2 = "INSERT INTO muestreos_e(codigo,id_periodo,id_colegio,id_usuario,observaciones,estado) VALUES('".$cod_pedido."','".$gp_periodo["id"]."','".$colegio."','".$_SESSION["id"]."','".$_POST["observaciones"]."','1')";
+	}
 				
 				
 	$query_p2 = $bdd->prepare( $sql_p2 );
@@ -135,54 +149,59 @@
 	$req_l3->execute();
 	$cole = $req_l3->fetch();
 
-	/*$mail = new PHPMailer(true);
+	
+	if ($_POST['tp']!=2) {
+		$mail = new PHPMailer(true);
 
-	try {
+		try {
 
-		//Server settings
-		//$mail->SMTPDebug = SMTP::DEBUG_LOWLEVEL;                      // OFF verbose debug output
-		$mail->isSMTP();                                            // Send using SMTP
-	    $mail->Host       = 'mail.eurekalibros.com.co';                    // Set the SMTP server to send through
-	    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-	    $mail->SMTPAutoTLS = false; 
-	    $mail->Username   = 'crm@eurekalibros.com.co';                     // SMTP username
-	    $mail->Password   = 'cRm14356$';                              // SMTP password
-		//$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-		$mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_S	above                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+			//Server settings
+			//$mail->SMTPDebug = SMTP::DEBUG_LOWLEVEL;                      // OFF verbose debug output
+			$mail->isSMTP();                                            // Send using SMTP
+		    $mail->Host       = 'mail.somoseureka.com.co';                    // Set the SMTP server to send through
+		    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+		    $mail->SMTPAutoTLS = false; 
+		    $mail->Username   = 'crm@somoseureka.com.co';                     // SMTP username
+		    $mail->Password   = 'cRm14356$';                              // SMTP password
+			//$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+			$mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_S	above                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 
-		//Recipients
-		$mail->setFrom('crm@eurekalibros.com.co', 'CRM Eureka');
-		$mail->addAddress("felipe.vargas@eurekalibros.com.co", 'Usuario');     // Add a recipient
-			  
-		$mail->addReplyTo('crm@eurekalibros.com.co', 'CRM Eureka');
-		$mail->addCC("pedidos@eurekalibros.com.co");
+			//Recipients
+			$mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka');
+			$mail->addAddress("felipe.vargas@somoseureka.com.co", 'Usuario');     // Add a recipient
+				  
+			$mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
+			$mail->addCC("pedidos@somoseureka.com.co");
 
-		//$mail->addBCC('bcc@example.com');
+			//$mail->addBCC('bcc@example.com');
 
-			  
-		// Content
-		$mail->isHTML(true);                                  // Set email format to HTML
+				  
+			// Content
+			$mail->isHTML(true);                                  // Set email format to HTML
 
-		$sql = "SELECT id FROM muestreos WHERE codigo='".$cod_pedido."'";
+			$sql = "SELECT id FROM muestreos WHERE codigo='".$cod_pedido."'";
 
-		$req = $bdd->prepare($sql);
-		$req->execute();
-		$pedido = $req->fetch();
+			$req = $bdd->prepare($sql);
+			$req->execute();
+			$pedido = $req->fetch();
 
-		$mail->Subject = 'Solicitud de muestras #'.$pedido["id"].'';
+			$mail->Subject = 'Solicitud de muestras #'.$pedido["id"].'';
 
-		$mail->Body    = '<p style="font-size: 17px;">'.$promo["promotor"].' hizo la solicitud de muestras #'.$pedido["id"].' para: '.$cole["colegio"].'. Haz clic <a href="https://eurekalibros.com.co/promotores/muestreo_colegio.php?id_muestreo='.$pedido['id'].' ">aquí</a> para revisarlo<p>';
+			$mail->Body    = '<p style="font-size: 17px;">'.$promo["promotor"].' hizo la solicitud de muestras #'.$pedido["id"].' para: '.$cole["colegio"].'. Haz clic <a href="https://crm.somoseureka.com.co/muestreo_colegio.php?id_muestreo='.$pedido['id'].' ">aquí</a> para revisarlo<p>';
 
-		$mail->AltBody = 'probandosss';
+			$mail->AltBody = 'probandosss';
 
-		$mail->CharSet = 'UTF-8';
+			$mail->CharSet = 'UTF-8';
 
-		$mail->send();
-			//echo "<script>alert('We have sent a message to your registered email. Check your Inbox or check your Spam Mail folder.');window.location='../index.php';</script>";
-		} catch (Exception $e) {
+			$mail->send();
+				//echo "<script>alert('We have sent a message to your registered email. Check your Inbox or check your Spam Mail folder.');window.location='../index.php';</script>";
+			} catch (Exception $e) {
 
-			echo "An error has occurred please try again: {$mail->ErrorInfo}";
-		}*/
+				echo "An error has occurred please try again: {$mail->ErrorInfo}";
+		}
+	}
+
+
 
 	header('Location: '.$_SERVER['HTTP_REFERER']);
 

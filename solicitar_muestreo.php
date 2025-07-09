@@ -4,7 +4,12 @@
   <head>
     <!-- Basic Page Info -->
     <meta charset="utf-8" />
-    <title>Inkpulse - Solicitar muestreo</title>
+    <?php if ($_GET['tp']!=2) { ?>
+      <title>Inkpulse - Solicitar muestreo</title>
+    <?php }else{ ?>
+      <title>Inkpulse - Entregar muestras</title>
+    <?php } ?>
+    
 
     <!-- Site favicon -->
     <link
@@ -67,7 +72,11 @@
             <div class="row">
               <div class="col-md-6 col-sm-12">
                 <div class="title">
-                  <h4>Solicitar muestreo</h4>
+                  <?php if ($_GET['tp']!=2) { ?>
+                    <h4>Solicitar muestreo</h4>
+                  <?php }else{ ?>
+                    <h4>Entregar muestras</h4>
+                  <?php } ?>
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
                   <ol class="breadcrumb">
@@ -75,7 +84,11 @@
                       Muestreo
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                      Solicitar
+                      <?php if ($_GET['tp']!=2) { ?>
+                        Solicitar
+                      <?php }else{ ?>
+                        Entregar
+                      <?php } ?>
                     </li>
                   </ol>
                 </nav>
@@ -226,6 +239,7 @@
                 <div class="col-sm-3 col-sm-offset-4">
                   <label for="observaciones">Observaciones:</label><br>
                   <textarea name="observaciones" id="observaciones" cols="30" rows="3"></textarea><br><br>
+                  <input type="hidden" name="tp"  value="<?php echo  $_GET['tp'] ?>">
                   <button class="btn btn-primary" id="solicitar">Solicitar</button></center>
                 </div>
 

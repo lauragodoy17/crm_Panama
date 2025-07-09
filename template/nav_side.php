@@ -312,6 +312,52 @@
 								><span class="mtext">Plan de trabajo</span>
 							</a>
 						</li>
+						<?php if ($_SESSION["tipo"] !=5  && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=8) {?>
+
+							<li class="dropdown" id="zonificacion">
+								<a href="javascript:;" class="dropdown-toggle" >
+									<span class="micon bi bi-book"></span
+									><span class="mtext">Muestreo</span>
+								</a>
+								<ul class="submenu">
+									<?php if ($_SESSION["tipo"]!=3 && $_SESSION["tipo"]!=6 ) {?>
+										<li>
+											<a href="solicitar_muestreo.php?tp=1" id="">Solicitar muestreo</a>
+										</li>
+										<li>
+											<a href="lista_muestreo.php?tp=2" id="">Pendientes</a>
+										</li>
+										<li>
+											<a href="lista_muestreo.php?tp=3" id="">Aprobados</a>
+										</li>
+										<li>
+											<a href="lista_muestreo.php?tp=4" id="">Despachados</a>
+										</li>
+										<li>
+											<a href="lista_muestreo.php?tp=5" id="">Anulados</a>
+										</li>
+										<li>
+											<a href="muestras_entregadas.php" id="">Muestras entregadas</a>
+										</li>
+									<?php }else{ ?>
+										<li>
+											<a href="solicitar_muestreo.php?tp=1" id="">Solicitar muestreo</a>
+										</li>
+										<li>
+											<a href="ver_muestreo.php" id="">Muestras solicitadas</a>
+										</li>
+										<li>
+											<a href="solicitar_muestreo.php?tp=2" id="">Entregar muestras</a>
+										</li>
+										<li>
+											<a href="muestras_entregadas.php" id="">Muestras entregadas</a>
+										</li>
+									<?php } ?>
+									
+								</ul>
+							</li>
+
+						<?php } ?>
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==3 ) {?>
 						<li>
 							<a href="colegios_presup.php" class="dropdown-toggle no-arrow" id="plan_trabajo">
@@ -370,6 +416,10 @@
 										<li><a href="reporte_valoriza.php">Valorización libro a libro</a></li>
 									<?php } ?>
 
+									<?php if ($_SESSION["tipo"]!=10) {?>
+										<li><a href="reporte_muestreo_f.php?tp=1">Muestreos solicitados</a></li>
+										<li><a href="reporte_muestreo_f.php?tp=2">Muestreos entregados</a></li>
+									<?php } ?>
 
 								</ul>
 							</li>

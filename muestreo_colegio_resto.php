@@ -8,9 +8,9 @@
       <?php if($_GET["tp"]==3) {  ?>
         <title>Inkpulse - Muestreo aprobado</title>
       <?php  }elseif($_GET["tp"]==4) { ?>
-        <title>Inkpulse - Muestreo anulado</title>
+        <title>Inkpulse - Muestreo despachado</title>
       <?php  }else{ ?>
-        <title>Inkpulse - Muestreo entregado</title>
+        <title>Inkpulse - Muestreo anulado</title>
       <?php  } ?>
 
      
@@ -97,9 +97,9 @@
                     <?php if($_GET["tp"]==3) {  ?>
                       <h4>Muestreo aprobado</h4>
                     <?php  }elseif($_GET["tp"]==4) { ?>
-                      <h4>Muestreo anulado</h4>
+                      <h4>Muestreo despachado</h4>
                     <?php  }else{ ?>
-                      <h4>Muestreo entregado</h4>
+                      <h4>Muestreo anulado</h4>
                     <?php  } ?>
                   <?php }else{ ?>
                     <h4>Muestras entregadas</h4>
@@ -116,9 +116,9 @@
                         <?php if($_GET["tp"]==3) {  ?>
                           Aprobado
                         <?php  }elseif($_GET["tp"]==4) { ?>
-                          Anulado
+                          Despachado
                         <?php  }else{ ?>
-                          Muestreo Entregado
+                          Anulado
                         <?php  } ?>
                       <?php }else{ ?>
                         Entregadas
@@ -256,7 +256,9 @@
                         <?php }else { ?>
                           <th>Cantidad Entregada</th>
                         <?php } ?>
-                        <th>Cantidad aprobada</th>
+                        <?php if (isset($_GET["id_pedido"])) { ?>
+                          <th>Cantidad aprobada</th>
+                        <?php } ?>
                       </tr>
                     </thead>
                     <tbody>
@@ -273,7 +275,9 @@
                           echo'<td class="">'.$libro["materia"].'</td>';
                           echo'<td class="">'.$libro["grado"].'</td>';                   
                           echo'<td class="center">'.$libro["cantidad"].'</td>';
-                          echo'<td class="center">'.$libro["cantidad_aprob"].'</td>';
+                          if (isset($_GET["id_pedido"])) {
+                            echo'<td class="center">'.$libro["cantidad_aprob"].'</td>';
+                          }
                                           
                         }
 
@@ -285,7 +289,9 @@
                         </tr>               
                         <td></td><td></td><td></td></td><td class="center"><b>Total:</b></td>
                         <td class="center"><b><?php echo $total_c; ?></b></td>
-                        <td class="center"><b><?php echo $total_c_aprob; ?></b></td>
+                        <?php if (isset($_GET["id_pedido"])) { ?>
+                          <td class="center"><b><?php echo $total_c_aprob; ?></b></td>
+                        <?php } ?>
                                        
                       </tbody>
                     </table>

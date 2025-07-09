@@ -81,9 +81,9 @@
                       <?php } else if($_GET["tp"]==3) {  ?>
                         Aprobados
                       <?php  }elseif($_GET["tp"]==4) { ?>
-                        Anulados
+                        Despachados
                       <?php  }else{ ?>
-                        Entregados
+                        Anulados
                       <?php  } ?>
                     </li>
                   </ol>
