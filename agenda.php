@@ -129,7 +129,7 @@
 											  <select name="cole" id="cole" class="form-control custom-select2" style="width: 300px;" required>
 										  		<option value="">Selecciona</option>
 										  		<?php 
-											 		if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==4 || $_SESSION["id"] == 10) {
+											 		if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==4 || $_SESSION["id"] == 10 || $_SESSION["zona"] == '5656') {
 														$sql = "SELECT id,colegio, dane, ciudad FROM colegios WHERE id > 2";
 													}
 													else {
@@ -146,7 +146,7 @@
 													    echo '<option value="'.$cole["id"].'">'.$cole["dane"].' - '.$cole["colegio"].' ('.$cole["ciudad"].')</option>';
 													}
 											 	?>
-
+											 	echo
 										  	</select>
 											</div>
 								  		</div><br>
