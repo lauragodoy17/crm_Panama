@@ -36,26 +36,28 @@ class StringTable extends WriterPart
 
         // Loop through cells
         foreach ($pSheet->getCoordinates() as $coordinate) {
-            $cell = $pSheet->getCell($coordinate);
-            $cellValue = $cell->getValue();
-            if (
-                !is_object($cellValue) &&
-                ($cellValue !== null) &&
-                $cellValue !== '' &&
-                !isset($aFlippedStringTable[$cellValue]) &&
-                ($cell->getDataType() == DataType::TYPE_STRING || $cell->getDataType() == DataType::TYPE_STRING2 || $cell->getDataType() == DataType::TYPE_NULL)
-            ) {
-                $aStringTable[] = $cellValue;
-                $aFlippedStringTable[$cellValue] = true;
-            } elseif (
-                $cellValue instanceof RichText &&
-                ($cellValue !== null) &&
-                !isset($aFlippedStringTable[$cellValue->getHashCode()])
-            ) {
-                $aStringTable[] = $cellValue;
-                $aFlippedStringTable[$cellValue->getHashCode()] = true;
-            }
-        }
+    $cell = $pSheet->getCell($coordinate);
+    $cellValue = $cell->getValue();
+    
+    if (
+        !is_object($cellValue) &&
+        ($cellValue !== null) &&
+        $cellValue !== '' &&
+        !isset($aFlippedStringTable[(string) $cellValue]) &&
+        ($cell->getDataType() == DataType::TYPE_STRING || $cell->getDataType() == DataType::TYPE_STRING2 || $cell->getDataType() == DataType::TYPE_NULL)
+    ) {
+        $aStringTable[] = (string) $cellValue;
+        $aFlippedStringTable[(string) $cellValue] = true;
+        
+    } elseif (
+        $cellValue instanceof RichText &&
+        ($cellValue !== null) &&
+        !isset($aFlippedStringTable[$cellValue->getHashCode()])
+    ) {
+        $aStringTable[] = $cellValue;
+        $aFlippedStringTable[$cellValue->getHashCode()] = true;
+    }
+}
 
         return $aStringTable;
     }
