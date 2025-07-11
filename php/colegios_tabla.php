@@ -1,5 +1,9 @@
 <?php
+ini_set('display_errors', 1);
 
+ini_set('display_startup_errors', 1);
+
+error_reporting(E_ALL);
 require_once("aut.php");
 require_once('../conexion/bdd.php');
 
@@ -34,7 +38,7 @@ if ($_SESSION["tipo"]!=3 && $_SESSION["tipo"]!=6 && $_SESSION["tipo"]!=10 ) {
 
     if ($_SESSION["tipo"]==10){
        
-            $searchSQL = " WHERE (colegio LIKE :search OR dane LIKE :search) AND cod_zona='".$_SESSION['zona']."' OR zona_madre='".$_SESSION['zona']."'";
+            $searchSQL = " WHERE (colegio LIKE :search OR dane LIKE :search) AND (cod_zona='".$_SESSION['zona']."' OR zona_madre='".$_SESSION['zona']."')";
             $params[':search'] = "%" . $searchValue . "%";
         
     }else{
