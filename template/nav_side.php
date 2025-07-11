@@ -358,7 +358,7 @@
 							</li>
 
 						<?php } ?>
-						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==3 ) {?>
+						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==3 || $_SESSION["tipo"] ==10) {?>
 						<li>
 							<a href="colegios_presup.php" class="dropdown-toggle no-arrow" id="plan_trabajo">
 								<span class="micon bi bi-currency-dollar"></span
