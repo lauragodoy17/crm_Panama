@@ -74,13 +74,13 @@
             </div>
           </div>
           <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-            <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5) {?>
+            <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5 || $_SESSION["id"] ==73) {?>
             <form action="php/visitas_general.php" method="POST">
             <?php }else{ ?>
               <form action="php/visitas_general2.php" method="POST">
             <?php } ?>
               <div class="row">
-                <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5) {?>
+                <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5 || $_SESSION["id"] ==73) {?>
                 <div class="col-sm-4">
                   
                   <div class="form-group">
