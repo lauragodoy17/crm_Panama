@@ -131,6 +131,7 @@
     <script>
       
     	$(document).ready(function () {
+        $.fn.dataTable.ext.errMode = 'none';
         $('#dataTables-example').dataTable({
 
           processing: true,
