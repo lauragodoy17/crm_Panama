@@ -403,6 +403,12 @@
 										<li><a href="reporte_visitas.php">Visitas</a></li>
 										
 									<?php } ?>
+
+									<?php if ($_SESSION["tipo"] ==4) {?>
+									
+										<li><a href="reporte_visitas.php">Visitas</a></li>
+									
+									<?php } ?>
 									
 									<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) {?>
 										<li><a href="reporte_atenciones.php">Atenciones a clientes</a></li>
@@ -416,7 +422,7 @@
 										<li><a href="reporte_valoriza.php">Valorización libro a libro</a></li>
 									<?php } ?>
 
-									<?php if ($_SESSION["tipo"]!=10) {?>
+									<?php if ($_SESSION["tipo"]!=10 && $_SESSION["tipo"]!=4) {?>
 										<li><a href="reporte_muestreo_f.php?tp=1">Muestreos solicitados</a></li>
 										<li><a href="reporte_muestreo_f.php?tp=2">Muestreos entregados</a></li>
 									<?php } ?>
