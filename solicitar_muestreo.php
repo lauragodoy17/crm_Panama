@@ -1,6 +1,6 @@
 <?php require_once("php/aut.php"); ?>
 <!DOCTYPE html>
-<html>
+<html lang="es">
   <head>
     <!-- Basic Page Info -->
     <meta charset="utf-8" />
