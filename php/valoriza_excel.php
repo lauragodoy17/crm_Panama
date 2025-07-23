@@ -173,7 +173,7 @@ foreach ($colegios as$colegio) {
 
 	   
 
-    if ($colegio["id_grado"] != 17) {
+    if ($colegio["id_grado"] != 17 && $colegio["cod_area"]=="") {
         
         $key = $colegio["id"] . "_" . $colegio["id_grado"] . "_" . $_POST['periodo'];
         // Consultar alumnos solo si no está en la caché
