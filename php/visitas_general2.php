@@ -61,7 +61,12 @@ $zona = $req_zona->fetch();
 
 
 $objSpreadsheet->getActiveSheet()->SetCellValue("B1", "Zona");
-$objSpreadsheet->getActiveSheet()->SetCellValue("B2", "$zona[zona]");
+if (!empty($zona["zona"])) {
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B2", "$zona[zona]");
+}else{
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B2", "");
+}
+
 $objSpreadsheet->getActiveSheet()->SetCellValue("C1", "Promotor");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C2", "$nombre_completo");
 
