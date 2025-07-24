@@ -53,6 +53,9 @@ while ($event = $stmt->fetch(PDO::FETCH_ASSOC)) {
   $start = ($start[1] == '00:00:00') ? $start[0] : $event['start'];
   $end = ($end[1] == '00:00:00') ? $end[0] : $event['end'];
 
+  if (empty($col['colegio'])) {
+    $col['colegio']="";
+  }
   $events[] = [
     'id' => $event['id'],
     'title' => $col['colegio']."\n".$objetivo['objetivo']."\nCon: ".$partics,
