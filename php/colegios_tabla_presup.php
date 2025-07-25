@@ -137,7 +137,7 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $colegio) {
 
     foreach ($presups as $presup) {
 
-        if ($presup["id_grado"] != 17) {
+        if ($presup["id_grado"] != 17 && $presup["cod_area"]=="") {
             $key = $colegio["id"] . "_" . $presup["id_grado"] . "_" . '7';
 
             if (!isset($cache_alumnos[$key])) {
