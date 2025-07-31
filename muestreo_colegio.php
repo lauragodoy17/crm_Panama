@@ -142,7 +142,7 @@
                   $num_repetido = $req_repetido->rowCount();
                   $n_repetido = $req_repetido->fetchAll();
                     
-                  $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.id as id_lm, l.isbn, m.materia, g.id as id_grado, g.grado  FROM muestreos pe JOIN libros_muestreos lp ON lp.cod_muestreo=pe.codigo JOIN libros l ON l.id=lp.id_libro JOIN materias m ON m.id=l.id_materia JOIN grados g ON g.id=l.id_grado WHERE pe.id='".$_GET["id_pedido"]."'  GROUP BY l.id";
+                  $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.id as id_lm, l.isbn, m.materia, g.id as id_grado, g.grado  FROM muestreos pe LEFT JOIN libros_muestreos lp ON lp.cod_muestreo=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON m.id=l.id_materia LEFT JOIN grados g ON g.id=l.id_grado WHERE pe.id='".$_GET["id_pedido"]."'  GROUP BY l.id";
                   $req = $bdd->prepare($sql);
                   $req->execute();
 
@@ -167,7 +167,7 @@
                   $num_repetido = $req_repetido->rowCount();
                   $n_repetido = $req_repetido->fetchAll();
                                 
-                  $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.id as id_lm, l.isbn, m.materia, g.id as id_grado, g.grado  FROM muestreos_e pe JOIN libros_muestreos_e lp ON lp.cod_muestreo=pe.codigo JOIN libros l ON l.id=lp.id_libro JOIN materias m ON m.id=l.id_materia JOIN grados g ON g.id=l.id_grado WHERE pe.id='".$_GET["id_muestras_e"]."'  GROUP BY l.id";
+                  $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.id as id_lm, l.isbn, m.materia, g.id as id_grado, g.grado  FROM muestreos_e pe LEFT JOIN libros_muestreos_e lp ON lp.cod_muestreo=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON m.id=l.id_materia LEFT JOIN grados g ON g.id=l.id_grado WHERE pe.id='".$_GET["id_muestras_e"]."'  GROUP BY l.id";
                   $req = $bdd->prepare($sql);
                   $req->execute();
 
