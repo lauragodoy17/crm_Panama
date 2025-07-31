@@ -211,8 +211,10 @@
 				<b>Guía:</b> <?php echo $op["guia"] ?> <br>
 				<b>Valor:</b> <?php echo $op["valor"] ?><br>
 				<b>Fecha de despacho:</b> <?php echo $op["fecha_entrega"] ?><br><br>
-				<?php if ($op["estado"] ==2) { ?>
-				<span class="d-print-none"> <b>Adjunto soporte de entrega:</b> <a href="adjuntos/envio/<?php echo $op["adjunto_envio"] ?>" style="cursor: pointer;" target="_blank"><?php echo $op["adjunto_envio"] ?></a><br><br></span>
+				<?php if ($op["estado"] ==2) {
+					list($antes,$archivo_env)=explode("_", $op["adjunto_envio"]);
+				?>
+				<span class="d-print-none"> <b>Adjunto soporte de entrega:</b> <a href="adjuntos/envio/<?php echo $op["adjunto_envio"] ?>" style="cursor: pointer;" target="_blank" download="<?php echo $archivo_env; ?>"><?php echo $archivo_env; ?></a><br><br></span>
 				<?php } ?>
 
 				<b>Observaciones de despacho:</b> <?php echo $op["obs_envio"] ?><br><br>
@@ -237,7 +239,7 @@
 
 			<center>
 				<button class="btn btn-primary d-print-none" onclick="window.print();">Imprimir</button>
-				<a href="lista_op.php" class="btn btn-info d-print-none" id="anular">Volver</a>
+				<a href="lista_op.php?tp=2" class="btn btn-info d-print-none" id="anular">Volver</a>
 					<!--<?php if ($op["estado"] ==1) { ?>
 						<a href="php/anular_op.php?op=<?php echo $op["opid"]; ?>" class="btn btn-danger d-print-none" id="anular">Anular</a>
 					<?php } ?>-->
