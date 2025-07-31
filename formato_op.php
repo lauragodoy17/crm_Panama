@@ -127,9 +127,9 @@
 
 					$pedido= $req->fetch();
 					if ($pedido["estado"] ==2) {
-						echo'<b>Muestreo:</b> <a href="muestreo_colegio_aprobado.php?id_pedido='.$op["id_muestreo"].'" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a><br><br>';
+						echo'<b>Muestreo:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a><br><br>';
 					}else{
-						echo'<b>Muestreo:</b> <a href="muestreo_colegio_entregado.php?id_pedido='.$op["id_muestreo"].'" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a><br><br>';
+						echo'<b>Muestreo:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a><br><br>';
 					}					
                                 	
                 }
