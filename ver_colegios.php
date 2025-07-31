@@ -191,7 +191,18 @@
 	                    next:"Siguiente",
 	                    last:"Último"
 	                	}
-              		}
+              		},
+                  initComplete: function () {
+                    var api = this.api();
+                    $('#dataTables-example_filter input')
+                      .off() // elimina cualquier búsqueda automática previa
+                      .on('keyup', function () {
+                        var valor = this.value;
+                        if (valor.length >= 4 || valor.length === 0) {
+                          api.search(valor).draw();
+                        }
+                    });
+                  }
             });
         });
 
