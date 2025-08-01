@@ -34,7 +34,7 @@
 
 		<?php
 
-			$sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.observaciones, o.estado, o.transportista, o.obs_envio, o.adjunto_envio, o.fecha_anu, o.motivo_anu, o.ciudad_destino, o.usuario_anu, o.id_pedido, o.id_pedido_dist,o.id_muestreo,o.id_devol_c,o.id_devol_p,o.id_devol_v,o.fecha_at, o.usuario_at , t.tipo, t.descrip, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["op"]."'";
+			$sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.observaciones, o.estado, o.transportista, o.obs_envio, o.adjunto_envio, o.fecha_anu, o.motivo_anu, o.ciudad_destino, o.usuario_anu, o.id_pedido, o.id_pedido_dist,o.id_muestreo,o.id_devol_c,o.id_devol_p,o.id_devol_v,o.fecha_at, o.usuario_at , o.año, t.tipo, t.descrip, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["op"]."'";
 
 			$req = $bdd->prepare($sql);
 			$req->execute();
@@ -46,7 +46,7 @@
 
 		<div class="main-container">
 			<img src="vendors/images/logo_ink-pulse.png" alt="logo">
-			<h2 align="center">Orden de pedido # <?php echo $op["opid"] ?></h2><br>
+			<h2 align="center">Orden de pedido # <?php echo $op["año"]." - ".$op["opid"] ?></h2><br>
 			<table class="table table-bordered">
 
 				<tr>

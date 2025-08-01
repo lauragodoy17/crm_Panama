@@ -15,7 +15,7 @@
 
 		if (!isset($_POST['pedidos_agp'])) {
 			
-			$sql_z = "INSERT INTO ordenes_pedidos (usuario,op_per,tipo_doc,cliente,solicitante,ciudad_destino,observaciones,archivo, estado, id_pedido, id_pedido_dist, id_muestreo, id_devol_c, id_devol_p, id_devol_v) VALUES ('".$_SESSION['id']."','".$_POST['op_per']."','".$_POST["tipo_doc"]."', '".$_POST["cliente"]."', '".$_POST["solicitante"]."', '".$_POST["ciudad_d"]."', '".$_POST["observaciones"]."','".$nombre_archivo."','1', '".$_POST["id_pedido"]."', '".$_POST["id_pedido_dist"]."', '".$_POST["id_muestreo"]."','".$_POST["id_devol_c"]."','".$_POST["id_devol_p"]."','".$_POST["id_devol_v"]."')";
+			$sql_z = "INSERT INTO ordenes_pedidos (usuario,op_per,tipo_doc,cliente,solicitante,ciudad_destino,observaciones,archivo, estado, id_pedido, id_pedido_dist, id_muestreo, id_devol_c, id_devol_p, id_devol_v, año) VALUES ('".$_SESSION['id']."','".$_POST['op_per']."','".$_POST["tipo_doc"]."', '".$_POST["cliente"]."', '".$_POST["solicitante"]."', '".$_POST["ciudad_d"]."', '".$_POST["observaciones"]."','".$nombre_archivo."','1', '".$_POST["id_pedido"]."', '".$_POST["id_pedido_dist"]."', '".$_POST["id_muestreo"]."','".$_POST["id_devol_c"]."','".$_POST["id_devol_p"]."','".$_POST["id_devol_v"]."', '".date("Y")."')";
 
 			$query_z = $bdd->prepare( $sql_z );
 			if ($query_z == false) {
@@ -30,7 +30,7 @@
 
 		}else{
 
-			$sql_z = "INSERT INTO ordenes_pedidos (usuario,op_per,tipo_doc,cliente,solicitante,ciudad_destino,observaciones,archivo, estado) VALUES ('".$_SESSION['id']."','".$_POST['op_per']."','".$_POST["tipo_doc"]."', '".$_POST["cliente"]."', '".$_POST["solicitante"]."', '".$_POST["ciudad_d"]."', '".$_POST["observaciones"]."','".$nombre_archivo."','1')";
+			$sql_z = "INSERT INTO ordenes_pedidos (usuario,op_per,tipo_doc,cliente,solicitante,ciudad_destino,observaciones,archivo, estado, año) VALUES ('".$_SESSION['id']."','".$_POST['op_per']."','".$_POST["tipo_doc"]."', '".$_POST["cliente"]."', '".$_POST["solicitante"]."', '".$_POST["ciudad_d"]."', '".$_POST["observaciones"]."','".$nombre_archivo."','1', '".date("Y")."')";
 
 			$query_z = $bdd->prepare( $sql_z );
 			if ($query_z == false) {

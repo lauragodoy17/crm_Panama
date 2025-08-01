@@ -114,7 +114,7 @@ $objSpreadsheet->getActiveSheet()->getStyle('A6:O6')->applyFromArray([
     ]
 ]);
 
-    $sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.ciudad_destino, o.observaciones, o.estado, o.transportista, o.obs_envio, o.guia, o.fecha_entrega, o.valor, o.usuario_at, o.transportista, o.obs_envio, t.tipo, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado AS n_estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_pedidos e ON e.id=o.estado WHERE o.estado='2'";
+    $sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.ciudad_destino, o.observaciones, o.estado, o.transportista, o.obs_envio, o.guia, o.fecha_entrega, o.valor, o.usuario_at, o.transportista, o.obs_envio, o.año, t.tipo, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado AS n_estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_pedidos e ON e.id=o.estado WHERE o.estado='2' ORDER BY o.id DESC";
 
 
     $req = $bdd->prepare($sql);
@@ -124,7 +124,7 @@ $objSpreadsheet->getActiveSheet()->getStyle('A6:O6')->applyFromArray([
     $conta=7;
 
 foreach($ops as $op) {
-
+    $opid=$op["año"]." - ".$op["opid"];
     $sql = "SELECT CONCAT(nombres,' ',apellidos) AS usr_at FROM usuarios WHERE id='".$op["usuario_at"]."' ";
 
     $req = $bdd->prepare($sql);
@@ -132,7 +132,7 @@ foreach($ops as $op) {
 
     $at= $req->fetch();
 
-    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$op[opid]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$opid");
     $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$op[fecha]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$op[usuario]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$op[tipo]");

@@ -101,7 +101,7 @@
             <?php 
               
 
-              $sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.observaciones, o.estado, o.transportista, o.obs_envio, o.guia, o.adjunto_envio, o.ciudad_destino, o.id_pedido, o.id_pedido_dist, o.id_muestreo, o.id_devol_c, o.id_devol_p, o.id_devol_v, o.fecha_at,o.usuario_at, t.id as tid,t.tipo,t.descrip, c.id as cid, c.cliente, c.documento, c.direccion, c.telefonos, c.ciudad, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado AS n_estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_op e ON e.id=o.estado WHERE o.id='".$_GET["op"]."'";
+              $sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.observaciones, o.estado, o.transportista, o.obs_envio, o.guia, o.adjunto_envio, o.ciudad_destino, o.id_pedido, o.id_pedido_dist, o.id_muestreo, o.id_devol_c, o.id_devol_p, o.id_devol_v, o.fecha_at,o.usuario_at, o.año, t.id as tid,t.tipo,t.descrip, c.id as cid, c.cliente, c.documento, c.direccion, c.telefonos, c.ciudad, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado AS n_estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_op e ON e.id=o.estado WHERE o.id='".$_GET["op"]."'";
 
 
               $req = $bdd->prepare($sql);
@@ -109,7 +109,7 @@
 
               $op = $req->fetch();
 
-              echo '<h3 style="display: inline-block;">OP # '.$_GET["op"].'</h3> &nbsp;&nbsp;<a style="display: inline-block;" href="formato_op.php?op='.$op["opid"].'" target="_blank" class="btn btn-info btn-sm"><i class="bi bi-printer"></i></a><br><br>';
+              echo '<h3 style="display: inline-block;">OP # '.$op["año"].' - '.$op["opid"].'</h3> &nbsp;&nbsp;<a style="display: inline-block;" href="formato_op.php?op='.$op["opid"].'" target="_blank" class="btn btn-info btn-sm"><i class="bi bi-printer"></i></a><br><br>';
 
               echo "<h4 style='display:inline-block; float: left;'><b>Estado:</b> ".$op["n_estado"]."</h4>";
               echo "<h4 style='display:inline-block; float: right;'><b>Usuario:</b> ".$op["usuario"]."</h4>";

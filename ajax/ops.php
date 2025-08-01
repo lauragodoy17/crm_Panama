@@ -46,7 +46,7 @@ $stmt->execute($params);
 $filtered = $stmt->fetchColumn();
 
 // Datos paginados con filtro
-$dataSQL = "SELECT o.id as opid, o.usuario, o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo,o.fecha_entrega, o.fecha_at, o.usuario_at, o.usuario_anu, o.fecha_anu, t.tipo, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_op e ON e.id=o.estado $searchSQL $orderSQL LIMIT :start, :length";
+$dataSQL = "SELECT o.id as opid, o.usuario, o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo,o.fecha_entrega, o.fecha_at, o.usuario_at, o.usuario_anu, o.fecha_anu, o.año, t.tipo, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_op e ON e.id=o.estado $searchSQL $orderSQL LIMIT :start, :length";
 
 $stmt = $bdd->prepare($dataSQL);
 
@@ -80,7 +80,7 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $op) {
         $op["usuario_anu"]=$anu["usr_anu"];
         $op["id"]=$op["opid"];
     }else{
-        $op["id"]="<a href='op_pendiente.php?op=".$op["opid"]."'>".$op["opid"]."</a>";
+        $op["id"]="<a href='op_pendiente.php?op=".$op["opid"]."'>".$op["año"]." - ".$op["opid"]."</a>";
     }
 
     $op["acciones"]="<a href='formato_op.php?op=".$op["opid"]."' target='_blank' class='btn btn-info btn-sm'><i class='bi bi-printer'></i></a>";

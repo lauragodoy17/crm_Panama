@@ -110,7 +110,7 @@ $objSpreadsheet->getActiveSheet()->getStyle('A6:H6')->applyFromArray([
     ]
 ]);
 
-	$sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.observaciones, o.estado, o.transportista, o.obs_envio, o.guia, o.adjunto_envio, o.ciudad_destino, t.tipo, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado AS n_estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_pedidos e ON e.id=o.estado WHERE o.estado='1' ORDER BY o.id DESC";
+	$sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.observaciones, o.estado, o.transportista, o.obs_envio, o.guia, o.adjunto_envio, o.ciudad_destino, o.año, t.tipo, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado AS n_estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_pedidos e ON e.id=o.estado WHERE o.estado='1' ORDER BY o.id DESC";
 
 
 	$req = $bdd->prepare($sql);
@@ -120,8 +120,8 @@ $objSpreadsheet->getActiveSheet()->getStyle('A6:H6')->applyFromArray([
 	$conta=7;
 
 foreach($ops as $op) {
-
-	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$op[opid]");
+    $opid=$op["año"]." - ".$op["opid"];
+	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$opid");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$op[fecha]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$op[usuario]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$op[tipo]");
