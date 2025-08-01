@@ -383,6 +383,21 @@
 							</li>
 						<?php } ?>
 
+						<?php if ($_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=6 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
+							<li class="dropdown">
+								<a href="javascript:;" class="dropdown-toggle">
+									<span class="micon bi bi-truck"></span
+									><span class="mtext">OP'S</span>
+								</a>
+								<ul class="submenu">
+									<li><a href="lista_op.php?tp=1">Todas</a></li>
+									<li><a href="lista_op.php?tp=2">Pendientes</a></li>
+									<li><a href="lista_op.php?tp=3">Atendidas</a></li>
+									<li><a href="lista_op.php?tp=4">Anuladas</a></li>
+								</ul>
+							</li>
+						<?php } ?>
+
 						<?php if ($_SESSION["tipo"] !=8) {?>
 							<li class="dropdown">
 								<a href="javascript:;" class="dropdown-toggle">
@@ -425,6 +440,12 @@
 									<?php if ($_SESSION["tipo"]!=10 && $_SESSION["tipo"]!=4) {?>
 										<li><a href="reporte_muestreo_f.php?tp=1">Muestreos solicitados</a></li>
 										<li><a href="reporte_muestreo_f.php?tp=2">Muestreos entregados</a></li>
+									<?php } ?>
+
+									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2) {?>
+										<li><a href="php/oppend_excel.php">OP'S pendientes</a></li>
+										<li><a href="php/opaten_excel.php">OP'S atendidas</a></li>
+										<li><a href="php/opanu_excel.php">OP'S anuladas</a></li>
 									<?php } ?>
 
 								</ul>
