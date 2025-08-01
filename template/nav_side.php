@@ -390,6 +390,7 @@
 									><span class="mtext">OP'S</span>
 								</a>
 								<ul class="submenu">
+									<li><a href="solicitar_op.php">Solicitar</a></li>
 									<li><a href="lista_op.php?tp=1">Todas</a></li>
 									<li><a href="lista_op.php?tp=2">Pendientes</a></li>
 									<li><a href="lista_op.php?tp=3">Atendidas</a></li>
