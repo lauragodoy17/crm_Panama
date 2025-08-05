@@ -1119,6 +1119,7 @@
                                 <td id='total_vp_d'></td>
                                 <td></td>
                                 <td></td>
+                                <td></td>
                                 <td id='total_vr'></td>
                                 </tr>";
 
