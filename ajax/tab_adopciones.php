@@ -260,7 +260,7 @@
 	</div>
     <?php
                             
-        $sql = "SELECT p.id,p.cod_area, b.materia, c.grado,l.id, l.libro,l.id_materia, l.id_grado, l.pri_sec, l.precio FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN materias b ON l.id_materia=b.id JOIN grados c ON l.id_grado=c.id WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$gp_periodo["id"]."' AND p.aprobado < 2 AND p.pre_definido='1' AND p.probabilidad !=3";
+        $sql = "SELECT p.id,p.cod_area, b.materia, c.grado,l.id, l.libro,l.id_materia, l.id_grado, l.pri_sec, l.precio, desc_max, desc_max_dist FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN materias b ON l.id_materia=b.id JOIN grados c ON l.id_grado=c.id WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$gp_periodo["id"]."' AND p.aprobado < 2 AND p.pre_definido='1' AND p.probabilidad !=3";
 
 
         $req = $bdd->prepare($sql);
@@ -871,21 +871,49 @@
                                             var descuento=parseFloat($('#descuento_d".$libro_p["id"]."').val());";
 
 
+                                            if ($_SESSION['tipo']!=6) {
+	                                    		echo "var desc_max=parseFloat(".$libro_p["desc_max"].")* 100;";
+			                                }else{
+			                                        	echo "var desc_max=parseFloat(".$libro_p["desc_max_dist"].")* 100;";
+			                                }
 
-                                            /*if ($libro_100 !=3481 && $libro_100 !=3482) {
-                                              echo "if (descuento > 69){
 
-                                                alert('el descuento no debe superar el 69%');
-                                                $('#descuento_d".$libro_p["id"]."').val('20');
-                                                $('#descuento_d".$libro_p["id"]."').focus();
-                                                descuento=20;
+		                                    if (isset($libro_100)) {
+		                                        if ($libro_100 !=3481 && $libro_100 !=3482) {
+			                                        echo "if (descuento > 69){
+			                                            alert('el descuento no debe superar el 69%');
+			                                            $('#descuento_d".$libro_p["id"]."').val('20');
+			                                            $('#descuento_d".$libro_p["id"]."').focus();
+			                                            descuento=20;
+			                                        }
+			                                        ";
 
-                                              }";
-                                            }*/
+
+			                                    }
+		                                    }else{
+		                                    	echo "if (descuento > 69){
+			                                        alert('el descuento no debe superar el 69%');
+			                                        $('#descuento_d".$libro_p["id"]."').val('20');
+			                                        $('#descuento_d".$libro_p["id"]."').focus();
+			                                        descuento=20;
+			                                    }
+			                                    ";
+		                                    }
                                             
-                                            
 
-                                            echo"descuento= descuento/100;
+		                                    echo"
+
+		                                    if (desc_max > 0){
+		                                    	if (descuento > desc_max){
+
+				                                    alert('el descuento no debe superar: '+desc_max);
+				                                    $('#descuento_d".$libro_p["id"]."').val(desc_max);
+				                                    $('#descuento_d".$libro_p["id"]."').focus();
+				                                    descuento=desc_max;
+			                                	}
+		                                    }
+
+                                            descuento= descuento/100;
 
 
 

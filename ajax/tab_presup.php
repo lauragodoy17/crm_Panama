@@ -462,9 +462,9 @@ $gp_periodo = $req_periodo->fetch();
                                     var pvp=parseInt($('#pvp_s_p".$libro_p["id"]."').val());
                                     var descuento=parseFloat($('#descuento_p".$libro_p["id"]."').val());";
                                     if ($_SESSION['tipo']!=6) {
-	                                    echo "var desc_max=parseFloat(".$libro_p["desc_max_dist"].")* 100;";
+	                                    echo "var desc_max=parseFloat(".$libro_p["desc_max"].")* 100;";
 	                                }else{
-	                                        	echo "var desc_max=parseFloat(".$libro_p["desc_max"].")* 100;";
+	                                        	echo "var desc_max=parseFloat(".$libro_p["desc_max_dist"].")* 100;";
 	                                }
 
 
