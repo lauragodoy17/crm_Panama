@@ -100,8 +100,8 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("H2", "Periodo $gp_periodo[perio
 $objSpreadsheet->getActiveSheet()->getStyle('C4')->applyFromArray($estilo_negrita);
 $objSpreadsheet->getActiveSheet()->getStyle('D4')->applyFromArray($estilo_negrita);
 
-$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Fecha");
-$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "$fecha");
+$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Fecha");
+$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "$fecha");
 
 $objSpreadsheet->getActiveSheet()->SetCellValue("A6", "#");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B6", "Empresa");
