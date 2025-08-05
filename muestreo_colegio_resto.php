@@ -167,7 +167,7 @@
                   $req->execute();
                   $libros = $req->fetchAll();
 
-                  $sql_op = "SELECT id FROM ordenes_pedidos WHERE id_muestreo='".$_GET["id_pedido"]."' AND estado!=4";
+                  $sql_op = "SELECT id, año FROM ordenes_pedidos WHERE id_muestreo='".$_GET["id_pedido"]."' AND estado!=4";
 
                   $req_op = $bdd->prepare($sql_op);
                   $req_op->execute();
@@ -175,7 +175,7 @@
                   $n_op = $req_op->fetch();
 
                   if ($op !=0) {
-                    echo "<h4>OP <a href='op_pendiente.php?op=".$n_op["id"]."' target='_blank'># ".$n_op["id"]."</a></h4>";
+                    echo "<h4>OP <a href='op_pendiente.php?op=".$n_op["id"]."' target='_blank'># ".$n_op["año"]." - ".$n_op["id"]."</a></h4>";
                   }
 
                 }else {

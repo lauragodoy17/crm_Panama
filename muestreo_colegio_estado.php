@@ -162,7 +162,7 @@
 
                   if (!isset($_GET["id_muestras_e"]) ) {
 
-                    $sql = "SELECT id FROM ordenes_pedidos WHERE id_muestreo='".$_GET["id_pedido"]."' AND estado!=4";
+                    $sql = "SELECT id, año FROM ordenes_pedidos WHERE id_muestreo='".$_GET["id_pedido"]."' AND estado!=4";
 
 
                         $req = $bdd->prepare($sql);
@@ -171,7 +171,7 @@
                         $n_op = $req->fetch();
 
                         if ($op !=0) {
-                          echo "<h4>OP <a href='op_pendiente.php?op=".$n_op["id"]."' target='_blank'># ".$n_op["id"]."</a></h4>";
+                          echo "<h4>OP <a href='op_pendiente.php?op=".$n_op["id"]."' target='_blank'># ".$n_op["año"]." - ".$n_op["id"]."</a></h4>";
                         }
                     
                   }
