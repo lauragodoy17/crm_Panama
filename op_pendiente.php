@@ -73,21 +73,21 @@
               <div class="col-md-6 col-sm-12">
                 <div class="title">
                   <?php if ($_GET['tp']!=2) { ?>
-                    <h4>Solicitar muestreo</h4>
+                    <h4>OP pendiente</h4>
                   <?php }else{ ?>
-                    <h4>Entregar muestras</h4>
+                    <h4>Op atendida</h4>
                   <?php } ?>
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
                   <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                      Muestreo
+                      OP
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                       <?php if ($_GET['tp']!=2) { ?>
-                        Solicitar
+                        Pendiente
                       <?php }else{ ?>
-                        Entregar
+                        Atendida
                       <?php } ?>
                     </li>
                   </ol>
