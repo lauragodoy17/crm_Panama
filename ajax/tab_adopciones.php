@@ -16,6 +16,11 @@
 ?>
 
 <div class="pd-20">
+	<style>
+		.table td {
+			padding: 5px !important;
+		}
+	</style>
 	<a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal_adopciones" type="button">Añadir libros</a><br><br>
 	<div class="modal fade bs-example-modal-xl" id="modal_adopciones" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -271,7 +276,7 @@
 		echo "<form action='php/guardar_definicion.php' class='miFormulario' method='POST' id='form_definicion' name='f2'>";
                               
             echo "<script src='../vendors/scripts/jquery-2.1.4.min.js'></script><div class='table-responsive'>
-                <table class='table table-bordered'>
+                <table class='table table-sm table-bordered table-striped'>
                 <thead>
                     <th>Título</th>
                     <th>Materia</th>
