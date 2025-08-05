@@ -680,7 +680,7 @@ $gp_periodo = $req_periodo->fetch();
 
 
 </div>
-
+<script src="../vendors/scripts/core.js"></script>
 <script>
 
 	 $('#grado').on('change',function(){
