@@ -1496,4 +1496,33 @@
 
         }
     })
+
+    var total_vp_d=0;
+
+     $('.venta1_d').each(function(){
+
+        total_vp_d+=parseFloat($(this).val()) || 0;
+        total_vp_d=Math.round(total_vp_d * 100) / 100;
+
+     });
+                                        
+    $('#total_vp_d').text(formatNumber.new(total_vp_d));
+
+    	total_uni_vr_d=0;
+
+      	$('.uni_vr_d').each(function(){
+
+        total_uni_vr_d+=parseFloat($(this).val()) || 0;
+
+        total_uni_vr_d=Math.round(total_uni_vr_d * 100) / 100;
+                                              
+
+    });
+
+    $('#total_vr').text(formatNumber.new(total_uni_vr_d));
+
+   	var cumplimiento=total_uni_vr_d / total_vp_d;
+
+    $('#cumplimiento').text(cumplimiento.toFixed(2));
+
 </script>
