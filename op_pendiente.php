@@ -392,9 +392,9 @@
                 <div class="col-sm-2 transp">
                   <!-- PAGE CONTENT BEGINS -->              
                   <div class="form-group">
-                    <label class="control-label no-padding-right" for="guia"> Guía<small style="color:red;"> *</small></label>
+                    <label class="control-label no-padding-right" for="guia"> Guía</label>
 
-                    <input required type="text" name="guia" id="guia" placeholder="Guía" class="form-control" />
+                    <input type="text" name="guia" id="guia" placeholder="Guía" class="form-control" />
                       
                   </div>
                 </div>
