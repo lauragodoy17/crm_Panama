@@ -134,7 +134,7 @@
                     $req_pedido->execute();
                     $pedido = $req_pedido->fetch();
 
-                    $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.cantidad_aprob FROM muestreos pe JOIN libros_muestreos lp ON lp.cod_muestreo=pe.codigo JOIN libros l ON l.id=lp.id_libro  WHERE pe.id='".$_GET["id_pedido"]."'  GROUP BY l.id";
+                    $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.cantidad_aprob FROM muestreos pe LEFT JOIN libros_muestreos lp ON lp.cod_muestreo=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro  WHERE pe.id='".$_GET["id_pedido"]."'  GROUP BY l.id";
                     $req = $bdd->prepare($sql);
                     $req->execute();
                                     
@@ -152,7 +152,7 @@
                     $req_pedido->execute();
                     $pedido = $req_pedido->fetch();
 
-                    $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.cantidad_aprob FROM muestreos_e pe JOIN libros_muestreos_e lp ON lp.cod_muestreo=pe.codigo JOIN libros l ON l.id=lp.id_libro  WHERE pe.id='".$_GET["id_muestras_e"]."'  GROUP BY l.id";
+                    $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.cantidad_aprob FROM muestreos_e pe LEFT JOIN libros_muestreos_e lp ON lp.cod_muestreo=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro  WHERE pe.id='".$_GET["id_muestras_e"]."'  GROUP BY l.id";
                     $req = $bdd->prepare($sql);
                     $req->execute();
 
