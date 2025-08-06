@@ -299,16 +299,19 @@ foreach ($colegios as$colegio) {
             
             if (!isset($cache_precio_venta[$key_precio])) {
                 $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento_d"]);
+                $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
+
+                
                       
             }
             
-            $precio_neto_d = $cache_precio_venta[$key_precio];
-            
+            $precio_neto_d = $cache_precio_venta[$key_precio]['precio_neto'];
+            $venta_ppto_d = $cache_precio_venta[$key_precio]['venta_ppto'];
+
+            $venta_real= $precio_neto_d * $colegio["uni_vr"];
         }
 
-        $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
-
-        $venta_real= $precio_neto_d * $colegio["uni_vr"];
+        
 
     }
    
@@ -384,7 +387,9 @@ foreach ($colegios as$colegio) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$venta_ppto_d");
     $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "$colegio[uni_vr]");
     if ($colegio["definido"] !=0) {
+        
         $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "$venta_real");
+        
     }else{
         $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "0");
     }
