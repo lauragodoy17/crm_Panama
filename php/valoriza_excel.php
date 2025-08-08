@@ -280,10 +280,17 @@ foreach ($colegios as$colegio) {
 
             if (!isset($cache_precio_venta[$key_precio])) {
                 $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
+                $venta_ppto_d = $precio_neto_d * $alumnos_tasa_d;
+
+                $cache_precio_venta[$key_precio] = [
+                    'precio_neto' => $precio_neto_d,
+                    'venta_ppto' => $venta_ppto_d
+                ];
                       
             }
 
-            $precio_neto_d = $cache_precio_venta[$key_precio];
+            $precio_neto_d = $cache_precio_venta[$key_precio]['precio_neto'];
+            $venta_ppto_d = $cache_precio_venta[$key_precio]['venta_ppto'];
             
            
         }else{
@@ -292,7 +299,7 @@ foreach ($colegios as$colegio) {
 
             if (!isset($cache_calculo_tasa[$key_calc])) {
                 $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra_d"]);
-                $cache_calculo_tasa[$key_calc] = $alumnos_tasa;
+                $cache_calculo_tasa[$key_calc] = $alumnos_tasa_d;
             }
             // Usar siempre el valor desde la caché
             $alumnos_tasa_d = $cache_calculo_tasa[$key_calc];
@@ -301,12 +308,16 @@ foreach ($colegios as$colegio) {
                 $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento_d"]);
                 $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
 
-                
+                $cache_precio_venta[$key_precio] = [
+                    'precio_neto' => $precio_neto_d,
+                    'venta_ppto' => $venta_ppto_d
+                ];
                       
             }
             
             $precio_neto_d = $cache_precio_venta[$key_precio]['precio_neto'];
-            $venta_ppto_d = $cache_precio_venta[$key_precio]['venta_ppto'];
+            //$venta_ppto_d = $cache_precio_venta[$key_precio]['venta_ppto'];
+            $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
 
             $venta_real= $precio_neto_d * $colegio["uni_vr"];
         }
