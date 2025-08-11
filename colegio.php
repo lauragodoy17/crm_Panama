@@ -187,6 +187,16 @@
                         >Atenciones a clientes</a
                       >
                     </li>
+                    <li class="nav-item atenc">
+                      <a
+                        class="nav-link"
+                        data-toggle="tab"
+                        href="#adjuntos"
+                        role="tab"
+                        aria-selected="false" data-url="ajax/tab_adjuntos.php"
+                        >Adjuntos</a
+                      >
+                    </li>
                   </ul>
                   <div class="tab-content">
                     <div
@@ -558,6 +568,8 @@
                     <div class="tab-pane" id="adopciones" role="tabpanel"></div>
 
                     <div class="tab-pane" id="atenciones" role="tabpanel"></div>
+
+                    <div class="tab-pane" id="adjuntos" role="tabpanel"></div>
 
                   </div>
                 </div>
