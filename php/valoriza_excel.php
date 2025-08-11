@@ -111,18 +111,20 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("I6", "Etiqueta");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J6", "Grado");
 $objSpreadsheet->getActiveSheet()->SetCellValue("K6", "Libro");
 $objSpreadsheet->getActiveSheet()->SetCellValue("L6", "Cantidades Presup.");
-$objSpreadsheet->getActiveSheet()->SetCellValue("M6", "Valor Presup.");
-$objSpreadsheet->getActiveSheet()->SetCellValue("N6", "Cantidades adopcones");
-$objSpreadsheet->getActiveSheet()->SetCellValue("O6", "Valor adopciones");
-$objSpreadsheet->getActiveSheet()->SetCellValue("P6", "Unidades venta Real");
-$objSpreadsheet->getActiveSheet()->SetCellValue("Q6", "Venta Real");
-$objSpreadsheet->getActiveSheet()->SetCellValue("R6", "Muestras entregadas");
-$objSpreadsheet->getActiveSheet()->SetCellValue("S6", "Valor atenciones entregadas");
-$objSpreadsheet->getActiveSheet()->SetCellValue("T6", "Total visitas ejecutadas");
-$objSpreadsheet->getActiveSheet()->SetCellValue("U6", "Status");
+$objSpreadsheet->getActiveSheet()->SetCellValue("M6", "Descuento Presup.");
+$objSpreadsheet->getActiveSheet()->SetCellValue("N6", "Valor Presup.");
+$objSpreadsheet->getActiveSheet()->SetCellValue("O6", "Cantidades adopcones");
+$objSpreadsheet->getActiveSheet()->SetCellValue("P6", "Descuento Adopción.");
+$objSpreadsheet->getActiveSheet()->SetCellValue("Q6", "Valor adopciones");
+$objSpreadsheet->getActiveSheet()->SetCellValue("R6", "Unidades venta Real");
+$objSpreadsheet->getActiveSheet()->SetCellValue("S6", "Venta Real");
+$objSpreadsheet->getActiveSheet()->SetCellValue("T6", "Muestras entregadas");
+$objSpreadsheet->getActiveSheet()->SetCellValue("U6", "Valor atenciones entregadas");
+$objSpreadsheet->getActiveSheet()->SetCellValue("V6", "Total visitas ejecutadas");
+$objSpreadsheet->getActiveSheet()->SetCellValue("W6", "Status");
 
 
-$objSpreadsheet->getActiveSheet()->getStyle('A6:U6')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A6:W6')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -169,8 +171,10 @@ $conta=7;
 $cache_alumnos = [];
 $cache_calculo_tasa = [];
 $cache_precio_venta = [];
-foreach ($colegios as$colegio) {
 
+foreach ($colegios as$colegio) {
+    $descuento_p=0;
+    $descuento_d=0;
 	   
 
     if ($colegio["id_grado"] != 17 && $colegio["cod_area"]=="") {
@@ -241,7 +245,7 @@ foreach ($colegios as$colegio) {
 
         // Creamos clave única para esta operación
         $key_precio = $colegio["precio"] . "_" . $colegio["descuento"] . "_" . $alumnos_tasa;
-
+        $descuento_p=$colegio["descuento"] * 100;
         if (!isset($cache_precio_venta[$key_precio])) {
             $precio_neto = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
             $venta_ppto = $precio_neto * $alumnos_tasa;
@@ -278,6 +282,7 @@ foreach ($colegios as$colegio) {
             
             $key_precio = $colegio["precio"] . "_" . $colegio["descuento"] . "_" . $alumnos_tasa;
 
+
             if (!isset($cache_precio_venta[$key_precio])) {
                 $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
                 $venta_ppto_d = $precio_neto_d * $alumnos_tasa_d;
@@ -288,6 +293,8 @@ foreach ($colegios as$colegio) {
                 ];
                       
             }
+
+             $descuento_d=$colegio["descuento"] * 100;
 
             $precio_neto_d = $cache_precio_venta[$key_precio]['precio_neto'];
             $venta_ppto_d = $cache_precio_venta[$key_precio]['venta_ppto'];
@@ -307,13 +314,14 @@ foreach ($colegios as$colegio) {
             if (!isset($cache_precio_venta[$key_precio])) {
                 $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento_d"]);
                 $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
-
                 $cache_precio_venta[$key_precio] = [
                     'precio_neto' => $precio_neto_d,
                     'venta_ppto' => $venta_ppto_d
                 ];
                       
             }
+            
+            $descuento_d=$colegio["descuento_d"] * 100;
             
             $precio_neto_d = $cache_precio_venta[$key_precio]['precio_neto'];
             //$venta_ppto_d = $cache_precio_venta[$key_precio]['venta_ppto'];
@@ -392,34 +400,36 @@ foreach ($colegios as$colegio) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$colegio[libro]");
     if ($colegio["pre_definido"] ==1) {
     	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$alumnos_tasa");
-    	$objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$venta_ppto");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$descuento_p");
+    	$objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$venta_ppto");
     }
-	$objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$alumnos_tasa_d");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$venta_ppto_d");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "$colegio[uni_vr]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$alumnos_tasa_d");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "$descuento_d");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "$venta_ppto_d");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "$colegio[uni_vr]");
     if ($colegio["definido"] !=0) {
         
-        $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "$venta_real");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "$venta_real");
         
     }else{
-        $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "0");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "0");
     }
 
-    $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "$muestras[cant]");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "$total[total]");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", "$ejecutadas[ejecu]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", "$muestras[cant]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("U$conta", "$total[total]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("V$conta", "$ejecutadas[ejecu]");
 
     if (!empty($status)) {
         
-        $objSpreadsheet->getActiveSheet()->SetCellValue("U$conta", "$status[status]");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("W$conta", "$status[status]");
 
     }elseif(!empty($status2)){
 
-        $objSpreadsheet->getActiveSheet()->SetCellValue("U$conta", "$status2[status]");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("W$conta", "$status2[status]");
 
     }else{
 
-        $objSpreadsheet->getActiveSheet()->SetCellValue("U$conta", "Por definir");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("W$conta", "Por definir");
     }
 
 	$conta++;
@@ -428,13 +438,7 @@ foreach ($colegios as$colegio) {
 }	
 
 
-$objSpreadsheet->getActiveSheet()->getStyle("M7:M$conta")
-          ->getNumberFormat()
-          ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
-        );
-
-    $objSpreadsheet->getActiveSheet()->getStyle("O7:O$conta")
+$objSpreadsheet->getActiveSheet()->getStyle("N7:N$conta")
           ->getNumberFormat()
           ->setFormatCode(
           '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
@@ -447,6 +451,12 @@ $objSpreadsheet->getActiveSheet()->getStyle("M7:M$conta")
         );
 
     $objSpreadsheet->getActiveSheet()->getStyle("S7:S$conta")
+          ->getNumberFormat()
+          ->setFormatCode(
+          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+        );
+
+    $objSpreadsheet->getActiveSheet()->getStyle("U7:U$conta")
           ->getNumberFormat()
           ->setFormatCode(
           '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
