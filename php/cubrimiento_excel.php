@@ -104,16 +104,17 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("M4", "Alumnos primaria");
 $objSpreadsheet->getActiveSheet()->SetCellValue("N4", "Alumnos bachillerato");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O4", "Alumnos global");
 $objSpreadsheet->getActiveSheet()->SetCellValue("P4", "Status");
-$objSpreadsheet->getActiveSheet()->SetCellValue("Q4", "Segmento");
-$objSpreadsheet->getActiveSheet()->SetCellValue("R4", "Estado del cliente");
-$objSpreadsheet->getActiveSheet()->SetCellValue("S4", "Fecha de ultimo contacto");
-$objSpreadsheet->getActiveSheet()->getStyle("A1:S1")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->SetCellValue("Q4", "Prpuesta comercial");
+$objSpreadsheet->getActiveSheet()->SetCellValue("R4", "Segmento");
+$objSpreadsheet->getActiveSheet()->SetCellValue("S4", "Estado del cliente");
+$objSpreadsheet->getActiveSheet()->SetCellValue("T4", "Fecha de ultimo contacto");
+$objSpreadsheet->getActiveSheet()->getStyle("A1:T1")->getFont()->getColor()->applyFromArray(
   array(
   'rgb' => '#251919'
   )
 );
 
-$objSpreadsheet->getActiveSheet()->getStyle('A4:S4')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A4:T4')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -209,7 +210,12 @@ foreach($coles as $cole) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$cole[promotor]");
   }
 
-  
+  $sql = "SELECT id FROM adjuntos WHERE id_colegio='".$cole["id"]."' AND id_periodo='".$_POST["periodo"]."' AND tipo=1";
+
+  $req = $bdd->prepare($sql);
+  $req->execute();
+  $count_p = $req->rowCount();
+
   $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$cole[departamento]");
   $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$cole[ciudad]");
   $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$cole[barrio]");
@@ -222,10 +228,17 @@ foreach($coles as $cole) {
   $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$gp_bach[alumnos]");
   $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$alumnos_global");
   $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "$cole[status]");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "$cole[segmento]");
+
+  if ($count_p < 1) {
+    $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "No");
+  }else{
+    $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "Si");
+  }
+
+  $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "$cole[segmento]");
 
   if ($_POST["periodo"] < 7) {
-    $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "");
   }else{
     $sql_est = "SELECT e.estado FROM estados_cliente e JOIN colegios_estados_clientes ce ON e.id=ce.id_estado_cliente WHERE ce.id_colegio='".$cole["id"]."' AND ce.id_periodo='".$_POST["periodo"]."'";
     $req_est = $bdd->prepare($sql_est);
@@ -233,18 +246,18 @@ foreach($coles as $cole) {
     $est = $req_est->fetch();
 
     if (empty($est["estado"])) {
-      $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "");
     }else{
-      $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "$est[estado]");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "$est[estado]");
     }
     
   }
   
 
   if (empty($uc["ultimo_contacto"])) {
-    $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", "");
   }else{
-    $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "$uc[ultimo_contacto]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", "$uc[ultimo_contacto]");
   }
 
 

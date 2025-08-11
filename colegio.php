@@ -195,7 +195,7 @@
                       role="tabpanel"
                     >
                       <div class="pd-20">
-                        <form action="php/actualizar_colegio.php" method="POST">
+                        <form action="php/actualizar_colegio.php" method="POST" enctype="multipart/form-data">
                           <div class="row">
                             <?php if ($promotor['tipo']==3 || $promotor['tipo']==1) {
 
@@ -488,6 +488,57 @@
                               </div>
                             <?php } ?>
                           </div>
+
+                          <div class="row">
+                            <div class="col-sm-4">
+                              <div class="form-group">
+                                <label for="">Propuesta comercial</label>
+                                <select name="propuesta_c" id="propuesta_c" class="form-control">
+                                  <?php
+
+                                    $sql = "SELECT adjunto FROM adjuntos WHERE id_colegio='".$colegio["id"]."' AND id_periodo='".$_GET['periodo']."' AND tipo=1";
+
+                                    $req = $bdd->prepare($sql);
+                                    $req->execute();
+                                    $count_p = $req->rowCount();
+                                    
+                                    if ($count_p > 0) {
+                                      echo '<option value="0">No</option>
+                                      <option value="1" SELECTED>Si</option>';
+                                    }ELSE{
+                                      echo '<option value="0">No</option>
+                                      <option value="1">Si</option>';
+                                    }
+                                  ?>
+                                  
+                                </select>
+                              </div>
+                            </div>
+                            <?php if ($count_p > 0) {
+                              $propuesta = $req->fetch();
+                              list($antes,$archivo)=explode("_", $propuesta["adjunto"]);
+                              echo '<div class="col-sm-4">
+                                <label>Adjunto propuesta comercial</>
+                                <a href="adjuntos/'.$propuesta["adjunto"].'" download="'.$archivo.'">'.$archivo.'</a>
+                              </div>';
+
+                            ?>
+
+                              
+                              
+                            <?php }else { ?>
+                              <div class="col-sm-4 d-none" id="adjunto_propuesta_c">
+                  
+                                <div class="form-group">
+                                  <label class="control-label no-padding-right" for="archivo"> Adjunto propuesta comercial <small style="color:red;"> *</small></label>
+
+                                  <input type="file" name="archivo" id="i_pc" placeholder="Adjunto" class="form-control" />
+                                    
+                                </div>
+                              </div>
+                            <?php } ?>
+
+                          </div>
                           <input type="hidden" name="id_colegio" value='<?php echo $colegio["id"] ?>'>
                           <input type="hidden" name="periodo" value="<?php echo $_GET['periodo'] ?>">
                           <input type="hidden" name="cod_colegio" value="<?php echo $colegio['codigo'] ?>">
@@ -591,6 +642,24 @@
            $('.nav-link[href="#' + tab + '"]').tab('show');
            
         }
+
+
+        $('#propuesta_c').on('change',function(){
+            var valor = $(this).val();
+
+            if (valor==1) {
+              $("#adjunto_propuesta_c").removeClass("d-none");
+              $("#i_pc").attr("required","required");
+               
+                       
+            }else {
+              $("#adjunto_propuesta_c").addClass("d-none");
+              $("#i_pc").removeAttr("required","required");
+            }
+                
+        });
+
+
 
       });
     </script>

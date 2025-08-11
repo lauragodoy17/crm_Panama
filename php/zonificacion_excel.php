@@ -98,13 +98,14 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Barrio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H4", "Dirección");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I4", "Telefono");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J4", "Status");
-$objSpreadsheet->getActiveSheet()->getStyle("A1:J1")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->SetCellValue("K4", "Propuesta comercial");
+$objSpreadsheet->getActiveSheet()->getStyle("A1:K1")->getFont()->getColor()->applyFromArray(
 	array(
 	'rgb' => '#251919'
 	)
 );
 
-$objSpreadsheet->getActiveSheet()->getStyle('A4:J4')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A4:K4')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -184,12 +185,24 @@ foreach($coles as $cole) {
   $req_dep->execute();
   $dep = $req_dep->fetch();
 
+   $sql = "SELECT id FROM adjuntos WHERE id_colegio='".$cole["id"]."' AND id_periodo='".$_POST["periodo"]."' AND tipo=1";
+
+   $req = $bdd->prepare($sql);
+   $req->execute();
+   $count_p = $req->rowCount();
+
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$dep[departamento]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$cole[ciudad]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$cole[barrio]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$cole[direccion]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$cole[telefono]");		
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$cole[status]");
+
+	if ($count_p < 1) {
+		$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "No");
+	}else{
+		$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "Si");
+	}
 
 
 
