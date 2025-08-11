@@ -20,7 +20,7 @@
 		$sql = "UPDATE muestreos SET estado='4' WHERE id='".$_GET["entregado"]."'";
 		$req = $bdd->prepare($sql);
 		$req->execute();
-		header("location: /..muestreo_aprobados.php");
+		header("location: ../muestreo_aprobados.php");
 	}
 
 	
