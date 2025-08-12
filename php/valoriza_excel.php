@@ -202,12 +202,13 @@ foreach ($colegios as$colegio) {
 
     }else{
 
-       
+        
         $sql_go = "SELECT id_grado_otro FROM areas_objetivas WHERE id_colegio='".$colegio['id']."' AND id_libro_eureka='".$colegio["idlibro"]."' AND id_periodo='".$_POST['periodo']."' AND codigo='".$colegio["cod_area"]."'";
             
         $req_go = $bdd->prepare($sql_go);
         $req_go->execute();
         $grado_o = $req_go->fetch();
+       
         $key = $colegio["id"] . "_" . $grado_o["id_grado_otro"] . "_" . $_POST['periodo'];
 
         if (!isset($cache_alumnos[$key])) {
@@ -366,7 +367,7 @@ foreach ($colegios as$colegio) {
     }
 
     if ($colegio["tipouser"]!=6) {
-        list($empresa,$n_zona) = explode("/", $colegio["zona"]);
+        list($empresa, $n_zona) = array_pad(explode("/", $colegio["zona"] ?? ''), 2, '');
         $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$empresa");
         $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$colegio[promotor]");
         $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$n_zona");
