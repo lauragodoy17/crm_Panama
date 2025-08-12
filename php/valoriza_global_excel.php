@@ -228,7 +228,7 @@ foreach ($colegios as $colegio) {
        
         }
 
-        if ($v_real["venta_real"] < 1) {
+        if (!is_array($v_real) || !isset($v_real['venta_real']) || $v_real['venta_real'] < 1) {
 
             $venta_real[$colegio["id"]][]= $precio_neto_d * $adopcion["uni_vr"];
         }else{
@@ -292,7 +292,7 @@ foreach ($colegios as $colegio) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "".$t_castigo[$colegio["id"]]."");
     $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "".$t_valor_adopcion[$colegio["id"]]."");
 
-    if ($v_real["venta_real"] > 0) {
+    if (is_array($v_real) && isset($v_real['venta_real']) && $v_real['venta_real'] > 0) {
         $t_venta_real= $v_real["venta_real"];
         $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real");
     }else{
