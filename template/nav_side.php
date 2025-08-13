@@ -358,6 +358,41 @@
 							</li>
 
 						<?php } ?>
+
+						<?php if ($_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=5) {?>
+
+							<li class="dropdown" id="zonificacion">
+								<a href="javascript:;" class="dropdown-toggle" >
+									<span class="micon bi bi-book"></span
+									><span class="mtext">Pedidos</span>
+								</a>
+								<ul class="submenu">
+									<?php if ($_SESSION["tipo"]==3 || $_SESSION["tipo"]==6) {?>
+										<li>
+											<a href="#"  data-toggle="modal" data-target="#modal_pedidos">Solicitar pedido</a>
+										</li>
+										<li>
+											<a href="ver_pedidos.php" >Ver pedidos</a>
+										</li>
+									<?php }else { ?>
+										<li>
+											<a href="#"  data-toggle="modal" data-target="#modal_pedidos">Solicitar</a>
+										</li>
+										<li>
+											<a href="lista_pedidos.php?tp=2" >Pendientes</a>
+											<a href="lista_pedidos.php?tp=3" >Aprobados</a>
+											<a href="lista_pedidos.php?tp=4" >Entregados</a>
+											<a href="lista_pedidos.php?tp=5" >Anulados</a>
+										</li>
+									<?php } ?>
+									
+									
+						
+								</ul>
+							</li>
+
+						<?php } ?>
+
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==3 || $_SESSION["tipo"] ==10) {?>
 						<li>
 							<a href="colegios_presup.php" class="dropdown-toggle no-arrow" id="plan_trabajo">
