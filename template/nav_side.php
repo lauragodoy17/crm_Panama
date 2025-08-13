@@ -361,7 +361,7 @@
 
 						<?php if ($_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=5) {?>
 
-							<li class="dropdown" id="zonificacion">
+							<li class="dropdown" id="pedidos">
 								<a href="javascript:;" class="dropdown-toggle" >
 									<span class="micon bi bi-book"></span
 									><span class="mtext">Pedidos</span>
@@ -383,6 +383,40 @@
 											<a href="lista_pedidos.php?tp=3" >Aprobados</a>
 											<a href="lista_pedidos.php?tp=4" >Entregados</a>
 											<a href="lista_pedidos.php?tp=5" >Anulados</a>
+										</li>
+									<?php } ?>
+									
+									
+						
+								</ul>
+							</li>
+
+						<?php } ?>
+
+						<?php if ($_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
+
+							<li class="dropdown" id="pedidos">
+								<a href="javascript:;" class="dropdown-toggle" >
+									<span class="micon bi bi-book"></span
+									><span class="mtext">Pedidos sin adop.</span>
+								</a>
+								<ul class="submenu">
+									<?php if ($_SESSION["tipo"] ==6 || $_SESSION["tipo"] ==4 || $_SESSION["tipo"] ==3) { ?>
+										<li>
+											<a href="solicitar_pedido_sa.php">Solicitar pedido</a>
+										</li>
+										<li>
+											<a href="ver_pedidos_sa.php" >Ver pedidos</a>
+										</li>
+									<?php }else { ?>
+										<li>
+											<a href="solicitar_pedido_sa.php">Solicitar</a>
+										</li>
+										<li>
+											<a href="lista_pedidos_sa.php?tp=2" >Pendientes</a>
+											<a href="lista_pedidos_sa.php?tp=3" >Aprobados</a>
+											<a href="lista_pedidos_sa.php?tp=4" >Entregados</a>
+											<a href="lista_pedidos_sa.php?tp=5" >Anulados</a>
 										</li>
 									<?php } ?>
 									
