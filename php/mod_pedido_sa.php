@@ -137,7 +137,7 @@
       $req_l2->execute();
       $promo = $req_l2->fetch();
 
-      $mail->Body    = '<p style="font-size: 17px;">El usuario: '.$promo["promotor"].' hizo la solicitud de pedido sin adopción #'.$pedido["id"].' para: '.$_POST["colegio"].'. Haz clic <a href="https://somoseureka.com.co/promotores/pedido_colegio2.php?id_pedido_dist='.$pedido['id'].' ">aquí</a> para revisarlo<p>';
+      $mail->Body    = '<p style="font-size: 17px;">El usuario: '.$promo["promotor"].' hizo la solicitud de pedido sin adopción #'.$pedido["id"].' para: '.$_POST["colegio"].'. Haz clic <a href="https://crm.somoseureka.com.co/pedido_colegio_sa.php?id_pedido_dist='.$pedido['id'].'&tp=2">aquí</a> para revisarlo<p>';
 
       $mail->AltBody = 'probandosss';
 

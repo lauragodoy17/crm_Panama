@@ -126,7 +126,7 @@
 
 		
 
-		$mail->Body    = '<p style="font-size: 17px;">'.$promo["promotor"].' hizo la solicitud de pedido #'.$pedido["id"].' para: '.$cole["colegio"].'. Haz clic <a href="https://crm.somoseureka.com.co/pedido_colegio.php?id_pedido='.$pedido['id'].' ">aquí</a> para revisarlo<p>';
+		$mail->Body    = '<p style="font-size: 17px;">'.$promo["promotor"].' hizo la solicitud de pedido #'.$pedido["id"].' para: '.$cole["colegio"].'. Haz clic <a href="https://crm.somoseureka.com.co/pedido_colegio.php?id_pedido='.$pedido['id'].'&tp=2">aquí</a> para revisarlo<p>';
 
 		$mail->AltBody = 'probandosss';
 
