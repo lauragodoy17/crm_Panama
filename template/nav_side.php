@@ -391,6 +391,51 @@
 								</ul>
 							</li>
 
+							<li class="dropdown">
+								<a href="javascript:;" class="dropdown-toggle" >
+									<span class="micon bi bi-building"></span
+									><span class="mtext">Devoluciones</span>
+								</a>
+								<ul class="submenu">
+									
+									<li>
+										<a href="devol_muestras_sa.php?tp=1">Devolución de muestras</a>
+									</li>
+
+									<li>
+										<a href="#"  data-toggle="modal" data-target="#modal_devols">Devolución de ventas</a>
+									</li>
+
+									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2 || $_SESSION["id"] ==2) { ?>
+
+										<li>
+											<a href="devol_muestras_sa.php?tp=3">Devol. de ventas sin adopciones</a>
+										</li>
+									<?php } ?>
+
+									<li>
+										<a href="ver_devol_muestras.php">Ver Devol. de muestras</a>
+									</li>
+
+									<li>
+										<a href="ver_devol_ventas.php">Ver Devol. de ventas</a>
+									</li>
+
+									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2) { ?>
+
+										<li>
+											<a href="devol_muestras_sa.php?tp=2">Devoluciones de proveedores</a>
+										</li>
+
+										<li>
+											<a href="ver_devol_proveedores.php">Ver devol. proveedores</a>
+										</li>
+
+									<?php } ?>
+									
+								</ul>
+							</li>
+
 						<?php } ?>
 
 						<?php if ($_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
