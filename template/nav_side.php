@@ -393,7 +393,7 @@
 
 							<li class="dropdown">
 								<a href="javascript:;" class="dropdown-toggle" >
-									<span class="micon bi bi-building"></span
+									<span class="micon bi bi-arrow-bar-left"></span
 									><span class="mtext">Devoluciones</span>
 								</a>
 								<ul class="submenu">
@@ -563,6 +563,7 @@
 										<li><a href="php/opaten_excel.php">OP'S atendidas</a></li>
 										<li><a href="php/opanu_excel.php">OP'S anuladas</a></li>
 										<li><a href="reporte_pedidos.php">Pedidos</a></li>
+										<li><a href="reporte_devoluciones.php">Devoluciones</a></li>
 
 									<?php } ?>
 
