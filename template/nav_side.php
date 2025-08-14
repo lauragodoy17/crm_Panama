@@ -363,7 +363,7 @@
 
 							<li class="dropdown" id="pedidos">
 								<a href="javascript:;" class="dropdown-toggle" >
-									<span class="micon bi bi-book"></span
+									<span class="micon bi bi-truck"></span
 									><span class="mtext">Pedidos</span>
 								</a>
 								<ul class="submenu">
@@ -397,7 +397,7 @@
 
 							<li class="dropdown" id="pedidos">
 								<a href="javascript:;" class="dropdown-toggle" >
-									<span class="micon bi bi-book"></span
+									<span class="micon bi bi-truck-flatbed"></span
 									><span class="mtext">Pedidos sin adop.</span>
 								</a>
 								<ul class="submenu">
@@ -455,7 +455,7 @@
 						<?php if ($_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=6 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
 							<li class="dropdown">
 								<a href="javascript:;" class="dropdown-toggle">
-									<span class="micon bi bi-truck"></span
+									<span class="micon bi bi-receipt"></span
 									><span class="mtext">OP'S</span>
 								</a>
 								<ul class="submenu">
