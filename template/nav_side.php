@@ -517,6 +517,8 @@
 										<li><a href="php/oppend_excel.php">OP'S pendientes</a></li>
 										<li><a href="php/opaten_excel.php">OP'S atendidas</a></li>
 										<li><a href="php/opanu_excel.php">OP'S anuladas</a></li>
+										<li><a href="reporte_pedidos.php">Pedidos</a></li>
+
 									<?php } ?>
 
 								</ul>
