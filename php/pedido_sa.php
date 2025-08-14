@@ -148,7 +148,7 @@
 	$promo = $req_l2->fetch();
 
 	
-	$mail = new PHPMailer(true);
+	/*$mail = new PHPMailer(true);
 
 	try {
 
@@ -180,11 +180,11 @@
 		$req->execute();
 		$pedido = $req->fetch();
 		                                  // Set email format to HTML
-		$mail->Subject = 'Solicitud de pedido sin adopcion #'.$pedido["id"].'';
+		$mail->Subject = 'Solicitud de pedido sin adopción #'.$pedido["id"].'';
 
 		
 
-		$mail->Body    = '<p style="font-size: 17px;">El usuario: '.$promo["promotor"].' hizo la solicitud de pedido #'.$pedido["id"].' para: '.$_POST["colegio"].'. Haz clic <a href="https://crm.somoseureka.com.co/pedido_colegio_sa.php?id_pedido_dist='.$pedido['id'].' ">aquí</a> para revisarlo<p>';
+		$mail->Body    = '<p style="font-size: 17px;">El usuario: '.$promo["promotor"].' hizo la solicitud de pedido sin adopción #'.$pedido["id"].' para: '.$_POST["colegio"].'. Haz clic <a href="https://crm.somoseureka.com.co/pedido_colegio_sa.php?id_pedido_dist='.$pedido['id'].' ">aquí</a> para revisarlo<p>';
 
 		$mail->AltBody = 'probandosss';
 
@@ -195,7 +195,7 @@
 	} catch (Exception $e) {
 
 		echo "An error has occurred please try again: {$mail->ErrorInfo}";
-	}
+	}*/
 
 
 	header("Location: ../pedido_colegio_sa.php?id_pedido=".$pedido["id"]."");
