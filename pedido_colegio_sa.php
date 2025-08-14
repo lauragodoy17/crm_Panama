@@ -232,8 +232,8 @@
                       <th>Cant.</th>
                       <th>Valor Venta</th>
                       <?php if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21) { ?>
-                        <th class="hidden-print">Desc. Aprobado</th>
-                        <th class="hidden-print">Cant. Aprobada</th>
+                        <th class="d-print-none">Desc. Aprobado</th>
+                        <th class="d-print-none">Cant. Aprobada</th>
                       <?php } ?>
                     </tr>
                   </thead>
@@ -255,7 +255,7 @@
                           echo'<td class="center">';
                           if (($_SESSION["tipo"] ==1 || $_SESSION["id"]==21) || $pedido["verify"]==0 ) {
 
-                             echo'<button type="button" class="btn btn-danger btn-xs hidden-print" id="e'.$libro["lpid"].'"><i class="fa fa-trash"></i></button> ';
+                             echo'<button type="button" class="btn btn-danger btn-xs d-print-none" id="e'.$libro["lpid"].'"><i class="fa fa-trash"></i></button> ';
                           }
                                                 
                           echo $i.'</td>';
@@ -290,8 +290,8 @@
                           echo'<td class="center">'.$libro["cantidad"].'</td>';
                           echo'<td class="center">$ '.number_format($v_venta,0,",", ".").'</td>';
                           if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21) {
-                            echo'<td class="center hidden-print"><input type="number" id="d'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["descuento_aprob"].'" class="form-control dc" size="4"></td>';
-                            echo'<td class="center hidden-print"><input type="number" id="c'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["cantidad_aprob"].'" class="form-control dc" size="4"></td>';
+                            echo'<td class="center d-print-none"><input type="number" id="d'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["descuento_aprob"].'" class="form-control dc" size="4"></td>';
+                            echo'<td class="center d-print-none"><input type="number" id="c'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["cantidad_aprob"].'" class="form-control dc" size="4"></td>';
                           }
                           echo '<input type="hidden" name="lpid[]" value="'.$libro["lpid"].'">';
                           echo '<input type="hidden" name="lib_p[]" id="l'.$libro["lpid"].'" >';
@@ -399,17 +399,17 @@
 
               <center>
                  <label for="observaciones">Observaciones:</label><br>
-                 <textarea name="observaciones" id="observaciones" cols="100" rows="9"><?php echo $pedido["observaciones"] ?></textarea><br><br>
+                 <textarea name="observaciones" id="observaciones" cols="100" rows="9" class="form-control"><?php echo $pedido["observaciones"] ?></textarea><br><br>
                   <br><br>
                 <?php if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21 ) {
                     if ($pedido["estado"] ==1) {
-                        echo '<button type="button" type="button" class="btn btn-success hidden-print" id="aprobar">Aprobar</button> <button type="button" class="btn btn-danger hidden-print" id="rechazar">Rechazar</button>';
+                        echo '<button type="button" type="button" class="btn btn-success d-print-none" id="aprobar">Aprobar</button> <button type="button" class="btn btn-danger d-print-none" id="rechazar">Rechazar</button>';
                     }elseif ($pedido["estado"]==2) {
                       if ($op ==0 && $op_agp ==0) {
-                        echo '<a href="solicitar_op.php?id_pedido_dist='.$_GET["id_pedido"].'" target="_blank" class="btn btn-warning hidden-print">Solicitar OP</a> ';
+                        echo '<a href="solicitar_op.php?id_pedido_dist='.$_GET["id_pedido"].'" target="_blank" class="btn btn-warning d-print-none">Solicitar OP</a> ';
                       }
 
-                      echo '<button type="button" class="btn btn-danger hidden-print" id="rechazar">Rechazar</button> <button type="button" class="btn btn-primary hidden-print modificar">Modificar</button> <button class="btn btn-success hidden-print" id="entregar" type="button">Entregar</button>';
+                      echo '<button type="button" class="btn btn-danger d-print-none" id="rechazar">Rechazar</button> <button type="button" class="btn btn-primary d-print-none modificar">Modificar</button> <button class="btn btn-success d-print-none" id="entregar" type="button">Entregar</button>';
 
                     }
                 ?>
@@ -417,9 +417,9 @@
                 <?php } ?>              
 
                 <?php if ($pedido["verify"]==0 ) { ?>
-                  <button type="button" class="btn btn-success hidden-print modificar">Confirmar</button>
+                  <button type="button" class="btn btn-success d-print-none modificar">Confirmar</button>
                 <?php } ?>
-                <button type="button" id="imprimir" class="btn btn-info hidden-print">Imprimir</button>
+                <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button>
               </form>
 
                

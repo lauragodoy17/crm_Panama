@@ -86,7 +86,7 @@
           -webkit-appearance: none; 
           margin: 0; 
       }
-      .form-control {
+      input[type=number].form-control {
         width: 50px !important;
       }
 
@@ -249,7 +249,7 @@
                         <th>Isbn</th>
                         <th>Título</th>
                         <th>Ubicación</th>
-                        <th class="hidden-print">Materia</th>
+                        <th class="d-print-none">Materia</th>
                         <th>Grado</th>
                         <th>PVP</th>
                         <th>Desc.</th>
@@ -259,8 +259,8 @@
                         <?php if ($pedido["tipo"]==3 || $pedido["codzona"]=='5656') { ?>
                           <th>Plataforma</th>
                         <?php } ?>
-                          <th class="hidden-print">Desc. Aprobado</th>
-                          <th class="hidden-print">Cant. Aprobada</th>
+                          <th class="d-print-none">Desc. Aprobado</th>
+                          <th class="d-print-none">Cant. Aprobada</th>
                       </tr>
                       </thead>
                         <tbody>
@@ -301,7 +301,7 @@
                         echo'<td class="">'.$libro["isbn"].'</td>';
                         echo'<td class="">'.$libro["libro"].'</td>';
                         echo'<td class="">'.$ubi.'</td>';
-                        echo'<td class="center hidden-print">'.$libro["materia"].'</td>';
+                        echo'<td class="center d-print-none">'.$libro["materia"].'</td>';
                         if ($libro["cod_area"] == "") {
 
                           $sql_g = "SELECT grado FROM grados WHERE id='".$libro["id_grado"]."'";
@@ -342,8 +342,8 @@
                                                 
                         }
 
-                        echo'<td class="center hidden-print"><input type="number" id="d'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["descuento_aprob"].'" class="form-control" size="5"></td>';
-                        echo'<td class="center hidden-print"><input type="number" id="c'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["cantidad_aprob"].'" class="form-control" size="5"></td>';
+                        echo'<td class="center d-print-none"><input type="number" id="d'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["descuento_aprob"].'" class="form-control" size="5"></td>';
+                        echo'<td class="center d-print-none"><input type="number" id="c'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["cantidad_aprob"].'" class="form-control" size="5"></td>';
                         echo '<input type="hidden" name="lib_p[]" id="l'.$libro["lpid"].'" >';
                                                
                         echo "<script>
@@ -373,7 +373,7 @@
                   </tbody>
                                    
                     <td class="center"></td>
-                    <td class="center hidden-print"></td>
+                    <td class="center d-print-none"></td>
                     <td class="center"></td>
                     <td class="center"></td>
                     <td class="center"></td>
@@ -390,23 +390,23 @@
 
               <br><center>
                   <label for="observaciones">Observaciones:</label><br>
-                 <textarea name="observaciones" id="observaciones" cols="100" rows="9"><?php echo $pedido["observaciones"] ?></textarea><br><br>
+                 <textarea name="observaciones" id="observaciones" cols="100" rows="9" class="form-control"><?php echo $pedido["observaciones"] ?></textarea><br><br>
                  <label for="">Direción de entrega:</label>
                 <?php echo $pedido["dir_ent"]; ?><br><br>
                  <h3><?php echo $pedido["estado"]; ?></h3><br>
                  <input type="hidden" name="pedido" value="<?php echo $_GET["id_pedido"] ?>">
                  </form>
-                 <button type="button" id="imprimir" class="btn btn-info hidden-print">Imprimir</button>
+                 <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button>
                  <?php if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21 || $_SESSION["tipo"]==10 ) {
 
                     if ($pedido["eid"]==1) {
-                      echo '<button class="btn btn-success hidden-print" id="aprobar">Aprobar</button> <button class="btn btn-danger hidden-print" id="rechazar">Rechazar</button>';
+                      echo '<button class="btn btn-success d-print-none" id="aprobar">Aprobar</button> <button class="btn btn-danger d-print-none" id="rechazar">Rechazar</button>';
                     }elseif ($pedido["eid"]==2) {
                       if ($op ==0 && $op_agp ==0) {
-                        echo '<a href="solicitar_op.php?id_pedido='.$_GET["id_pedido"].'" target="_blank" class="btn btn-warning hidden-print">Solicitar OP</a> ';
+                        echo '<a href="solicitar_op.php?id_pedido='.$_GET["id_pedido"].'" target="_blank" class="btn btn-warning d-print-none">Solicitar OP</a> ';
                       }
 
-                      echo '<button class="btn btn-danger hidden-print" id="rechazar">Anular</button> <button class="btn btn-success hidden-print" id="entregar" type="button">Entregar</button> <button type="button" class="btn btn-primary hidden-print" id="modificar">Modificar</button>';
+                      echo '<button class="btn btn-danger d-print-none" id="rechazar">Anular</button> <button class="btn btn-success d-print-none" id="entregar" type="button">Entregar</button> <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>';
                     }
 
                   ?>
