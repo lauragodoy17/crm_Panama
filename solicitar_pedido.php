@@ -63,6 +63,10 @@
           -webkit-appearance: none; 
           margin: 0; 
       }
+
+      input[type=number].form-control {
+        width: 50px !important;
+      }
     </style>
   </head>
   <body>
@@ -252,11 +256,11 @@
                             }
                                                 
                             if ($libro["cod_area"] !="") {
-                              echo'<td class="center"><input type="number" id="cantidad'.$libro["cod_area"].'" value="0" required size="2"></td>';
+                              echo'<td class="center"><input type="number" id="cantidad'.$libro["cod_area"].'" class="form-control" value="0" required></td>';
 
                               echo'<input type="hidden" name="libro[]" id="libro'.$libro["cod_area"].'">';
                             }else{
-                              echo'<td class="center"><input type="number" id="cantidad'.$libro["id"].'" value="0" required size="2"></td>';
+                              echo'<td class="center"><input type="number" id="cantidad'.$libro["id"].'" class="form-control" value="0" required></td>';
                               echo'<input type="hidden" name="libro[]" id="libro'.$libro["id"].'">';
                             }
                                                   
@@ -399,7 +403,7 @@
                       </div>
                 
                      <br><label for="observaciones">Observaciones:</label><br>
-                     <textarea name="observaciones" id="observaciones" cols="70" rows="8"></textarea><br><br>
+                     <textarea name="observaciones" id="observaciones" cols="70" rows="8" class="form-control"></textarea><br><br>
                       <button class="btn btn-success" id="solicitar">Solicitar</button></center>
                     </div>
                 
