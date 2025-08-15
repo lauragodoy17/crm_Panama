@@ -227,7 +227,7 @@
                                 <th>Isbn</th>
                                 <th>Título</th>
                                 <th>Ubicación</th>
-                                <th class="hidden-print">Materia</th>
+                                <th class="d-print-none">Materia</th>
                                 <th>Grado</th>
                                 <th>PVP</th>
                                 <th>Desc.</th>
@@ -272,7 +272,7 @@
                                     echo'<td class="">'.$libro["isbn"].'</td>';
                                     echo'<td class="">'.$libro["libro"].'</td>';
                                     echo'<td class="">'.$ubi.'</td>';
-                                    echo'<td class="center hidden-print">'.$libro["materia"].'</td>';
+                                    echo'<td class="center d-print-none">'.$libro["materia"].'</td>';
                                     if ($libro["cod_area"] == "") {
 
                                       $sql_g = "SELECT grado FROM grados WHERE id='".$libro["id_grado"]."'";
@@ -310,7 +310,7 @@
                                 </tbody>
                                    
                                 <td class="center"></td>
-                                <td class="center hidden-print"></td>
+                                <td class="center d-print-none"></td>
                                 <td class="center"></td>
                                 <td class="center"></td>
                                 <td class="center"></td>
@@ -342,14 +342,14 @@
                   if ($pedido["eid"]==1 && $n_op["estado"]!=2) {
                      if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==22) {
                       echo '<h3>'.$pedido["estado"].'</h3><br>';
-                      echo'<button class="btn btn-danger hidden-print" id="rechazar" type="button">Anular</button> <br><br>';
-                      echo '<button class="btn btn-success hidden-print" id="aprobar" type="button">Recibir</button> <br><br>';
+                      echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
+                      echo '<button class="btn btn-success d-print-none" id="aprobar" type="button">Recibir</button> <br><br>';
                     }
                    }elseif ($pedido["eid"]==2 && $n_op["estado"]!=2) {
                     if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==24) {
                       echo '<h3>'.$pedido["estado"].'</h3><br>';
-                      echo'<button class="btn btn-danger hidden-print" id="rechazar" type="button">Anular</button> <br><br>';
-                      echo '<button class="btn btn-success hidden-print" id="proceso" type="button">En proceso</button> <br><br>';
+                      echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
+                      echo '<button class="btn btn-success d-print-none" id="proceso" type="button">En proceso</button> <br><br>';
                     }
                    }elseif ($pedido["eid"]==4 && $n_op["estado"]!=2) {
                     echo '<h3>'.$pedido["estado"].'</h3><br>';
@@ -372,7 +372,7 @@
                   if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2) {
                         if ($op ==0) {
                           
-                          echo '<a href="solicitar_op.php?id_devol_v='.$_GET["id_pedido"].'" target="_blank" class="btn btn-warning hidden-print">Solicitar OP</a>';
+                          echo '<a href="solicitar_op.php?id_devol_v='.$_GET["id_pedido"].'" target="_blank" class="btn btn-warning d-print-none">Solicitar OP</a>';
                           
                         }
                     }
@@ -380,7 +380,7 @@
                   
 
                 ?>
-                 <button type="button" id="imprimir" class="btn btn-info hidden-print">Imprimir</button>
+                 <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button>
 
                 </center>
 
