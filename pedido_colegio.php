@@ -463,6 +463,34 @@
         });
       });
 
+      window.addEventListener("beforeprint", function(event) {
+        $("#impre").html("<h5><?php echo date("Y-m-d H:i") ?></h5>");
+          
+        var dataString = 'feid='+"<?php echo date("Y-m-d H:i:s") ?>"+'/'+"<?php echo $_GET["id_pedido"] ?>";
+              
+          $.ajax({
+
+            url: "ajax/fecha_impre.php",
+            type: "POST",
+            data: dataString,
+            dataType: "html",
+            success: function (resp) {
+
+            },
+            error: function (jqXHR,estado,error){
+              alert("error");
+              console.log(estado);
+              console.log(error);
+            },
+            complete: function (jqXHR,estado){
+              console.log(estado);
+            }
+
+                          
+          })
+
+      });
+
       $("#rechazar").click(function(){
         window.location="php/accion_pedidos.php?rechazar=<?php echo $_GET["id_pedido"] ?>";
       });
