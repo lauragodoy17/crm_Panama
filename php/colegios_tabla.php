@@ -62,7 +62,7 @@ $stmt->execute($params);
 $filtered = $stmt->fetchColumn();
 
 // Datos paginados con filtro
-$dataSQL = "SELECT id, codigo, dane, colegio, direccion, barrio,departamento,ciudad,telefono, cod_zona, responsable, sub_zona FROM colegios $searchSQL $orderSQL LIMIT :start, :length";
+$dataSQL = "SELECT id, codigo, dane, colegio, direccion, barrio,departamento,ciudad,telefono, cod_zona, responsable, sub_zona, id_calendario FROM colegios $searchSQL $orderSQL LIMIT :start, :length";
 $stmt = $bdd->prepare($dataSQL);
 
 // Agregar parámetros de límite y desplazamiento
@@ -77,10 +77,7 @@ if (!empty($searchSQL)) {
 $stmt->execute();
 $data = [];
 
-$sql_periodo="SELECT id, periodo FROM periodos ORDER BY id DESC";
-$req_periodo = $bdd->prepare($sql_periodo);
-$req_periodo->execute();
-$gp_periodo = $req_periodo->fetchAll();
+
 
 $sql_periodo1="SELECT id FROM periodos ORDER BY id DESC";
 $req_periodo1 = $bdd->prepare($sql_periodo1);
@@ -131,7 +128,12 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $colegio) {
     $req_dep->execute();
     $dep = $req_dep->fetch();
     
-    // Armas el select de forma segura
+    
+    $sql_periodo="SELECT id, periodo FROM periodos WHERE id_calendario='".$colegio['id_calendario']."' ORDER BY id DESC";
+    $req_periodo = $bdd->prepare($sql_periodo);
+    $req_periodo->execute();
+    $gp_periodo = $req_periodo->fetchAll();
+
     $selectPeriodo = '<select id="periodo' . $colegio["id"] . '" name="periodo" style="width: 100px;">';
     foreach ($gp_periodo as $periodo) {
         $selectPeriodo .= '<option value="' . $periodo["id"] . '">' . htmlspecialchars($periodo["periodo"]) . '</option>';
