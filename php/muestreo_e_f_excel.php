@@ -67,10 +67,9 @@
 		$objSpreadsheet->getActiveSheet()->SetCellValue("B4", "Usuario");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Fecha");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Colegio");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Estado");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Isbn");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Libro");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("H4", "Cantidad");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Isbn");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Libro");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Cantidad");
 
 	}else{
 
@@ -86,10 +85,9 @@
 		$objSpreadsheet->getActiveSheet()->SetCellValue("A4", "#");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("B4", "Fecha");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Colegio");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Estado");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Isbn");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Libro");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Cantidad");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Isbn");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Libro");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Cantidad");
 	}
 
 	
@@ -147,11 +145,7 @@
 
 	    }
 
-      	
-	    $sql = "SELECT estado FROM estados_pedidos WHERE id='".$libro["estado"]."'";
-		$req = $bdd->prepare($sql);
-		$req->execute();
-		$estado = $req->fetch();
+     
 
 		if ($_POST["usuario"]==0) {
 
@@ -159,19 +153,17 @@
 			$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$libro[promotor]");
 			$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$libro[fecha]");
 			$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$libro[colegio]");
-			$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$estado[estado]");
-			$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$libro[isbn]");
-			$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$libro[libro]");
-			$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$cantidad");
+			$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$libro[isbn]");
+			$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$libro[libro]");
+			$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$cantidad");
 
 		}else{
 			$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$libro[id]");
 			$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$libro[fecha]");
 			$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$libro[colegio]");
-			$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$estado[estado]");
-			$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$libro[isbn]");
-			$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$libro[libro]");
-			$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$cantidad");
+			$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$libro[isbn]");
+			$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$libro[libro]");
+			$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$cantidad");
 		}
 		
 		
