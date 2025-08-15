@@ -216,6 +216,8 @@
                     <?php } ?>
                   </tr>
                 </table>
+                <center id="impre"></center>
+                <input type="hidden" id="fecha_impre">
                 <center>Archivo Adjunto:</b> <a href="adjuntos_dist/<?php echo $pedido["archivo"] ?>" style="cursor: pointer;" target="_blank"><?php echo $pedido["archivo"] ?></a></center><br>
                 <div class="table-responsive">
                 <table class="table table-striped table-bordered table-hover">

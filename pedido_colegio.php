@@ -241,6 +241,8 @@
                   <?php } ?>
                   </tr>
                 </table>
+                <center id="impre"></center>
+                <input type="hidden" id="fecha_impre">
                 <form method="POST" action="php/aprobar_pedido.php" id="form_pedido">        
                 <div class="">
                     <table class="table table-striped table-bordered table-hover" id="dataTables-example">
