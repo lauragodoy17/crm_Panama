@@ -110,8 +110,8 @@
                         <option value="">Seleccione</option>
                           <?php
 
-                            if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==4 || $_SESSION["id"] == 10) {
-                            $sql = "SELECT id,colegio FROM colegios WHERE colegio like'%".$colegio."%'";
+                          if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2 || $_SESSION["tipo"]==2) {
+                            $sql = "SELECT id,colegio FROM colegios WHERE colegio like'%".$colegio."%' AND id > 2";
                           }
                           elseif ($_SESSION["tipo"]==3) {
 
