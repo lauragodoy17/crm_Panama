@@ -117,7 +117,7 @@
           <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
             
             <div class="row">
-              <div class="col-xs-12">
+              <div class="col-sm-12">
              
                 <?php 
                                   
