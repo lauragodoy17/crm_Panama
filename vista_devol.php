@@ -394,13 +394,13 @@
                  
                  <?php 
                   if ($pedido["eid"]==1 && $n_op["estado"]!=2) {
-                     if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==22) {
+                     if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {
                       echo '<h3>'.$pedido["estado"].'</h3><br>';
                       echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
                       echo '<button class="btn btn-success d-print-none" id="aprobar" type="button">Recibir</button> <br><br>';
                     }
                    }elseif ($pedido["eid"]==2 && $n_op["estado"]!=2) {
-                    if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==24 || $_SESSION["id"]==22) {
+                    if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {
                       echo '<h3>'.$pedido["estado"].'</h3><br>';
                       echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
                       echo '<button class="btn btn-success d-print-none" id="proceso" type="button">En proceso</button> <br><br>';
@@ -588,7 +588,7 @@
       
   })
 
-  <?php if($_SESSION["tipo"]==1 || $_SESSION["id"]==22)   { ?>
+  <?php if($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2)   { ?>
 
     window.addEventListener("beforeprint", function(event) {
       $("#impre").html("<h4>Fecha recibido bodega: <?php echo date("Y-m-d H:i") ?></h4>");
