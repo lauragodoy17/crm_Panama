@@ -410,7 +410,12 @@ foreach ($colegios as$colegio) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "$colegio[uni_vr]");
     if ($colegio["definido"] !=0) {
         
-        $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "$venta_real");
+        if (empty($venta_real)) {
+            $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "0");
+        }else{
+            $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "$venta_real");
+        }
+        
         
     }else{
         $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "0");
