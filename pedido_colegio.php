@@ -172,7 +172,7 @@
           
                   $libros = $req->fetchAll();
 
-                  $sql = "SELECT id FROM ordenes_pedidos WHERE id_pedido='".$_GET["id_pedido"]."' AND estado!=4";
+                  $sql = "SELECT id,año FROM ordenes_pedidos WHERE id_pedido='".$_GET["id_pedido"]."' AND estado!=4";
 
                   $req = $bdd->prepare($sql);
                   $req->execute();
@@ -180,7 +180,7 @@
                   $n_op = $req->fetch();
 
                   if ($op !=0) {
-                    echo "<h4>OP <a href='op_pendiente.php?op=".$n_op["id"]."' target='_blank'># ".$n_op["id"]."</a></h4>";
+                    echo "<h4>OP <a href='op_pendiente.php?op=".$n_op["id"]."' target='_blank'># ".$n_op["año"]." - ".$n_op["id"]."</a></h4>";
                   }
 
                   $sql = "SELECT op FROM op_pedidos_agrupados WHERE id_pedido='".$_GET["id_pedido"]."'";
@@ -399,7 +399,7 @@
                  <input type="hidden" name="pedido" value="<?php echo $_GET["id_pedido"] ?>">
                  </form>
                  <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button>
-                 <?php if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21 || $_SESSION["tipo"]==10 ) {
+                 <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 ||  $_SESSION["id"]==21 || $_SESSION["tipo"]==10 ) {
 
                     if ($pedido["eid"]==1) {
                       echo '<button class="btn btn-success d-print-none" id="aprobar">Aprobar</button> <button class="btn btn-danger d-print-none" id="rechazar">Rechazar</button>';
