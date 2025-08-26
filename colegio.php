@@ -206,6 +206,9 @@
                     >
                       <div class="pd-20">
                         <form action="php/actualizar_colegio.php" method="POST" enctype="multipart/form-data">
+                          <?php if ($_SESSION['id']==1) { ?>
+                            <a href="" class="btn btn-warning" data-toggle="modal" data-target="#modal_reasig">Reasignar</a><br><br>
+                          <?php } ?>
                           <div class="row">
                             <?php if ($promotor['tipo']==3 || $promotor['tipo']==1) {
 
@@ -259,17 +262,17 @@
                               </div> 
                           </div>
                           <br>
-                          <div class="row">
-                            <div class="col-sm-6">
-                              <div class="form-group">
-                                <label>Nombre de la institución <small style="color:red;"> *</small></label>
-                                <input type="text" class="form-control" placeholder="Nombre de la instricución" name="colegio"  value="<?php echo $colegio['colegio']; ?>" required />
-                              </div>
-                            </div>
+                          <div class="row">   
                             <div class="col-sm-3">
                               <div class="form-group">
                                 <label>DANE <small style="color:red;"> *</small></label>
                                 <input type="text" class="form-control" placeholder="DANE" name="dane" value="<?php echo $colegio['dane']; ?>" required/>
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <label>Nombre de la institución <small style="color:red;"> *</small></label>
+                                <input type="text" class="form-control" placeholder="Nombre de la instricución" name="colegio"  value="<?php echo $colegio['colegio']; ?>" required />
                               </div>
                             </div>
                             <div class="col-sm-3">
@@ -575,7 +578,87 @@
                 </div>
                       
 
-          </div>
+                <div class="modal fade bs-example-modal-lg" id="modal_reasig" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title" id="myLargeModalLabel">
+                          Reasignar colegio
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                          ×
+                        </button>
+                      </div>
+                      <form action="php/reasignar_colegio.php" method="POST">
+                        <div class="modal-body">
+                          <div class="row">
+
+                            <div class="col-sm-6">
+                
+                              <div class="form-group">
+                                <label class="control-label no-padding-right" for="empresa"> Empresa:<small style="color:red;"> *</small> </label>
+
+                                <select name="empresa" id="empresa" class="form-control custom-select2" required>
+                                  <option value="">Seleccione</option>
+                                  <option value="1">EUREKA</option>
+                                    <?php
+
+                                      $sql = "SELECT * FROM zonas WHERE zona NOT LIKE '%Eureka%' AND zona NOT LIKE '%ALEJANDRO%'";
+
+                                      $req = $bdd->prepare($sql);
+                                      $req->execute();
+
+                                      $zonas = $req->fetchAll();
+
+                                      foreach ($zonas as $zona) {
+                                                          
+                                        echo '<option value="'.$zona["codigo"].'">'.$zona["zona"].'</option>';
+                                                       
+                                      }
+
+                                    ?>
+                                  </select>
+                                  
+                              </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+                              
+                              <div class="form-group">
+                                <label class="control-label no-padding-right" for="zona"> Zona:<small style="color:red;"> *</small> </label>
+
+                                <select name="zona" id="zona" class="form-control custom-select2" required>
+                                  <option value="">Seleccione</option>
+                                </select>
+                                  
+                              </div>
+
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-sm-6 col-responsable d-none">
+
+                              <div class="form-group">
+                                <label class="control-label no-padding-right" for="responsable"> Responsable:<small style="color:red;"> *</small> </label>              
+                                <input type="text" name="responsable" id="responsable" placeholder="" class="form-control" />
+                                  
+                              </div>  
+                            </div>
+                          </div>   
+                        </div>
+                        <div class="modal-footer">
+                          <button  class="btn btn-primary">
+                            Guardar
+                            </button>
+                          </div>
+                          <input type="hidden" name="id_colegio" value='<?php echo $colegio["id"] ?>'>
+                          <input type="hidden" name="cod_colegio" value="<?php echo $colegio['codigo'] ?>">
+                      </form>
+                    </div>
+                    </div>
+
+                </div>
         </div>
         <?php include("template/footer.php"); ?>
       </div>
@@ -599,7 +682,9 @@
        $("#ver_zonificacion").addClass("active");
 
       $(document).ready(function () {
-
+        $("#modal_reasig .custom-select2").select2({
+          dropdownParent: $('#modal_reasig')
+        });
         //llamar contenido de tabs dinamicamente
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
           var target = $(e.target).attr("href");
@@ -626,7 +711,8 @@
           setTimeout(function () {
             const selects = $(target).find('select.custom-select2');
             if (selects.length) {
-               
+              
+
               $("#modal_atenciones .custom-select2").select2({
                 dropdownParent: $('#modal_atenciones')
               });
@@ -671,9 +757,49 @@
                 
         });
 
-
-
       });
+
+
+      $('#empresa').on('change',function(){
+        var valor = $(this).val();
+        
+        if (valor==1) {
+          $(".col-responsable").addClass("d-none");
+          $(".col-responsable").addClass("d-none");
+           $("#responsable").removeAttr("required");
+        }else{
+          $(".col-responsable").removeClass("d-none");
+          $("#responsable").attr("required","required");
+        }
+       
+        var dataString = 'empresa='+valor;
+        $.ajax({
+
+          url: "ajax/buscar_zona.php",
+          type: "POST",
+          data: dataString,
+          success: function (resp) {
+                   
+            $("#zona").html(resp);                        
+            console.log(resp);
+            if(valor =="") {
+              $("#zona").html("");
+            }
+          },
+          error: function (jqXHR,estado,error){
+            alert("error");
+            console.log(estado);
+            console.log(error);
+          },
+          complete: function (jqXHR,estado){
+            console.log(estado);
+          }
+
+                          
+        })
+                
+      });
+
     </script>
     
   </body>
