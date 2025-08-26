@@ -403,7 +403,7 @@
                  <label for="observaciones">Observaciones:</label><br>
                  <textarea name="observaciones" id="observaciones" cols="100" rows="9" class="form-control"><?php echo $pedido["observaciones"] ?></textarea><br><br>
                   <br><br>
-                <?php if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21 ) {
+                <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"]==2 ) {
                     if ($pedido["estado"] ==1) {
                         echo '<button type="button" type="button" class="btn btn-success d-print-none" id="aprobar">Aprobar</button> <button type="button" class="btn btn-danger d-print-none" id="rechazar">Rechazar</button>';
                     }elseif ($pedido["estado"]==2) {
