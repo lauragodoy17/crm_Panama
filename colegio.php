@@ -206,7 +206,7 @@
                     >
                       <div class="pd-20">
                         <form action="php/actualizar_colegio.php" method="POST" enctype="multipart/form-data">
-                          <?php if ($_SESSION['id']==1) { ?>
+                          <?php if ($_SESSION['tipo']==1) { ?>
                             <a href="" class="btn btn-warning" data-toggle="modal" data-target="#modal_reasig">Reasignar</a><br><br>
                           <?php } ?>
                           <div class="row">
