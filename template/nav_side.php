@@ -299,7 +299,12 @@
 								><span class="mtext">Zonificación</span>
 							</a>
 							<ul class="submenu">
-								<!--<li><a href="crear_colegio.php">Crear colegio</a></li>-->
+								<?php if ($_SESSION["tipo"] ==1) {?>
+
+									<li>
+										<a href="agregar_colegio.php">Crear colegio</a>
+									</li>
+								<?php } ?>
 								<li>
 									<a href="ver_colegios.php" id="ver_zonificacion">Ver</a>
 								</li>
@@ -551,6 +556,10 @@
 									<?php if ($_SESSION["tipo"]!=4) {?>
 										<li><a href="reporte_valoriza.php">Valorización libro a libro</a></li>
 										<li><a href="reporte_valoriza_global.php">Valorización global</a></li>
+									<?php } ?>
+
+									<?php if ($_SESSION["tipo"]!=10) {?>
+										<li><a href="reporte_cant_adop.php">Cantidad adopciones</a></li>
 									<?php } ?>
 
 									<?php if ($_SESSION["tipo"]!=10 && $_SESSION["tipo"]!=4) {?>

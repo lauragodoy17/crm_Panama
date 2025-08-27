@@ -92,7 +92,7 @@
                                             <!--<th>Codigo</th>-->
                       <th>DANE</th>
                       <th>Colegio</th>
-                      <?php if ($_SESSION['tipo'] == 1  || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5) { ?>
+                      <?php if ($_SESSION['tipo'] == 1  || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5 || $_SESSION['zona']=='5656') { ?>
                         <th>Empresa</th>
                         <th>Zona</th>
                       <th>Responsable</th>
@@ -138,7 +138,7 @@
           serverSide: true,
           ajax: "php/colegios_tabla.php", // tu script PHP aquí
 
-          <?php if ($_SESSION['tipo'] == 1  || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5) { ?>
+          <?php if ($_SESSION['tipo'] == 1  || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5 || $_SESSION['zona']=='5656') { ?>
             columns: [
               { data: "dane" },
               { data: "colegio" },
