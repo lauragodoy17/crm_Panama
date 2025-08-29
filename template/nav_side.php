@@ -557,6 +557,9 @@
 										<li><a href="reporte_valoriza.php">Valorización libro a libro</a></li>
 										<li><a href="reporte_valoriza_global.php">Valorización global</a></li>
 									<?php } ?>
+									<?php if ($_SESSION["tipo"]!=10) {?>
+										<li><a href="reporte_trabajadores.php">Contactos</a></li>
+									<?php } ?>
 
 									<?php if ($_SESSION["tipo"]!=10) {?>
 										<li><a href="reporte_cant_adop.php">Cantidad adopciones</a></li>
