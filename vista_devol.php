@@ -149,10 +149,10 @@
 
                   if ($_GET["tipo"] =="1") {
 
-                    $sql = "SELECT pe.id, l.id, l.id_grado, l.libro, l.isbn, m.materia, lp.cantidad, lp.id as lpid FROM devoluciones pe JOIN libros_devol lp ON lp.cod_pedido=pe.codigo JOIN libros l ON l.id=lp.id_libro JOIN materias m ON l.id_materia=m.id WHERE pe.id='".$_GET["id_devol"]."'";
+                    $sql = "SELECT pe.id, l.id, l.id_grado, l.libro, l.isbn, m.materia, lp.cantidad, lp.id as lpid FROM devoluciones pe LEFT JOIN libros_devol lp ON lp.cod_pedido=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON l.id_materia=m.id WHERE pe.id='".$_GET["id_devol"]."'";
 
                   }else{
-                    $sql = "SELECT pe.id, l.id, l.id_grado, l.libro, l.isbn, m.materia, lp.cantidad, lp.id as lpid FROM devoluciones_prov pe JOIN libros_devol lp ON lp.cod_pedido=pe.codigo JOIN libros l ON l.id=lp.id_libro JOIN materias m ON l.id_materia=m.id WHERE pe.id='".$_GET["id_devol"]."'";
+                    $sql = "SELECT pe.id, l.id, l.id_grado, l.libro, l.isbn, m.materia, lp.cantidad, lp.id as lpid FROM devoluciones_prov pe LEFT JOIN libros_devol lp ON lp.cod_pedido=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON l.id_materia=m.id WHERE pe.id='".$_GET["id_devol"]."'";
                   }
 
                   $req = $bdd->prepare($sql);
