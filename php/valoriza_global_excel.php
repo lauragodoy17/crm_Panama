@@ -112,13 +112,15 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Colegio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Departamento");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H6", "Ciudad");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I6", "Población total");
-$objSpreadsheet->getActiveSheet()->SetCellValue("J6", "Compradores activos");
-$objSpreadsheet->getActiveSheet()->SetCellValue("K6", "Valor adopciones");
-$objSpreadsheet->getActiveSheet()->SetCellValue("L6", "Venta real");
-$objSpreadsheet->getActiveSheet()->SetCellValue("M6", "Valor atenciones entregadas");
+$objSpreadsheet->getActiveSheet()->SetCellValue("J6", "Cantidad. Presup");
+$objSpreadsheet->getActiveSheet()->SetCellValue("K6", "Valor presup");
+$objSpreadsheet->getActiveSheet()->SetCellValue("L6", "Compradores activos");
+$objSpreadsheet->getActiveSheet()->SetCellValue("M6", "Valor adopciones");
+$objSpreadsheet->getActiveSheet()->SetCellValue("N6", "Venta real");
+$objSpreadsheet->getActiveSheet()->SetCellValue("O6", "Valor atenciones entregadas");
 
 
-$objSpreadsheet->getActiveSheet()->getStyle('A6:M6')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A6:O6')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -135,25 +137,25 @@ if ($_SESSION['tipo']==1 || $_SESSION['tipo']==2 || $_SESSION['tipo']==7) {
     if ($_POST['promotor']!=0) {
 
 
-     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.id_usuario='".$_POST['promotor']."' AND p.definido='1' AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
+     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.id_usuario='".$_POST['promotor']."' AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
                                   
 
  
 
     }else{
 
-         $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.definido='1' AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
+         $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
      
     }
 
 }elseif($_SESSION['tipo']==3){
 
-    $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.definido='1' AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."' GROUP BY c.id ORDER BY p.conse DESC";
+    $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."' GROUP BY c.id ORDER BY p.conse DESC";
 
   
 }else{
 
-     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.definido='1' AND p.id_periodo='".$_POST['periodo']."' AND (c.cod_zona='".$_SESSION['zona']."' OR c.zona_madre='".$_SESSION['zona']."') GROUP BY c.id ORDER BY p.conse DESC";
+     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND (c.cod_zona='".$_SESSION['zona']."' OR c.zona_madre='".$_SESSION['zona']."') GROUP BY c.id ORDER BY p.conse DESC";
 }
 
 
@@ -179,7 +181,7 @@ foreach ($colegios as $colegio) {
     $req->execute();*/
   
 
-    $sql = "SELECT p.tasa_compra,p.tasa_compra_d,p.descuento ,p.descuento_d ,p.precio, p.definido, p.cod_area, p.uni_vr, l.id as idlibro, l.id_grado FROM presupuestos p JOIN libros l ON p.id_libro=l.id WHERE p.id_colegio='".$colegio["id"]."' AND p.definido=1 AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$colegio["uid"]."'";
+    $sql = "SELECT p.tasa_compra,p.tasa_compra_d,p.descuento ,p.descuento_d ,p.precio, p.pre_definido, p.definido, p.cod_area, p.uni_vr, l.id as idlibro, l.id_grado FROM presupuestos p JOIN libros l ON p.id_libro=l.id WHERE p.id_colegio='".$colegio["id"]."' AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$colegio["uid"]."'";
 
 
     $req = $bdd->prepare($sql);
@@ -197,7 +199,7 @@ foreach ($colegios as $colegio) {
 
     foreach ($adopciones as $adopcion) {
        
-        if ($adopcion["id_grado"] != 17) {
+        if ($adopcion["id_grado"] != 17  && $adopcion["cod_area"]=="") {
 
             $sq_gp = "SELECT  SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$colegio["id"]."' AND id_grado='".$adopcion["id_grado"]."' AND id_periodo='".$_POST['periodo']."' AND alumnos > 0";
 
@@ -217,37 +219,62 @@ foreach ($colegios as $colegio) {
         $req_gp->execute();
         $gp = $req_gp->fetch();
 
-        if ($adopcion["tasa_compra_d"] == 0.00) {
-            $alumnos_tasa_d= floor($gp["alumnos"] * $adopcion["tasa_compra"]);
-            $precio_neto_d=$adopcion["precio"] - ($adopcion["precio"] * $adopcion["descuento"]);
+        if ($adopcion["pre_definido"] ==1) {
+
+            $alumnos_tasa= floor($gp["alumnos"] * $adopcion["tasa_compra"]);
+            $precio_neto=$adopcion["precio"] - ($adopcion["precio"] * $adopcion["descuento"]);
+
+            $valor_presup[$colegio["id"]][]=$precio_neto * $alumnos_tasa;
+
+            $cant_presup[$colegio["id"]][]=$alumnos_tasa;
+
            
-        }else{
-            $alumnos_tasa_d= floor($gp["alumnos"] * $adopcion["tasa_compra_d"]);
-            $precio_neto_d=$adopcion["precio"] - ($adopcion["precio"] * $adopcion["descuento_d"]);
-
-       
         }
 
-        if (!is_array($v_real) || !isset($v_real['venta_real']) || $v_real['venta_real'] < 1) {
+        if ($adopcion["definido"] !=0) {
 
-            $venta_real[$colegio["id"]][]= $precio_neto_d * $adopcion["uni_vr"];
-        }else{
+            if ($adopcion["tasa_compra_d"] == 0.00) {
+                $alumnos_tasa_d= floor($gp["alumnos"] * $adopcion["tasa_compra"]);
+                $precio_neto_d=$adopcion["precio"] - ($adopcion["precio"] * $adopcion["descuento"]);
+           
+            }else{
+                $alumnos_tasa_d= floor($gp["alumnos"] * $adopcion["tasa_compra_d"]);
+                $precio_neto_d=$adopcion["precio"] - ($adopcion["precio"] * $adopcion["descuento_d"]);
+
+            }
+
+            if (!is_array($v_real) || !isset($v_real['venta_real']) || $v_real['venta_real'] < 1) {
+
+                $venta_real[$colegio["id"]][]= $precio_neto_d * $adopcion["uni_vr"];
+            }else{
+
+            }
+
+            $valor_adopcion[$colegio["id"]][]=$precio_neto_d * $alumnos_tasa_d;
+
+            $castigo[$colegio["id"]][]=$alumnos_tasa_d;
 
         }
+
+        
     
         
-        $valor_adopcion[$colegio["id"]][]=$precio_neto_d * $alumnos_tasa_d;
-
-        $castigo[$colegio["id"]][]=$alumnos_tasa_d;
+        
 
         $alms[$colegio["id"]][]=$gp["alumnos"];
 
     }
 
+    $t_cant_presup[$colegio["id"]]=array_sum($cant_presup[$colegio["id"]]);
+    $t_valor_presup[$colegio["id"]]=array_sum($valor_presup[$colegio["id"]]);
 
-    $t_castigo[$colegio["id"]]=array_sum($castigo[$colegio["id"]]);
-    $t_valor_adopcion[$colegio["id"]]=array_sum($valor_adopcion[$colegio["id"]]);
+  
+    $t_castigo[$colegio["id"]]       = array_sum($castigo[$colegio["id"]] ?? []);
+    $t_valor_adopcion[$colegio["id"]] = array_sum($valor_adopcion[$colegio["id"]] ?? []);
+
+    
     $t_alms[$colegio["id"]]=array_sum($alms[$colegio["id"]]);
+    
    
 
     
@@ -289,20 +316,27 @@ foreach ($colegios as $colegio) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$dep[departamento]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$colegio[ciudad]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "".$t_alms[$colegio["id"]]."");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "".$t_castigo[$colegio["id"]]."");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "".$t_valor_adopcion[$colegio["id"]]."");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "".$t_cant_presup[$colegio["id"]]."");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "".$t_valor_presup[$colegio["id"]]."");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "".$t_castigo[$colegio["id"]]."");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "".$t_valor_adopcion[$colegio["id"]]."");
 
     if (is_array($v_real) && isset($v_real['venta_real']) && $v_real['venta_real'] > 0) {
         $t_venta_real= $v_real["venta_real"];
-        $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$t_venta_real");
     }else{
-        $t_venta_real[$colegio["id"]]=array_sum($venta_real[$colegio["id"]]);
-        $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "".$t_venta_real[$colegio["id"]]."");
+        if (empty($venta_real[$colegio["id"]])) {
+            $t_venta_real[$colegio["id"]]=0;
+        }else{
+            $t_venta_real[$colegio["id"]]=array_sum($venta_real[$colegio["id"]]);
+        }
+        
+        $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "".$t_venta_real[$colegio["id"]]."");
     }
 
     
    
-	$objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$total[total]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$total[total]");
    
 
 	$conta++;

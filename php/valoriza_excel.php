@@ -271,61 +271,31 @@ foreach ($colegios as$colegio) {
     if ($colegio["definido"] !=0) {
         if ($colegio["tasa_compra_d"] == 0.00) {
 
-            // Creamos una clave única con los valores involucrados
-            $key_calc = $alumnos . "_" . $colegio["tasa_compra"];
-
-            if (!isset($cache_calculo_tasa[$key_calc])) {
-                $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra"]);
-                $cache_calculo_tasa[$key_calc] = $alumnos_tasa;
-            }
-            // Usar siempre el valor desde la caché
-            $alumnos_tasa_d = $cache_calculo_tasa[$key_calc];
+            $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra"]);
             
             $key_precio = $colegio["precio"] . "_" . $colegio["descuento"] . "_" . $alumnos_tasa;
 
 
-            if (!isset($cache_precio_venta[$key_precio])) {
-                $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
-                $venta_ppto_d = $precio_neto_d * $alumnos_tasa_d;
+            $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
+            $venta_ppto_d = $precio_neto_d * $alumnos_tasa_d;
 
-                $cache_precio_venta[$key_precio] = [
-                    'precio_neto' => $precio_neto_d,
-                    'venta_ppto' => $venta_ppto_d
-                ];
-                      
-            }
 
              $descuento_d=$colegio["descuento"] * 100;
 
-            $precio_neto_d = $cache_precio_venta[$key_precio]['precio_neto'];
-            $venta_ppto_d = $cache_precio_venta[$key_precio]['venta_ppto'];
-            
+
            
         }else{
-            // Creamos una clave única con los valores involucrados
-            $key_calc = $alumnos . "_" . $colegio["tasa_compra_d"];
+           
+            $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra_d"]);
 
-            if (!isset($cache_calculo_tasa[$key_calc])) {
-                $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra_d"]);
-                $cache_calculo_tasa[$key_calc] = $alumnos_tasa_d;
-            }
-            // Usar siempre el valor desde la caché
-            $alumnos_tasa_d = $cache_calculo_tasa[$key_calc];
-            
-            if (!isset($cache_precio_venta[$key_precio])) {
-                $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento_d"]);
-                $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
-                $cache_precio_venta[$key_precio] = [
-                    'precio_neto' => $precio_neto_d,
-                    'venta_ppto' => $venta_ppto_d
-                ];
-                      
-            }
+         
+            $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento_d"]);
+            $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
+               
             
             $descuento_d=$colegio["descuento_d"] * 100;
             
-            $precio_neto_d = $cache_precio_venta[$key_precio]['precio_neto'];
-            //$venta_ppto_d = $cache_precio_venta[$key_precio]['venta_ppto'];
+           
             $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
 
             $venta_real= $precio_neto_d * $colegio["uni_vr"];
