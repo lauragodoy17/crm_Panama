@@ -402,7 +402,11 @@
 									><span class="mtext">Devoluciones</span>
 								</a>
 								<ul class="submenu">
-									
+									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2) { ?>
+										<li>
+										<a href="proveedores.php">Cargar Proveedores</a>
+									</li>
+									<?php } ?>
 									<li>
 										<a href="devol_muestras_sa.php?tp=1">Devolución de muestras</a>
 									</li>
@@ -509,6 +513,9 @@
 									><span class="mtext">OP'S</span>
 								</a>
 								<ul class="submenu">
+									<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {?>
+										<li><a href="clientes_op.php">Cargar clientes</a></li>
+									<?php } ?>
 									<li><a href="solicitar_op.php">Solicitar</a></li>
 									<li><a href="lista_op.php?tp=1">Todas</a></li>
 									<li><a href="lista_op.php?tp=2">Pendientes</a></li>
