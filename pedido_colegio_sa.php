@@ -235,7 +235,7 @@
                       <th>Valor Venta</th>
                       <?php if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21) { ?>
                         <th class="d-print-none">Desc. Aprobado</th>
-                        <th class="d-print-none">Cant. Aprobada</th>
+                        <th class="">Cant. Aprobada</th>
                       <?php } ?>
                     </tr>
                   </thead>
@@ -293,7 +293,7 @@
                           echo'<td class="center">$ '.number_format($v_venta,0,",", ".").'</td>';
                           if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21) {
                             echo'<td class="center d-print-none"><input type="number" id="d'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["descuento_aprob"].'" class="form-control dc" size="4"></td>';
-                            echo'<td class="center d-print-none"><input type="number" id="c'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["cantidad_aprob"].'" class="form-control dc" size="4"></td>';
+                            echo'<td class="center"><input type="number" id="c'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["cantidad_aprob"].'" class="form-control dc" size="4"></td>';
                           }
                           echo '<input type="hidden" name="lpid[]" value="'.$libro["lpid"].'">';
                           echo '<input type="hidden" name="lib_p[]" id="l'.$libro["lpid"].'" >';

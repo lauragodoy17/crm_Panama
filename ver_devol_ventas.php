@@ -123,14 +123,14 @@
                                   
                   if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2) {
 
-                    $sql = "SELECT p.id,  u.nombres, u.apellidos, p.fecha, e.estado,c.cliente, i.colegio FROM devoluciones_v p JOIN usuarios u ON u.id=p.id_usuario JOIN estados_dev e ON e.id=p.estado JOIN clientes c ON c.id=p.cliente JOIN colegios i ON i.id=p.id_colegio";
+                    $sql = "SELECT p.id,  u.nombres, u.apellidos, p.fecha, e.estado,c.cliente, i.colegio FROM devoluciones_v p JOIN usuarios u ON u.id=p.id_usuario JOIN estados_dev e ON e.id=p.estado JOIN clientes c ON c.id=p.cliente LEFT JOIN colegios i ON i.id=p.id_colegio";
 
                   }elseif($_SESSION["tipo"]==3) {
 
-                    $sql = "SELECT p.id,  u.nombres, u.apellidos, p.fecha, e.estado,c.cliente, i.colegio FROM devoluciones_v p JOIN usuarios u ON u.id=p.id_usuario JOIN estados_dev e ON e.id=p.estado JOIN clientes c ON c.id=p.cliente JOIN colegios i ON i.id=p.id_colegio WHERE p.id_usuario='".$_SESSION["id"]."'";
+                    $sql = "SELECT p.id,  u.nombres, u.apellidos, p.fecha, e.estado,c.cliente, i.colegio FROM devoluciones_v p JOIN usuarios u ON u.id=p.id_usuario JOIN estados_dev e ON e.id=p.estado JOIN clientes c ON c.id=p.cliente LEFT JOIN colegios i ON i.id=p.id_colegio WHERE p.id_usuario='".$_SESSION["id"]."'";
                     
                   }else{
-                    $sql = "SELECT p.id,  u.nombres, u.apellidos, p.fecha, e.estado,c.cliente, i.colegio FROM devoluciones_v p JOIN usuarios u ON u.id=p.id_usuario JOIN estados_dev e ON e.id=p.estado JOIN clientes c ON c.id=p.cliente JOIN colegios i ON i.id=p.id_colegio WHERE i.cod_zona='".$_SESSION['zona']."' OR i.zona_madre='".$_SESSION['zona']."'";
+                    $sql = "SELECT p.id,  u.nombres, u.apellidos, p.fecha, e.estado,c.cliente, i.colegio FROM devoluciones_v p JOIN usuarios u ON u.id=p.id_usuario JOIN estados_dev e ON e.id=p.estado JOIN clientes c ON c.id=p.cliente LEFT JOIN colegios i ON i.id=p.id_colegio WHERE i.cod_zona='".$_SESSION['zona']."' OR i.zona_madre='".$_SESSION['zona']."'";
                   }
                   $req = $bdd->prepare($sql);
                   $req->execute();

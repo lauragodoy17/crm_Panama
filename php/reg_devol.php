@@ -126,7 +126,7 @@
 	}
 
 	else{
-		$sql_p2 = "INSERT INTO devoluciones_v(codigo,id_periodo,id_colegio,id_usuario,observaciones,cliente,tipo,estado) VALUES('".$cod_pedido."','".$_POST["periodo"]."','".$_POST["id_colegio"]."','".$_SESSION["id"]."','".$_POST["observaciones"]."','".$_POST["cliente"]."','1','1')";
+		$sql_p2 = "INSERT INTO devoluciones_v(codigo,id_usuario,observaciones,cliente,tipo,estado) VALUES('".$cod_pedido."','".$_SESSION["id"]."','".$_POST["observaciones"]."','".$_POST["cliente"]."','1','1')";
 
 	}
 
@@ -165,6 +165,7 @@
 		$req = $bdd->prepare($sql);
 		$req->execute();
 		$pedido = $req->fetch();
+		echo "<script>alert('Devolución registrada');window.location='../devolucion_colegio.php?id_pedido=".$pedido["id"]."';</script>";
 	}
 
 
