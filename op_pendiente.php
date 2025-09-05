@@ -188,9 +188,10 @@
 
                     $pedido= $req->fetch();
                     if ($pedido["estado"] ==2) {
-                      echo'<td><b>Pedido de venta:</b> <a href="pedido_colegio_aprobado.php?id_pedido='.$op["id_pedido"].'" style="cursor: pointer;" target="_blank">#'.$op["id_pedido"].'</a></td>';
+                      echo'<td><b>Pedido de venta:</b> <a href=" pedido_colegio.php?id_pedido='.$op["id_pedido"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_pedido"].'</a></td>';
+
                     }else{
-                      echo'<td>Pedido de venta <a href="pedido_colegio_entregado.php?id_pedido='.$op["id_pedido"].'" style="cursor: pointer;" target="_blank">#'.$op["id_pedido"].'</a></td>';
+                      echo'<td><b>Pedido de venta:</b> <a href=" pedido_colegio.php?id_pedido='.$op["id_pedido"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_pedido"].'</a></td>';
                     }
 
                     
@@ -207,9 +208,10 @@
 
                   $pedido= $req->fetch();
                   if ($pedido["estado"] ==2) {
-                    echo'<td><b>Pedido distribuidor:</b> <a href="pedido_colegio_aprobado2.php?id_pedido='.$op["id_pedido_dist"].'" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
+                    echo'<td><b>Pedido de venta sin adopción:</b> <a href="pedido_colegio_sa.php?id_pedido='.$op["id_pedido"].'8&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
+
                   }else{
-                    echo'<td><b>Pedido distribuidor:</b> <a href="pedido_colegio_entregado2.php?id_pedido='.$op["id_pedido"].'" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
+                    echo'<td><b>Pedido de venta sin adopción:</b> <a href="pedido_colegio_sa.php?id_pedido='.$op["id_pedido"].'8&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
                   }
 
                     
@@ -226,9 +228,12 @@
 
                     $pedido= $req->fetch();
                     if ($pedido["estado"] ==2) {
-                      echo'<td><b>Pedido de mustras:</b> <a href="muestreo_colegio_aprobado.php?id_pedido='.$op["id_muestreo"].'" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
+                      
+                      echo'<td><b>Pedido de mustras:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
                     }else{
-                      echo'<td><b>Pedido de mustras:</b> <a href="muestreo_colegio_entregado.php?id_pedido='.$op["id_muestreo"].'" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
+                      echo'<td><b>Pedido de mustras:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
+
+                      
                     }
 
                     
