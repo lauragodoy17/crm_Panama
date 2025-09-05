@@ -180,15 +180,15 @@
               <?php } ?>
 
               <?php if (isset($_GET['id_pedido_dist'])) { ?>
-                <h4>OP para pedido de distribuidor:</h4>
+                <h4>OP para pedido de venta sin adopción:</h4>
                 <table class="table table-bordered table-hover">
                   <tr>
-                    <td># Pedido distribuidor: <?php echo $_GET["id_pedido_dist"] ?></td>
+                    <td># Pedido de venta sin adopción: <?php echo $_GET["id_pedido_dist"] ?></td>
                     <td>Colegio: <?php echo $pedido["colegio"] ?></td>
                     <td>Fecha: <?php echo $pedido["fecha"] ?></td>
                   </tr>
                   <tr>
-                    <td>Distribuidor: <?php echo $pedido["nombres"]." ".$pedido["apellidos"] ?></td>
+                    <td>Usuario: <?php echo $pedido["nombres"]." ".$pedido["apellidos"] ?></td>
                       <td>Fecha de recogida: <?php echo $pedido["fecha_r"];?></td>
                   </tr>
                 </table>
