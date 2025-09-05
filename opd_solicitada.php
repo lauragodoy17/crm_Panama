@@ -1,0 +1,736 @@
+<?php require_once("php/aut.php"); ?>
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <!-- Basic Page Info -->
+    <meta charset="utf-8" />
+    <title>Inkpulse - Orden de producción</title>
+    <!-- Site favicon -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="vendors/images/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="vendors/images/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="vendors/images/favicon-16x16.png"
+    />
+
+    <!-- Mobile Specific Metas -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="src/plugins/datatables/css/dataTables.bootstrap4.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="src/plugins/datatables/css/responsive.bootstrap4.min.css"
+    />
+
+    <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendors/styles/icon-font.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
+
+    <style>
+      @page{
+          margin: 30px;
+      
+      }
+      @media print {
+        a {display: none;}
+        
+        a[href]:after {
+            content: none !important;
+        }
+        body{
+          font-size: 9px;
+        }
+      }
+
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+          -webkit-appearance: none; 
+          margin: 0; 
+      }
+
+      .dc {
+        width: 40px !important;
+      }
+
+      input[type=number] { -moz-appearance:textfield; }
+
+
+    </style>
+
+  </head>
+  <body>
+    
+    <?php include("template/nav_side.php"); ?>
+    <div class="main-container">
+      <div class="pd-ltr-20 xs-pd-20-10">
+        <div class="min-height-200px">
+          <div class="page-header">
+            <div class="row">
+              <div class="col-md-6 col-sm-12">
+                <div class="title">
+                  <h4>Orden de producción</h4>
+                </div>
+                <nav aria-label="breadcrumb" role="navigation">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                      Pedido
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                      Pendiente
+                    </li>
+                  </ol>
+                </nav>
+              </div>
+              
+            </div>
+          </div>
+          <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
+            
+            <div class="row">
+              <div class="col-sm-12">
+            
+                <?php 
+
+                  $sql_pedido="SELECT o.observaciones, o.fecha, o.descripcion, o.orden_pedido, o.conse, c.cliente, o.cliente as cid, o.adjunto, u.nombres, u.apellidos, o.fecha_ent_s, o.estado FROM ordenes_produccion o JOIN clientes c ON o.cliente=c.id JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["opd"]."'";
+                  
+
+                  $req_pedido = $bdd->prepare($sql_pedido);
+                  $req_pedido->execute();
+                  $pedido = $req_pedido->fetch();
+
+                  $sql_cliente="SELECT cliente FROM clientes WHERE id='".$pedido["cliente"]."'";
+
+                  $req_cliente = $bdd->prepare($sql_cliente);
+                  $req_cliente->execute();
+                  $cliente = $req_cliente->fetch();
+
+                                  $sql = "SELECT * FROM libros_opd WHERE opid='".$_GET['opd']."'";
+                  $req = $bdd->prepare($sql);
+                  $req->execute();
+
+                                
+                  $libros = $req->fetchAll();
+                                
+                ?>
+
+                <table class="table table-bordered table-hover">
+                <form method="POST" action="php/mod_opd.php" id="form_pedido">
+                  <tr>
+                    <?php if ($_GET["opd"] < 104) { ?>
+
+                      <td>OPD #: <?php echo $_GET["opd"] ?></td>
+
+                    <?php }else{ ?>
+
+                      <td>OPD # 25-:<?php echo $pedido["conse"] ?></td>
+                    <?php } ?>
+                                
+                    <td>Fecha: <?php echo $pedido["fecha"] ?></td>
+                    <td>
+                      Descripción pedido:
+
+                      <?php 
+                        if ($pedido["descripcion"]==1) {
+                          echo "Libro Suelto";
+                        }elseif ($pedido["descripcion"]==1) {
+                          echo "Guía";
+                        }else{
+                          echo "Otro";
+                        }
+                      ?>
+                    </td>
+                  </tr>
+                  <tr>
+                  <td>
+                    Usuario: <?php echo $pedido["nombres"]." ".$pedido["apellidos"] ?>
+                  </td>
+                                
+                  <?php if ($_SESSION['tipo']!=8) { ?>
+                    <td>Orden de pedido: <input type="text" name="orden_pedido" value="<?php echo $pedido["orden_pedido"];?>"> </td>
+                  <?php }else{ ?>
+                    <td>Orden de pedido:  <?php echo $pedido["orden_pedido"];?> </td>
+                  <?php } ?>
+                    <td>
+                  <?php if ($_SESSION['tipo']!=8) { ?>
+                    <label for="fecha_ent_s">Fecha de entrega solicitada:<small style="color:red;"> *</small></label>
+                    <div class="input-group">
+                      <input type="text" class="form-control date-picker" name="fecha_ent_s" id="fecha_ent_s" type="text" data-date-format="yyyy-mm-dd" required="" autocomplete="off" value="<?php echo $pedido["fecha_ent_s"] ?>" />
+                      <span class="input-group-addon">
+                        <i class="fa fa-calendar bigger-110"></i>
+                      </span>
+                    </div>
+                    <?php }else{ 
+                      echo "Fecha de entrega solicitada: ".$pedido["fecha_ent_s"]
+                    ?>
+
+                    <?php }?>
+
+                  </td>
+                </tr>
+                   
+                </table>
+
+                  Archivo Adjunto:</b> <a href="adjuntos_opd/<?php echo $pedido["adjunto"] ?>" style="cursor: pointer;" target="_blank"><?php echo  $pedido["adjunto"] ?></a><br><br>
+
+                  <?php if ($_SESSION['tipo']!=8) { ?>
+                    <div class="form-group " for="persona">
+                              
+                      <label>Cliente<small style="color:red;"> *</small> </label>         
+                      <select class="form-control custom-select2" name="persona" id="persona" style="width: 100%;" required>
+                        <option selected="selected" value="">Seleccionar</option>
+                        <?php 
+
+                          $sql = "SELECT * FROM clientes";
+
+                          $req = $bdd->prepare($sql);
+                          $req->execute();
+
+                          $clientes = $req->fetchAll();
+
+                          foreach ($clientes as $cliente) {
+
+                            if ($cliente["id"] == $pedido["cid"]) {
+                                              
+                              echo '<option value="'.$cliente["id"].'" SELECTED>'.$cliente["cliente"].'</option>';
+
+                            }else{
+
+                              echo '<option value="'.$cliente["id"].'">'.$cliente["cliente"].'</option>';
+
+                            }
+                                            
+                                            
+                          }
+
+                        ?>
+                      </select>
+                    </div>
+                    <?php }else{ ?>
+                      <?php echo "<h5>Cliente: ".$pedido["cliente"]."</h5><br>"; ?>
+                    <?php } ?>
+                          
+                    <div class="">
+                              
+                      <table class="table table-striped table-bordered table-hover">
+                      <thead>
+                        <tr>
+                                          
+                          <th>#</th>
+                          <th>Título</th>
+                          <th>Encaratulado</th>
+                          <th>Cantidad</th>
+                          <?php if ($_SESSION['tipo']==2) { ?>
+
+                            <th class="hent1 d-none">Entrega 1</th>
+                            <th class="hent2 d-none">Entrega 2</th>
+                            <th class="hent3 d-none">Entrega 3</th>
+                            <th class="hent4 d-none">Entrega 4</th>
+                            <th class="hent5 d-none">Entrega 5</th>           
+
+                          <?php }else { ?>
+                            <th>Entrega 1</th>
+                            <th>Entrega 2</th>
+                            <th>Entrega 3</th>
+                            <th>Entrega 4</th>
+                            <th>Entrega 5</th>         
+                          <?php } ?>
+                                                                       
+                        </tr>
+                      </thead>
+                      <tbody>
+                                
+                        <script src='vendors/scripts/jquery-2.1.4.min.js'></script>
+                          <?php
+                            $i=1;
+                            foreach($libros as $libro) {
+
+                              $sql_ent1="SELECT e.cant_entregada, e.observacion_entrega, e.fecha FROM entregas_opd e JOIN libros_opd l ON e.id_libro_opd=l.id WHERE l.opid='".$_GET["opd"]."' AND l.id='".$libro["id"]."' LIMIT 1";
+                  
+                              $req_ent1 = $bdd->prepare($sql_ent1);
+                              $req_ent1->execute();
+                              $ent1 = $req_ent1->fetch();
+
+                              $sql_ent2="SELECT e.cant_entregada, e.observacion_entrega, e.fecha FROM entregas_opd e JOIN libros_opd l ON e.id_libro_opd=l.id WHERE l.opid='".$_GET["opd"]."' AND l.id='".$libro["id"]."' LIMIT 1,2";
+                        
+                              $req_ent2 = $bdd->prepare($sql_ent2);
+                              $req_ent2->execute();
+                              $ent2 = $req_ent2->fetch();
+
+                              $sql_ent3="SELECT e.cant_entregada, e.observacion_entrega, e.fecha FROM entregas_opd e JOIN libros_opd l ON e.id_libro_opd=l.id WHERE l.opid='".$_GET["opd"]."' AND l.id='".$libro["id"]."' LIMIT 2,3";
+                        
+                              $req_ent3 = $bdd->prepare($sql_ent3);
+                              $req_ent3->execute();
+                              $ent3 = $req_ent3->fetch();
+
+
+                              $sql_ent4="SELECT e.cant_entregada, e.observacion_entrega, e.fecha FROM entregas_opd e JOIN libros_opd l ON e.id_libro_opd=l.id WHERE l.opid='".$_GET["opd"]."' AND l.id='".$libro["id"]."' LIMIT 3,4";
+                        
+                              $req_ent4 = $bdd->prepare($sql_ent4);
+                              $req_ent4->execute();
+                              $ent4 = $req_ent4->fetch();
+
+                              $sql_ent5="SELECT e.cant_entregada, e.observacion_entrega, e.fecha FROM entregas_opd e JOIN libros_opd l ON e.id_libro_opd=l.id WHERE l.opid='".$_GET["opd"]."' AND l.id='".$libro["id"]."' LIMIT 4,5";
+                        
+                              $req_ent5 = $bdd->prepare($sql_ent5);
+                              $req_ent5->execute();
+                              $ent5 = $req_ent5->fetch();
+                                           
+                              $total_cantidad[]=$libro["cantidad"];
+
+                              echo'<tr class="odd gradeX" id="'.$libro["id"].'">';
+                              echo'<td class="">';
+                                if ($_SESSION['tipo']!=8) {
+
+                                  echo'<button type="button" class="btn btn-danger btn-xs d-print-none" id="e'.$libro["id"].'"><i class="fa fa-trash"></i></button>';
+                                }
+                                                
+                              echo''.$i.'</td>';
+                              echo'<td class="">'.$libro["libro"].'</td>';
+                              echo'<td class="">'.$libro["encaratulado"].'</td>';
+
+                              if ($_SESSION['tipo']!=8) {
+                                echo'<td class=""> <input type="number" class="form-control" min="0" max="5000" id="cantidad'.$libro["id"].'" name="cantidad" value="'.$libro["cantidad"].'">  </td>';
+                              }else{
+                                echo'<td class="">'.$libro["cantidad"].'</td>';
+                              }
+
+                              if ($_SESSION['tipo']!=2) {
+
+                                if ($ent1["cant_entregada"] =="") {
+                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega1'.$libro["id"].'" ></td>';
+                                }else{
+                                  echo "<td>".$ent1["cant_entregada"]."</td>";
+                                }
+
+                                if ($ent2["cant_entregada"] =="") {
+                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega2'.$libro["id"].'" ></td>';
+                                }else{
+                                  echo "<td>".$ent2["cant_entregada"]."</td>";
+                                }
+
+                                if ($ent3["cant_entregada"] =="") {
+                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega3'.$libro["id"].'" ></td>';
+                                }else{
+                                  echo "<td>".$ent3["cant_entregada"]."</td>";
+                                }
+
+                                if ($ent4["cant_entregada"] =="") {
+                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega4'.$libro["id"].'"></td>';
+                                }else{
+                                  echo "<td>".$ent4["cant_entregada"]."</td>";
+                                }
+
+                                if ($ent5["cant_entregada"] =="") {
+                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega5'.$libro["id"].'" name="entrega5[]"></td></tr>';
+
+                                }else{
+                                  echo "<td>".$ent5["cant_entregada"]."</td></tr>";
+                                }
+
+                              }else{
+
+                                if ($ent1["cant_entregada"] =="") {
+                                  echo "<td class='d-none'>".$ent1["cant_entregada"]."</td>";
+                                }else{
+                                  echo "<script>
+                                    $('.hent1').removeClass('d-none');
+                                  </script>";
+                                  echo "<td>".$ent1["cant_entregada"]."</td>";
+                                }
+
+                                if ($ent2["cant_entregada"] =="") {
+                                  echo "<td class='d-none'>".$ent2["cant_entregada"]."</td>";
+                                }else{
+                                  echo "<script>
+                                    $('.hent2').removeClass('d-none');
+                                  </script>";
+                                  echo "<td>".$ent2["cant_entregada"]."</td>";
+                                }
+
+                                if ($ent3["cant_entregada"] =="") {
+                                  echo "<td class='d-none'>".$ent3["cant_entregada"]."</td>";
+                                }else{
+                                  echo "<script>
+                                    $('.hent3').removeClass('d-none');
+                                  </script>";
+                                  echo "<td>".$ent3["cant_entregada"]."</td>";
+                                }
+
+                                if ($ent4["cant_entregada"] =="") {
+                                  echo "<td class='d-none'>".$ent4["cant_entregada"]."</td>";
+                                }else{
+                                  echo "<script>
+                                  $('.hent4').removeClass('d-none');
+                                  </script>";
+                                  echo "<td>".$ent4["cant_entregada"]."</td>";
+                                }
+                                                  
+                                if ($ent5["cant_entregada"] =="") {
+                                  echo "<td class='d-none'>".$ent5["cant_entregada"]."</td>";
+                                }else{
+                                  echo "<script>
+                                    $('.hent5').removeClass('d-none');
+                                    </script>";
+                                    echo "<td>".$ent5["cant_entregada"]."</td>";
+                                }
+                                                  
+                              }
+
+                              echo '<input type="hidden" name="lpid[]" value="'.$libro["id"].'" id="lpid'.$libro["id"].'">';
+                              echo '<input type="hidden" name="lib_p[]" id="l'.$libro["id"].'" >';
+                              echo '<input type="hidden" name="entrega1[]" id="ent1'.$libro["id"].'" >';
+                              echo '<input type="hidden" name="entrega2[]" id="ent2'.$libro["id"].'" >';
+                              echo '<input type="hidden" name="entrega3[]" id="ent3'.$libro["id"].'" >';
+                              echo '<input type="hidden" name="entrega4[]" id="ent4'.$libro["id"].'" >';
+                              echo '<input type="hidden" name="entrega5[]" id="ent5'.$libro["id"].'" >';
+
+                              echo "<script>
+
+
+                                $('#e".$libro["id"]."').click(function(){
+
+                                  $('#".$libro["id"]."').remove();
+                                  $('#lpid".$libro["id"]."').remove();
+
+                                })
+
+                                $('#cantidad".$libro["id"]."').keyup(function(){
+
+                                  var cant =$('#cantidad".$libro["id"]."').val();
+                                  
+
+                                  $('#l".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
+
+                              
+                                })
+
+                                $('#entrega1".$libro["id"]."').keyup(function(){
+
+                                  var cant =$('#entrega1".$libro["id"]."').val();
+                                  
+
+                                  $('#ent1".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
+
+                              
+                                })
+
+                                $('#entrega2".$libro["id"]."').keyup(function(){
+
+                                  var cant =$('#entrega2".$libro["id"]."').val();
+                                  
+
+                                  $('#ent2".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
+
+                              
+                                })
+
+                                $('#entrega3".$libro["id"]."').keyup(function(){
+
+                                  var cant =$('#entrega3".$libro["id"]."').val();
+                                  
+
+                                  $('#ent3".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
+
+                              
+                                })
+
+                                $('#entrega4".$libro["id"]."').keyup(function(){
+
+                                  var cant =$('#entrega4".$libro["id"]."').val();
+                                  
+
+                                  $('#ent4".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
+
+                              
+                                })
+
+                                $('#entrega5".$libro["id"]."').keyup(function(){
+
+                                  var cant =$('#entrega5".$libro["id"]."').val();
+                                  
+
+                                  $('#ent5".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
+
+                              
+                                })
+
+
+                            </script>";
+                                                
+                                                   
+                            $i++;
+                          }
+
+                          $total_c=array_sum($total_cantidad);
+
+                        ?>
+                                        
+                        </tr>                            
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td></td>
+                          <td></td>
+                          <td>Total</td>
+                          <td><?php echo $total_c; ?></td>
+                        </tr>
+                      </tfoot>
+                                    
+                    </table>
+                  </div>
+                  <input type="hidden" name="opd" value="<?php echo $_GET["opd"] ?>">
+
+                  <?php for ($i=1; $i < 100; $i++) { ?>
+
+                    <div id="agg_l<?php echo $i;?>" class="d-none">
+                      <h4>Material #<?php echo $i;?>:</h4>
+                      <div class="row">
+                        <div class="form-group col-sm-3">
+                          <label id="l_titulo<?php echo $i;?>" for="titulo<?php echo $i;?>" class="control-label">Titulo<small style="color:red;"> *</small></label>
+                          <input type="text" class="form-control" name="titulo" id="titulo<?php echo $i;?>">
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                          <label id="l_cantidad<?php echo $i;?>" for="cantidad<?php echo $i;?>" class="control-label">Cantidad<small style="color:red;"> *</small></label>
+                          <input type="number" class="form-control" name="cantidad" id="cantidad<?php echo $i;?>">
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                          <label id="l_cencaratulado<?php echo $i;?>" for="encaratulado<?php echo $i;?>" class="control-label">Encaratulado<small style="color:red;"> *</small></label>
+                          <input type="text" class="form-control" name="encaratulado" id="encaratulado<?php echo $i;?>">
+                        </div>
+                      </div>
+                  
+                  
+                      <input type="hidden" name="libro_e[]" id="libro_e<?php echo $i;?>">
+                    </div>
+
+                  <?php } ?>
+                            
+                  <a id="agregar_libro" style="cursor: pointer;">Agregar otro +</a><br>
+                  <br><div class="row">
+                  <div class="col-sm-6">
+                    <?php if ($_SESSION['tipo']!=8) { ?>
+                      <label for="observaciones">Observaciones de solicitud:</label><br>
+                      <textarea name="observaciones" id="observaciones" cols="70" rows="9"><?php echo $pedido["observaciones"] ?></textarea><br>
+                    <?php }else{ ?>
+                      <label for="observaciones">Observaciones de solicitud:</label>
+                      <?php echo $pedido["observaciones"] ?>
+                    <?php } ?>
+                  </div>
+
+                  <div class="col-sm-6">
+                  <?php
+                    if ($ent1["fecha"]!="") {
+
+                      echo "Fecha de entrega taller 1: ".$ent1["fecha"]."<hr>"; 
+
+                    }
+
+                    if ($ent1["observacion_entrega"]!="") {
+
+                      echo "Observaciones de entrega 1: ".$ent1["observacion_entrega"]."<hr>"; 
+                    }
+
+                    if ($ent2["fecha"]!="") {
+
+                      echo "Fecha de entrega taller 2: ".$ent2["fecha"]."<hr>"; 
+
+                    }
+        
+                    if ($ent2["observacion_entrega"]!="") {
+                     
+                      echo "Observaciones de entrega 2: ".$ent2["observacion_entrega"]."<hr>"; 
+                    }
+
+                    if ($ent3["fecha"]!="") {
+
+                       echo "Fecha de entrega taller 3: ".$ent3["fecha"]."<hr>"; 
+
+                    }
+
+                    if ($ent3["observacion_entrega"]!="") {
+
+                      echo "Observaciones de entrega 3: ".$ent3["observacion_entrega"]."<hr>"; 
+                    }
+
+                    if ($ent4["fecha"]!="") {
+
+                      echo "Fecha de entrega taller 4: ".$ent4["fecha"]."<hr>"; 
+
+                    }
+
+                    if ($ent4["observacion_entrega"]!="") {                 
+
+                      echo "Observaciones de entrega 4: ".$ent4["observacion_entrega"]."<hr>"; 
+                    }
+
+                    if ($ent5["fecha"]!="") {
+
+                      echo "Fecha de entrega taller 5: ".$ent5["fecha"]."<hr>"; 
+
+                    }
+
+                    if ($ent5["observacion_entrega"]!="") {
+
+                      echo "Observaciones de entrega 5: ".$ent5["observacion_entrega"]."<br>"; 
+                    }
+                  ?>
+                  <?php if ($_SESSION['tipo']!=2) { ?>
+                    <br><label for="observaciones_ent">Observaciones de entrega:</label><br>
+                    <textarea name="observaciones_ent" id="observaciones_ent" cols="80" rows="12"></textarea><br>
+                  <?php } ?>
+                </div>
+              </div><br>
+
+              <center>
+                <?php if ($pedido["estado"]==4) { ?>
+                    <h4 style="color: #53C144">Cumplida</h4>
+                <?php } ?>
+                 <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button> <br><br>
+
+                <?php if ($_SESSION['tipo']!=2) { ?>
+                  <button class="btn btn-success d-print-none" id="entregar">Entregar</button>
+                <?php } ?>
+
+                <?php if ($_SESSION['tipo']!=8) { ?>
+                  <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>
+                  <?php if ($pedido["estado"]==0) { ?>
+                    <button class="btn btn-default d-print-none" id="cumplida">Cumplida</button>
+                  <?php } ?>
+                <?php } ?>
+
+              </center>
+                        
+              <center>
+            </form>
+
+                <!-- PAGE CONTENT ENDS -->
+              </div><!-- /.col -->
+            </div><!-- /.row -->
+
+          </div>
+        </div>
+        <?php include("template/footer.php"); ?>
+      </div>
+    </div>
+    
+    <!-- js -->
+    <script src="vendors/scripts/core.js"></script>
+    <script src="vendors/scripts/script.min.js"></script>
+    <script src="vendors/scripts/process.js"></script>
+    <script src="vendors/scripts/layout-settings.js"></script>
+    <script src="src/plugins/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
+    <script src="src/plugins/datatables/js/dataTables.responsive.min.js"></script>
+    <script src="src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+
+    <script>
+    
+
+
+      $("#entregar").click(function(){
+        
+        $("#form_pedido").attr("action","php/entregar_opd.php");
+      });
+
+      $("#cumplida").click(function(){
+        
+        $("#form_pedido").attr("action","php/cumplir_opd.php");
+      });
+
+      $("#imprimir").click(function(){
+        window.print();
+      })
+
+      $("#modificar").click(function(){
+        $("#form_pedido").submit();
+      });
+
+      var m = 1;
+    
+    $("#agregar_libro").click(function(){
+      if (m>98) {
+        $("#agregar_libro").addClass("d-none");
+      }
+    
+      $("#agg_l"+m).removeClass("d-none")
+
+      m++;
+
+      <?php for ($i=1; $i < 100; $i++) { ?>
+
+
+        $('#cantidad<?php echo $i; ?>').keyup(function(){
+
+          var cant =$('#cantidad<?php echo $i; ?>').val();
+          var titulo=$('#titulo<?php echo $i; ?>').val();
+          var enca=$('#encaratulado<?php echo $i; ?>').val();
+          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant+'/'+enca);
+
+        })
+
+        $('#titulo<?php echo $i; ?>').keyup(function(){
+
+          var cant =$('#cantidad<?php echo $i; ?>').val();
+          var titulo=$('#titulo<?php echo $i; ?>').val();
+          var enca=$('#encaratulado<?php echo $i; ?>').val();
+          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant+'/'+enca);
+
+        })
+
+        $('#encaratulado<?php echo $i; ?>').keyup(function(){
+
+          var cant =$('#cantidad<?php echo $i; ?>').val();
+          var titulo=$('#titulo<?php echo $i; ?>').val();
+          var enca=$('#encaratulado<?php echo $i; ?>').val();
+          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant+'/'+enca);
+
+        })
+
+        
+
+      <?php } ?>
+
+      
+      
+    
+
+
+      
+  })
+
+
+  </script>
+    
+  </body>
+</html>

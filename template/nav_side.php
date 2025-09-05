@@ -525,6 +525,21 @@
 							</li>
 						<?php } ?>
 
+						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==8) {?>
+							<li class="dropdown">
+								<a href="javascript:;" class="dropdown-toggle">
+									<span class="micon bi bi-printer"></span
+									><span class="mtext">OPD'S</span>
+								</a>
+								<ul class="submenu">
+									<li><a href="solicitar_orden_pd.php">Solicitar</a></li>
+									<li><a href="ver_opds.php">Ver</a></li>
+									<li><a href="reporte_opd.php">Reporte</a></li>
+									
+								</ul>
+							</li>
+						<?php } ?>
+
 						<?php if ($_SESSION["tipo"] !=8) {?>
 							<li class="dropdown">
 								<a href="javascript:;" class="dropdown-toggle">
