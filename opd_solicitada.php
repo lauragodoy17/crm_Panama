@@ -78,7 +78,7 @@
       }
 
       .dc {
-        width: 40px !important;
+        width: 50px !important;
       }
 
       input[type=number] { -moz-appearance:textfield; }
@@ -300,7 +300,7 @@
                               echo'<td class="">'.$libro["encaratulado"].'</td>';
 
                               if ($_SESSION['tipo']!=8) {
-                                echo'<td class=""> <input type="number" class="form-control" min="0" max="5000" id="cantidad'.$libro["id"].'" name="cantidad" value="'.$libro["cantidad"].'">  </td>';
+                                echo'<td class=""> <input type="number" class="form-control dc" min="0" max="5000" id="cantidad'.$libro["id"].'" name="cantidad" value="'.$libro["cantidad"].'">  </td>';
                               }else{
                                 echo'<td class="">'.$libro["cantidad"].'</td>';
                               }
@@ -308,19 +308,19 @@
                               if ($_SESSION['tipo']!=2) {
 
                                 if ($ent1["cant_entregada"] =="") {
-                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega1'.$libro["id"].'" ></td>';
+                                  echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega1'.$libro["id"].'" ></td>';
                                 }else{
                                   echo "<td>".$ent1["cant_entregada"]."</td>";
                                 }
 
                                 if ($ent2["cant_entregada"] =="") {
-                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega2'.$libro["id"].'" ></td>';
+                                  echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega2'.$libro["id"].'" ></td>';
                                 }else{
                                   echo "<td>".$ent2["cant_entregada"]."</td>";
                                 }
 
                                 if ($ent3["cant_entregada"] =="") {
-                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega3'.$libro["id"].'" ></td>';
+                                  echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega3'.$libro["id"].'" ></td>';
                                 }else{
                                   echo "<td>".$ent3["cant_entregada"]."</td>";
                                 }
@@ -529,11 +529,13 @@
                  <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button> <br><br>
 
                 <?php if ($_SESSION['tipo']!=2) { ?>
-                  <button class="btn btn-success d-print-none" id="entregar">Entregar</button>
+                  <button class="btn btn-warning d-print-none" id="entregar">Entregar</button>
                 <?php } ?>
 
-                
-                  <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>
+                  <?php if ($_SESSION['tipo']!=8) { ?>
+                    <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>
+                  <?php } ?>
+                  
                   <?php if ($pedido["estado"]==0) { ?>
                     <button class="btn btn-success d-print-none" id="cumplida">Cumplida</button>
                   <?php } ?>
