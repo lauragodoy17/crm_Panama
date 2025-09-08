@@ -120,7 +120,7 @@
             
                 <?php 
 
-                  $sql_pedido="SELECT o.observaciones, o.fecha, o.descripcion, o.orden_pedido, o.conse, c.cliente, o.cliente as cid, o.adjunto, u.nombres, u.apellidos, o.fecha_ent_s, o.estado, o.solicitante FROM ordenes_produccion o JOIN clientes c ON o.cliente=c.id JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["opd"]."'";
+                  $sql_pedido="SELECT o.observaciones, o.fecha, o.descripcion, o.orden_pedido, o.conse, c.cliente, o.cliente as cid, o.adjunto, u.nombres, u.apellidos, o.fecha_ent_s, o.estado, o.solicitante, o.fecha_cumplida FROM ordenes_produccion o JOIN clientes c ON o.cliente=c.id JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["opd"]."'";
                   
 
                   $req_pedido = $bdd->prepare($sql_pedido);
@@ -524,7 +524,7 @@
 
               <center>
                 <?php if ($pedido["estado"]==4) { ?>
-                    <h4 style="color: #53C144">Cumplida</h4>
+                    <h4 style="color: #53C144">Cumplida <?php echo $pedido["fecha_cumplida"] ?></h4>
                 <?php } ?>
                  <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button> <br><br>
 

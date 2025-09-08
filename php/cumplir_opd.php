@@ -3,7 +3,7 @@
 	require_once("../php/aut.php");
 	include("../conexion/bdd.php");
 
-	$sql_e = "UPDATE ordenes_produccion SET estado='4' WHERE id='".$_POST['opd']."'";
+	$sql_e = "UPDATE ordenes_produccion SET estado='4', fecha_cumplida='".date("Y-m-d H:i:s")."' WHERE id='".$_POST['opd']."'";
 
 	$query_e = $bdd->prepare( $sql_e );
 	if ($query_e == false) {
