@@ -145,14 +145,11 @@
                 <table class="table table-bordered table-hover">
                 <form method="POST" action="php/mod_opd.php" id="form_pedido">
                   <tr>
-                    <?php if ($_GET["opd"] < 104) { ?>
+                   
 
-                      <td>OPD #: <?php echo $_GET["opd"] ?></td>
+                      <td>OPD #: <?php echo date("y")." - ".$_GET["opd"] ?></td>
 
-                    <?php }else{ ?>
-
-                      <td>OPD # 25-:<?php echo $pedido["conse"] ?></td>
-                    <?php } ?>
+                   
                                 
                     <td>Fecha: <?php echo $pedido["fecha"] ?></td>
                     <td>

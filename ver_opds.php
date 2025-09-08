@@ -103,7 +103,7 @@
                                   
 
                                   
-                                  $sql = "SELECT o.id as opid, o.usuario, o.fecha, o.solicitante, o.estado, o.conse, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario FROM ordenes_produccion o JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario WHERE estado !=3 AND conse > 0";
+                  $sql = "SELECT o.id as opid, o.usuario, o.fecha, o.solicitante, o.estado, o.conse, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario FROM ordenes_produccion o JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario WHERE estado !=3 AND conse > 0";
 
                   $req = $bdd->prepare($sql);
                   $req->execute();
@@ -128,44 +128,39 @@
                                         <?php 
                                           foreach($ops as $op) {
 
-                                                echo'<tr class="odd gradeX">';
+                                            echo'<tr class="odd gradeX">';
 
-                                                if ($op["opid"] < 104) {
-                                                  echo'<td class="center"><a href="opd_solicitada.php?opd='.$op["opid"].'">'.$op["opid"].'</a></td>';
-                                                }else{
-                                                  echo'<td class="center"><a href="opd_solicitada.php?opd='.$op["opid"].'">25-'.$op["conse"].'</a></td>';
-                                                }
-                                                
-                                                echo'<td class="center">'.$op["usuario"].'</td>';
-                                                echo'<td class="center">'.$op["fecha"].'</td>';
+                                            echo'<td class="center"><a href="opd_solicitada.php?opd='.$op["opid"].'">'.date("y").' - '.$op["opid"].'</a></td>';
+                                            echo'<td class="center">'.$op["usuario"].'</td>';
+                                            echo'<td class="center">'.$op["fecha"].'</td>';
 
-                                                echo'<td class="center">'.$op["cliente"].'</td>';
+                                            echo'<td class="center">'.$op["cliente"].'</td>';
 
-                                                $sql = "SELECT libro FROM libros_opd WHERE opid='".$op["opid"]."'";
+                                            $sql = "SELECT libro FROM libros_opd WHERE opid='".$op["opid"]."'";
 
-                        $req = $bdd->prepare($sql);
-                        $req->execute();
+                                            $req = $bdd->prepare($sql);
+                                            $req->execute();
 
-                        $titulos = $req->fetchAll();
+                                            $titulos = $req->fetchAll();
 
-                        echo "<td>";
+                                            echo "<td>";
 
-                          foreach ($titulos as $titulo) {
+                                              foreach ($titulos as $titulo) {
 
-                            echo "- ".$titulo["libro"]." ";
-                          }
+                                                echo "- ".$titulo["libro"]." ";
+                                              }
 
-                        echo "</td>";
+                                            echo "</td>";
 
-                                                if ($op["estado"]==4) {
-                                                  echo'<td class="center" style="color: #24B910">Si</td>';
-                                                }else{
-                                                  echo'<td class="center" style="color: #EA0000">No</td>';
-                                                }
+                                            if ($op["estado"]==4) {
+                                              echo'<td class="center" style="color: #24B910">Si</td>';
+                                            }else{
+                                              echo'<td class="center" style="color: #EA0000">No</td>';
+                                            }
 
 
                                                     
-                                            }
+                                          }
                                          ?>
                                         
                                         </tr>

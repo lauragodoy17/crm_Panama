@@ -22,14 +22,14 @@
 		$nombre_archivo="";
 	}
 
-	$sql = "SELECT MAX(conse) as conse FROM ordenes_produccion";
+	/*$sql = "SELECT MAX(conse) as conse FROM ordenes_produccion";
     $req = $bdd->prepare($sql);
     $req->execute();
 	$conse = $req->fetch();
 
-	$conse["conse"]++;
+	$conse["conse"]++;*/
 
-	$sql_p2 = "INSERT INTO ordenes_produccion(usuario,solicitante,orden_pedido,cliente,descripcion,observaciones,adjunto,fecha_ent_s, conse) VALUES('".$_SESSION["id"]."','".$_POST["solicitante"]."','".$_POST["orden_pedido"]."','".$_POST["cliente"]."','".$_POST["descrip"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$_POST["fecha_ent_s"]."', '".$conse["conse"]."')";
+	$sql_p2 = "INSERT INTO ordenes_produccion(usuario,solicitante,cliente,descripcion,observaciones,adjunto,fecha_ent_s) VALUES('".$_SESSION["id"]."','".$_POST["solicitante"]."','".$_POST["cliente"]."','".$_POST["descrip"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$_POST["fecha_ent_s"]."')";
 				
 				
 	$query_p2 = $bdd->prepare( $sql_p2 );
