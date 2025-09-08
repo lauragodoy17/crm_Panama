@@ -111,23 +111,19 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("M6", "Entrega 2");
 $objSpreadsheet->getActiveSheet()->SetCellValue("N6", "Fecha / Observaciones E2");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O6", "Entrega 3");
 $objSpreadsheet->getActiveSheet()->SetCellValue("P6", "OFecha / Observaciones E3");
-$objSpreadsheet->getActiveSheet()->SetCellValue("Q6", "Entrega 4");
-$objSpreadsheet->getActiveSheet()->SetCellValue("R6", "Fecha / Observaciones E4");
-$objSpreadsheet->getActiveSheet()->SetCellValue("S6", "Entrega 5");
-$objSpreadsheet->getActiveSheet()->SetCellValue("T6", "Fecha / Observaciones E5");
 
-$objSpreadsheet->getActiveSheet()->getStyle("A1:T1")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->getStyle("A1:P1")->getFont()->getColor()->applyFromArray(
 	array(
 	'rgb' => '#251919'
 	)
 );
-$objSpreadsheet->getActiveSheet()->getStyle("A6:T6")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->getStyle("A6:P6")->getFont()->getColor()->applyFromArray(
 	array(
 	'rgb' => '#251919'
 	)
 );
 
-$objSpreadsheet->getActiveSheet()->getStyle('A6:T6')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A6:P6')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -219,31 +215,6 @@ foreach ($opds as $opd) {
     }
     
 
-    $sql="SELECT fecha, cant_entregada, cant_entregada, observacion_entrega FROM entregas_opd WHERE id_libro_opd='".$opd["lid"]."' ORDER BY id LIMIT 1 OFFSET 3";
-
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $ent4 = $req->fetch();
-
-    if (!empty($ent4)) {
-        $entrega4= $ent4["fecha"]." / ".$ent4["observacion_entrega"];
-
-        $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "$ent4[cant_entregada]");
-        $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "$entrega4");
-    }
-    
-
-    $sql="SELECT fecha, cant_entregada, cant_entregada, observacion_entrega FROM entregas_opd WHERE id_libro_opd='".$opd["lid"]."' ORDER BY id LIMIT 1 OFFSET 4";
-
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $ent5 = $req->fetch();
-    if (!empty($ent5)) {
-        $entrega5= $ent5["fecha"]." / ".$ent5["observacion_entrega"];
-
-        $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "$ent5[cant_entregada]");
-        $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", "$entrega5");
-    }
     
    
 	$conta++;

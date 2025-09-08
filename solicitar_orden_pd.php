@@ -96,10 +96,6 @@
                   <input type="text" class="form-control" name="solicitante" id="solicitante" required>
                 </div>
 
-                <div class="col-sm-2">
-                  <label  for="orden_pedido" class="control-label">Orden de pedido</label>
-                  <input type="text" class="form-control" name="orden_pedido" id="orden_pedido" >
-                </div>
 
                 <div class="col-sm-4">
                   
@@ -180,19 +176,14 @@
               <div class="row">
                 
                 
-                <div class="form-group col-sm-3">
+                <div class="form-group col-sm-6">
                   <label id="l_titulo" for="titulo" class="control-label">Titulo<small style="color:red;"> *</small></label>
                   <input type="text" class="form-control" name="titulo" id="titulo">
                 </div>
 
-                <div class="form-group col-sm-3">
+                <div class="form-group col-sm-6">
                   <label id="l_cantidad" for="cantidad" class="control-label">Cantidad<small style="color:red;"> *</small></label>
                   <input type="number" class="form-control" name="cantidad" id="cantidad">
-                </div>
-
-                <div class="form-group col-sm-3">
-                  <label id="l_cencaratulado" for="encaratulado" class="control-label">Encaratulado<small style="color:red;"> *</small></label>
-                  <input type="text" class="form-control" name="encaratulado" id="encaratulado">
                 </div>
               </div>
               
@@ -203,20 +194,15 @@
                 <div id="agg_l<?php echo $i;?>" class="d-none">
                   <h4>Material #<?php echo $i+1;?>:</h4>
                   <div class="row">
-                    <div class="form-group col-sm-3">
+                    <div class="form-group col-sm-6">
                       <label id="l_titulo<?php echo $i;?>" for="titulo<?php echo $i;?>" class="control-label">Titulo<small style="color:red;"> *</small></label>
                       <input type="text" class="form-control" name="titulo" id="titulo<?php echo $i;?>">
                     </div>
 
-                    <div class="form-group col-sm-3">
+                    <div class="form-group col-sm-6">
                       <label id="l_cantidad<?php echo $i;?>" for="cantidad<?php echo $i;?>" class="control-label">Cantidad<small style="color:red;"> *</small></label>
                       <input type="number" class="form-control" name="cantidad" id="cantidad<?php echo $i;?>">
-                    </div>
-
-                    <div class="form-group col-sm-3">
-                      <label id="l_cencaratulado<?php echo $i;?>" for="encaratulado<?php echo $i;?>" class="control-label">Encaratulado<small style="color:red;"> *</small></label>
-                      <input type="text" class="form-control" name="encaratulado" id="encaratulado<?php echo $i;?>">
-                    </div>
+                    </div>                  
                   </div>
               
               
@@ -258,24 +244,14 @@
       $('#cantidad').keyup(function(){
         var cant =$('#cantidad').val();
         var titulo=$('#titulo').val();
-        var enca=$('#encaratulado').val();
-        $('#libro_e').val(titulo+'/'+cant+'/'+enca);
+        $('#libro_e').val(titulo+'/'+cant);
 
       })
 
       $('#titulo').keyup(function(){
         var cant =$('#cantidad').val();
         var titulo=$('#titulo').val();
-        var enca=$('#encaratulado').val();
-        $('#libro_e').val(titulo+'/'+cant+'/'+enca);
-
-      })
-
-      $('#encaratulado').keyup(function(){
-        var cant =$('#cantidad').val();
-        var titulo=$('#titulo').val();
-        var enca=$('#encaratulado').val();
-        $('#libro_e').val(titulo+'/'+cant+'/'+enca);
+        $('#libro_e').val(titulo+'/'+cant);
 
       })
 
@@ -298,8 +274,7 @@
 
           var cant =$('#cantidad<?php echo $i; ?>').val();
           var titulo=$('#titulo<?php echo $i; ?>').val();
-          var enca=$('#encaratulado<?php echo $i; ?>').val();
-          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant+'/'+enca);
+          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant);
 
         })
 
@@ -307,21 +282,10 @@
 
           var cant =$('#cantidad<?php echo $i; ?>').val();
           var titulo=$('#titulo<?php echo $i; ?>').val();
-          var enca=$('#encaratulado<?php echo $i; ?>').val();
-          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant+'/'+enca);
+          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant);
 
         })
-
-        $('#encaratulado<?php echo $i; ?>').keyup(function(){
-
-          var cant =$('#cantidad<?php echo $i; ?>').val();
-          var titulo=$('#titulo<?php echo $i; ?>').val();
-          var enca=$('#encaratulado<?php echo $i; ?>').val();
-          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant+'/'+enca);
-
-        })
-
-        
+      
 
       <?php } ?>
 

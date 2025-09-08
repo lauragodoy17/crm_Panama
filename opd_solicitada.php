@@ -120,7 +120,7 @@
             
                 <?php 
 
-                  $sql_pedido="SELECT o.observaciones, o.fecha, o.descripcion, o.orden_pedido, o.conse, c.cliente, o.cliente as cid, o.adjunto, u.nombres, u.apellidos, o.fecha_ent_s, o.estado FROM ordenes_produccion o JOIN clientes c ON o.cliente=c.id JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["opd"]."'";
+                  $sql_pedido="SELECT o.observaciones, o.fecha, o.descripcion, o.orden_pedido, o.conse, c.cliente, o.cliente as cid, o.adjunto, u.nombres, u.apellidos, o.fecha_ent_s, o.estado, o.solicitante FROM ordenes_produccion o JOIN clientes c ON o.cliente=c.id JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["opd"]."'";
                   
 
                   $req_pedido = $bdd->prepare($sql_pedido);
@@ -174,11 +174,11 @@
                     Usuario: <?php echo $pedido["nombres"]." ".$pedido["apellidos"] ?>
                   </td>
                                 
-                  <?php if ($_SESSION['tipo']!=8) { ?>
-                    <td>Orden de pedido: <input type="text" name="orden_pedido" value="<?php echo $pedido["orden_pedido"];?>"> </td>
-                  <?php }else{ ?>
-                    <td>Orden de pedido:  <?php echo $pedido["orden_pedido"];?> </td>
-                  <?php } ?>
+                 
+                  <td>Solicitante: <?php echo $pedido["solicitante"]; ?> </td>
+                 
+              
+                
                     <td>
                   <?php if ($_SESSION['tipo']!=8) { ?>
                     <label for="fecha_ent_s">Fecha de entrega solicitada:<small style="color:red;"> *</small></label>
@@ -252,16 +252,12 @@
 
                             <th class="hent1 d-none">Entrega 1</th>
                             <th class="hent2 d-none">Entrega 2</th>
-                            <th class="hent3 d-none">Entrega 3</th>
-                            <th class="hent4 d-none">Entrega 4</th>
-                            <th class="hent5 d-none">Entrega 5</th>           
+                            <th class="hent3 d-none">Entrega 3</th>       
 
                           <?php }else { ?>
                             <th>Entrega 1</th>
                             <th>Entrega 2</th>
                             <th>Entrega 3</th>
-                            <th>Entrega 4</th>
-                            <th>Entrega 5</th>         
                           <?php } ?>
                                                                        
                         </tr>
@@ -292,17 +288,6 @@
                               $ent3 = $req_ent3->fetch();
 
 
-                              $sql_ent4="SELECT e.cant_entregada, e.observacion_entrega, e.fecha FROM entregas_opd e JOIN libros_opd l ON e.id_libro_opd=l.id WHERE l.opid='".$_GET["opd"]."' AND l.id='".$libro["id"]."' LIMIT 3,4";
-                        
-                              $req_ent4 = $bdd->prepare($sql_ent4);
-                              $req_ent4->execute();
-                              $ent4 = $req_ent4->fetch();
-
-                              $sql_ent5="SELECT e.cant_entregada, e.observacion_entrega, e.fecha FROM entregas_opd e JOIN libros_opd l ON e.id_libro_opd=l.id WHERE l.opid='".$_GET["opd"]."' AND l.id='".$libro["id"]."' LIMIT 4,5";
-                        
-                              $req_ent5 = $bdd->prepare($sql_ent5);
-                              $req_ent5->execute();
-                              $ent5 = $req_ent5->fetch();
                                            
                               $total_cantidad[]=$libro["cantidad"];
 
@@ -343,18 +328,6 @@
                                   echo "<td>".$ent3["cant_entregada"]."</td>";
                                 }
 
-                                if ($ent4["cant_entregada"] =="") {
-                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega4'.$libro["id"].'"></td>';
-                                }else{
-                                  echo "<td>".$ent4["cant_entregada"]."</td>";
-                                }
-
-                                if ($ent5["cant_entregada"] =="") {
-                                  echo'<td class=""><input type="number" class="form-control" min="0" max="5000" id="entrega5'.$libro["id"].'" name="entrega5[]"></td></tr>';
-
-                                }else{
-                                  echo "<td>".$ent5["cant_entregada"]."</td></tr>";
-                                }
 
                               }else{
 
@@ -385,23 +358,7 @@
                                   echo "<td>".$ent3["cant_entregada"]."</td>";
                                 }
 
-                                if ($ent4["cant_entregada"] =="") {
-                                  echo "<td class='d-none'>".$ent4["cant_entregada"]."</td>";
-                                }else{
-                                  echo "<script>
-                                  $('.hent4').removeClass('d-none');
-                                  </script>";
-                                  echo "<td>".$ent4["cant_entregada"]."</td>";
-                                }
-                                                  
-                                if ($ent5["cant_entregada"] =="") {
-                                  echo "<td class='d-none'>".$ent5["cant_entregada"]."</td>";
-                                }else{
-                                  echo "<script>
-                                    $('.hent5').removeClass('d-none');
-                                    </script>";
-                                    echo "<td>".$ent5["cant_entregada"]."</td>";
-                                }
+                                
                                                   
                               }
 
@@ -410,8 +367,6 @@
                               echo '<input type="hidden" name="entrega1[]" id="ent1'.$libro["id"].'" >';
                               echo '<input type="hidden" name="entrega2[]" id="ent2'.$libro["id"].'" >';
                               echo '<input type="hidden" name="entrega3[]" id="ent3'.$libro["id"].'" >';
-                              echo '<input type="hidden" name="entrega4[]" id="ent4'.$libro["id"].'" >';
-                              echo '<input type="hidden" name="entrega5[]" id="ent5'.$libro["id"].'" >';
 
                               echo "<script>
 
@@ -462,27 +417,6 @@
 
                               
                                 })
-
-                                $('#entrega4".$libro["id"]."').keyup(function(){
-
-                                  var cant =$('#entrega4".$libro["id"]."').val();
-                                  
-
-                                  $('#ent4".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
-
-                              
-                                })
-
-                                $('#entrega5".$libro["id"]."').keyup(function(){
-
-                                  var cant =$('#entrega5".$libro["id"]."').val();
-                                  
-
-                                  $('#ent5".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
-
-                              
-                                })
-
 
                             </script>";
                                                 
@@ -541,7 +475,7 @@
                   <div class="col-sm-6">
                     <?php if ($_SESSION['tipo']!=8) { ?>
                       <label for="observaciones">Observaciones de solicitud:</label><br>
-                      <textarea name="observaciones" id="observaciones" cols="70" rows="9"><?php echo $pedido["observaciones"] ?></textarea><br>
+                      <textarea name="observaciones" id="observaciones" cols="70" rows="9" class="form-control"><?php echo $pedido["observaciones"] ?></textarea><br>
                     <?php }else{ ?>
                       <label for="observaciones">Observaciones de solicitud:</label>
                       <?php echo $pedido["observaciones"] ?>
@@ -583,31 +517,10 @@
                       echo "Observaciones de entrega 3: ".$ent3["observacion_entrega"]."<hr>"; 
                     }
 
-                    if ($ent4["fecha"]!="") {
-
-                      echo "Fecha de entrega taller 4: ".$ent4["fecha"]."<hr>"; 
-
-                    }
-
-                    if ($ent4["observacion_entrega"]!="") {                 
-
-                      echo "Observaciones de entrega 4: ".$ent4["observacion_entrega"]."<hr>"; 
-                    }
-
-                    if ($ent5["fecha"]!="") {
-
-                      echo "Fecha de entrega taller 5: ".$ent5["fecha"]."<hr>"; 
-
-                    }
-
-                    if ($ent5["observacion_entrega"]!="") {
-
-                      echo "Observaciones de entrega 5: ".$ent5["observacion_entrega"]."<br>"; 
-                    }
                   ?>
                   <?php if ($_SESSION['tipo']!=2) { ?>
                     <br><label for="observaciones_ent">Observaciones de entrega:</label><br>
-                    <textarea name="observaciones_ent" id="observaciones_ent" cols="80" rows="12"></textarea><br>
+                    <textarea name="observaciones_ent" id="observaciones_ent" cols="80" rows="12" class="form-control"></textarea><br>
                   <?php } ?>
                 </div>
               </div><br>
@@ -622,12 +535,12 @@
                   <button class="btn btn-success d-print-none" id="entregar">Entregar</button>
                 <?php } ?>
 
-                <?php if ($_SESSION['tipo']!=8) { ?>
+                
                   <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>
                   <?php if ($pedido["estado"]==0) { ?>
-                    <button class="btn btn-default d-print-none" id="cumplida">Cumplida</button>
+                    <button class="btn btn-success d-print-none" id="cumplida">Cumplida</button>
                   <?php } ?>
-                <?php } ?>
+               
 
               </center>
                         
