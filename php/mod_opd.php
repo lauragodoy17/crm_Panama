@@ -69,6 +69,25 @@
 		}
 
 	}
+
+	foreach ($_POST["i_click"] as $click) {
+		
+		list($lib,$click) =explode("/", $click);
+
+		$sql_e = "UPDATE libros_opd SET click='".$click."' WHERE id='".$lib."'";
+
+		$query_e = $bdd->prepare( $sql_e );
+		if ($query_e == false) {
+			print_r($bdd->errorInfo());
+			die ('Erreur prepare');
+		}
+		$sth_e = $query_e->execute();
+		if ($sth_e == false) {
+			print_r($query_e->errorInfo());
+			die ('Erreur execute');
+		}
+
+	}
 	
 	$sql_e = "UPDATE ordenes_produccion SET observaciones='".$_POST["observaciones"]."', cliente='".$_POST["persona"]."', orden_pedido='".$_POST["orden_pedido"]."',fecha_ent_s='".$_POST["fecha_ent_s"]."' WHERE id='".$_POST["opd"]."'";
 

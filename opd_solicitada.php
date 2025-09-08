@@ -245,6 +245,7 @@
                           <th>Título</th>
                           <th>Encaratulado</th>
                           <th>Cantidad</th>
+                          <th># Click</th>
                           <?php if ($_SESSION['tipo']==2) { ?>
 
                             <th class="hent1 d-none">Entrega 1</th>
@@ -305,6 +306,8 @@
                                 echo'<td class="">'.$libro["cantidad"].'</td>';
                               }
 
+                              echo'<td class=""> <input type="number" class="form-control dc" min="0" id="click'.$libro["id"].'" name="click" value="'.$libro["click"].'">  </td>';
+
                               if ($_SESSION['tipo']!=2) {
 
                                 if ($ent1["cant_entregada"] =="") {
@@ -361,6 +364,7 @@
 
                               echo '<input type="hidden" name="lpid[]" value="'.$libro["id"].'" id="lpid'.$libro["id"].'">';
                               echo '<input type="hidden" name="lib_p[]" id="l'.$libro["id"].'" >';
+                              echo '<input type="hidden" name="i_click[]" id="i_click'.$libro["id"].'" >';
                               echo '<input type="hidden" name="entrega1[]" id="ent1'.$libro["id"].'" >';
                               echo '<input type="hidden" name="entrega2[]" id="ent2'.$libro["id"].'" >';
                               echo '<input type="hidden" name="entrega3[]" id="ent3'.$libro["id"].'" >';
@@ -381,6 +385,16 @@
                                   
 
                                   $('#l".$libro["id"]."').val(".$libro["id"]."+'/'+cant);
+
+                              
+                                })
+
+                                $('#click".$libro["id"]."').keyup(function(){
+
+                                  var click =$('#click".$libro["id"]."').val();
+                                  
+
+                                  $('#i_click".$libro["id"]."').val(".$libro["id"]."+'/'+click);
 
                               
                                 })
@@ -532,9 +546,9 @@
                   <button class="btn btn-warning d-print-none" id="entregar">Entregar</button>
                 <?php } ?>
 
-                  <?php if ($_SESSION['tipo']!=8) { ?>
-                    <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>
-                  <?php } ?>
+                  
+                <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>
+                  
                   
                   <?php if ($pedido["estado"]==0) { ?>
                     <button class="btn btn-success d-print-none" id="cumplida">Cumplida</button>
