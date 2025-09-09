@@ -78,7 +78,7 @@
       }
 
       .dc {
-        width: 50px !important;
+        width: 60px !important;
       }
 
       input[type=number] { -moz-appearance:textfield; }
@@ -133,7 +133,7 @@
                   $req_cliente->execute();
                   $cliente = $req_cliente->fetch();
 
-                                  $sql = "SELECT * FROM libros_opd WHERE opid='".$_GET['opd']."'";
+                  $sql = "SELECT * FROM libros_opd WHERE opid='".$_GET['opd']."'";
                   $req = $bdd->prepare($sql);
                   $req->execute();
 
@@ -243,9 +243,9 @@
                                           
                           <th>#</th>
                           <th>Título</th>
-                          <th>Encaratulado</th>
                           <th>Cantidad</th>
                           <th># Click</th>
+                          <th>Impresora</th>
                           <?php if ($_SESSION['tipo']==2) { ?>
 
                             <th class="hent1 d-none">Entrega 1</th>
@@ -257,14 +257,24 @@
                             <th>Entrega 2</th>
                             <th>Entrega 3</th>
                           <?php } ?>
-                                                                       
+                            <th>Total entregas</th>
+                            <th>Total Clicks</th>
+                            <th>Valor</th>                                        
                         </tr>
                       </thead>
                       <tbody>
                                 
                         <script src='vendors/scripts/jquery-2.1.4.min.js'></script>
+
                           <?php
+
                             $i=1;
+
+                            $sql="SELECT * FROM impresoras_taller WHERE act=1";                      
+                            $req = $bdd->prepare($sql);
+                            $req->execute();
+                            $impresoras = $req->fetchAll();
+
                             foreach($libros as $libro) {
 
                               $sql_ent1="SELECT e.cant_entregada, e.observacion_entrega, e.fecha FROM entregas_opd e JOIN libros_opd l ON e.id_libro_opd=l.id WHERE l.opid='".$_GET["opd"]."' AND l.id='".$libro["id"]."' LIMIT 1";
@@ -293,12 +303,11 @@
                               echo'<td class="">';
                                 if ($_SESSION['tipo']!=8) {
 
-                                  echo'<button type="button" class="btn btn-danger btn-xs d-print-none" id="e'.$libro["id"].'"><i class="fa fa-trash"></i></button>';
+                                  echo'<button type="button" class="btn btn-danger btn-sm d-print-none" id="e'.$libro["id"].'"><i class="fa fa-trash"></i></button> ';
                                 }
                                                 
                               echo''.$i.'</td>';
                               echo'<td class="">'.$libro["libro"].'</td>';
-                              echo'<td class="">'.$libro["encaratulado"].'</td>';
 
                               if ($_SESSION['tipo']!=8) {
                                 echo'<td class=""> <input type="number" class="form-control dc" min="0" max="5000" id="cantidad'.$libro["id"].'" name="cantidad" value="'.$libro["cantidad"].'">  </td>';
@@ -307,6 +316,22 @@
                               }
 
                               echo'<td class=""> <input type="number" class="form-control dc" min="0" id="click'.$libro["id"].'" name="click" value="'.$libro["click"].'">  </td>';
+                              echo'<td class="">
+                                <select name="impresora" class="form-control" id="impresora'.$libro["id"].'">
+                                  <option value="">Seleccione</option>';
+
+                                  foreach ($impresoras as $impresora) {
+                                    if ($libro["impresora"]==$impresora["id"]) {
+                                      echo "<option value='".$impresora["id"]."' data-valor='".$impresora["valor_click"]."' SELECTED>".$impresora["impresora"]."</option>";
+                                    }else{
+                                      echo "<option value='".$impresora["id"]."' data-valor='".$impresora["valor_click"]."'>".$impresora["impresora"]."</option>";
+                                    }
+                                    
+                                  }
+
+                                echo'</select>
+                              </td>';
+
 
                               if ($_SESSION['tipo']!=2) {
 
@@ -358,13 +383,21 @@
                                   echo "<td>".$ent3["cant_entregada"]."</td>";
                                 }
 
-                                
-                                                  
                               }
 
+                              $total_entr=$ent1["cant_entregada"] +$ent2["cant_entregada"] +$ent3["cant_entregada"];
+                              $total_click=$total_entr * $libro["click"];
+                              $valor=$total_click * $libro["valor_click"];
+                              $total_entregas[]=$total_entr;
+                              $total_clicks[]=$total_click;
+                              $total_valor[]=$valor;
+                              echo "<td>".$total_entr."</td>";
+                              echo "<td>".$total_click."</td>";
+                              echo "<td>$ ".number_format($valor,0,",", ".")."</td>";
                               echo '<input type="hidden" name="lpid[]" value="'.$libro["id"].'" id="lpid'.$libro["id"].'">';
                               echo '<input type="hidden" name="lib_p[]" id="l'.$libro["id"].'" >';
                               echo '<input type="hidden" name="i_click[]" id="i_click'.$libro["id"].'" >';
+                              echo '<input type="hidden" name="i_impresora[]" id="i_impresora'.$libro["id"].'" >';
                               echo '<input type="hidden" name="entrega1[]" id="ent1'.$libro["id"].'" >';
                               echo '<input type="hidden" name="entrega2[]" id="ent2'.$libro["id"].'" >';
                               echo '<input type="hidden" name="entrega3[]" id="ent3'.$libro["id"].'" >';
@@ -395,6 +428,16 @@
                                   
 
                                   $('#i_click".$libro["id"]."').val(".$libro["id"]."+'/'+click);
+
+                              
+                                })
+
+                                $('#impresora".$libro["id"]."').change(function(){
+
+                                  var impresora =$('#impresora".$libro["id"]."').val();
+                                  var valor =  $('#impresora".$libro["id"]." option:selected').data('valor');                          
+
+                                  $('#i_impresora".$libro["id"]."').val(".$libro["id"]."+'/'+impresora+'/'+valor);
 
                               
                                 })
@@ -436,6 +479,9 @@
                           }
 
                           $total_c=array_sum($total_cantidad);
+                          $total_entregas=array_sum($total_entregas);
+                          $total_clicks=array_sum($total_clicks);
+                          $total_valor=array_sum($total_valor);
 
                         ?>
                                         
@@ -444,9 +490,16 @@
                       <tfoot>
                         <tr>
                           <td></td>
-                          <td></td>
                           <td>Total</td>
                           <td><?php echo $total_c; ?></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td><?php echo $total_entregas; ?></td>
+                          <td><?php echo $total_clicks; ?></td>
+                          <td>$ <?php echo number_format($total_valor,0,",", "."); ?></td>
                         </tr>
                       </tfoot>
                                     
@@ -530,8 +583,8 @@
 
                   ?>
                   <?php if ($_SESSION['tipo']!=2) { ?>
-                    <br><label for="observaciones_ent">Observaciones de entrega:</label><br>
-                    <textarea name="observaciones_ent" id="observaciones_ent" cols="80" rows="12" class="form-control"></textarea><br>
+                    <br><label for="observaciones_ent">Observaciones de entrega:<small style="color: red">*</small></label><br>
+                    <textarea name="observaciones_ent" id="observaciones_ent" cols="80" rows="12" class="form-control" required placeholder="Tipo de insumo"></textarea><br>
                   <?php } ?>
                 </div>
               </div><br>

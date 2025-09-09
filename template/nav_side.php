@@ -293,30 +293,33 @@
 								><span class="mtext">Inicio</span>
 							</a>
 						</li>
-						<li class="dropdown" id="zonificacion">
-							<a href="javascript:;" class="dropdown-toggle" >
-								<span class="micon bi bi-building"></span
-								><span class="mtext">Zonificación</span>
-							</a>
-							<ul class="submenu">
-								<?php if ($_SESSION["tipo"] ==1) {?>
+						<?php if ($_SESSION["tipo"] !=8) {?>
+							<li class="dropdown" id="zonificacion">
+								<a href="javascript:;" class="dropdown-toggle" >
+									<span class="micon bi bi-building"></span
+									><span class="mtext">Zonificación</span>
+								</a>
+								<ul class="submenu">
+									<?php if ($_SESSION["tipo"] ==1) {?>
 
+										<li>
+											<a href="agregar_colegio.php">Crear colegio</a>
+										</li>
+									<?php } ?>
 									<li>
-										<a href="agregar_colegio.php">Crear colegio</a>
+										<a href="ver_colegios.php" id="ver_zonificacion">Ver</a>
 									</li>
-								<?php } ?>
-								<li>
-									<a href="ver_colegios.php" id="ver_zonificacion">Ver</a>
-								</li>
-								
-							</ul>
-						</li>
-						<li>
-							<a href="agenda.php" class="dropdown-toggle no-arrow" id="plan_trabajo">
-								<span class="micon bi bi-calendar4-week"></span
-								><span class="mtext">Plan de trabajo</span>
-							</a>
-						</li>
+									
+								</ul>
+							</li>
+							<li>
+								<a href="agenda.php" class="dropdown-toggle no-arrow" id="plan_trabajo">
+									<span class="micon bi bi-calendar4-week"></span
+									><span class="mtext">Plan de trabajo</span>
+								</a>
+							</li>
+						<?php }?>
+						
 						<?php if ($_SESSION["tipo"] !=5  && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=8) {?>
 
 							<li class="dropdown" id="zonificacion">
@@ -532,9 +535,14 @@
 									><span class="mtext">OPD'S</span>
 								</a>
 								<ul class="submenu">
-									<li><a href="solicitar_orden_pd.php">Solicitar</a></li>
+
+									<?php if ($_SESSION["tipo"] !=8) {?>
+										<li><a href="solicitar_orden_pd.php">Solicitar</a></li>
+									<?php }?>
 									<li><a href="ver_opds.php">Ver</a></li>
-									<li><a href="reporte_opd.php">Reporte</a></li>
+									<?php if ($_SESSION["tipo"] !=8) {?>
+										<li><a href="reporte_opd.php">Reporte</a></li>
+									<?php }?>
 									
 								</ul>
 							</li>

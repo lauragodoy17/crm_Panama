@@ -103,7 +103,7 @@
                                   
 
                                   
-                  $sql = "SELECT o.id as opid, o.usuario, o.fecha, o.solicitante, o.estado, o.conse, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario FROM ordenes_produccion o JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario WHERE estado !=3 AND conse > 0";
+                  $sql = "SELECT o.id as opid, o.usuario, o.fecha, o.solicitante, o.estado, o.conse, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario FROM ordenes_produccion o JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario WHERE estado !=3";
 
                   $req = $bdd->prepare($sql);
                   $req->execute();
@@ -208,7 +208,8 @@
               last:"Último"
             }
           },
-          order: [[0, 'desc']]
+          order: [[2, 'desc']],
+          
         });
       });
 

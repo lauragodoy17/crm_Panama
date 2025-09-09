@@ -111,19 +111,24 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("M6", "Entrega 2");
 $objSpreadsheet->getActiveSheet()->SetCellValue("N6", "Fecha / Observaciones E2");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O6", "Entrega 3");
 $objSpreadsheet->getActiveSheet()->SetCellValue("P6", "OFecha / Observaciones E3");
+$objSpreadsheet->getActiveSheet()->SetCellValue("Q6", "Total entregas");
+$objSpreadsheet->getActiveSheet()->SetCellValue("R6", "Impresora");
+$objSpreadsheet->getActiveSheet()->SetCellValue("S6", "Click");
+$objSpreadsheet->getActiveSheet()->SetCellValue("T6", "Total clicks");
+$objSpreadsheet->getActiveSheet()->SetCellValue("U6", "Valor");
 
-$objSpreadsheet->getActiveSheet()->getStyle("A1:P1")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->getStyle("A1:U1")->getFont()->getColor()->applyFromArray(
 	array(
 	'rgb' => '#251919'
 	)
 );
-$objSpreadsheet->getActiveSheet()->getStyle("A6:P6")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->getStyle("A6:U6")->getFont()->getColor()->applyFromArray(
 	array(
 	'rgb' => '#251919'
 	)
 );
 
-$objSpreadsheet->getActiveSheet()->getStyle('A6:P6')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A6:U6')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -136,7 +141,7 @@ $objSpreadsheet->getActiveSheet()->getStyle('A6:P6')->applyFromArray([
 
 $desde=$_POST["desde"]." "."00:00:00";
 $hasta=$_POST["hasta"]." "."23:59:59";
-$sql="SELECT o.id, o.fecha, o.estado, o.solicitante, o.observaciones, o.fecha_ent_s, o.conse, CONCAT(u.nombres,' ',u.apellidos) AS usuario, c.cliente, l.id as lid, l.libro, l.cantidad FROM ordenes_produccion o JOIN usuarios u ON u.id=o.usuario JOIN clientes c ON c.id=o.cliente JOIN libros_opd l ON l.opid=o.id WHERE o.fecha BETWEEN '".$desde."' AND '".$hasta."' ORDER BY id DESC";
+$sql="SELECT o.id, o.fecha, o.estado, o.solicitante, o.observaciones, o.fecha_ent_s, o.conse, CONCAT(u.nombres,' ',u.apellidos) AS usuario, c.cliente, l.id as lid, l.libro, l.cantidad, l.click, l.impresora, l.valor_click  FROM ordenes_produccion o JOIN usuarios u ON u.id=o.usuario JOIN clientes c ON c.id=o.cliente JOIN libros_opd l ON l.opid=o.id WHERE o.fecha BETWEEN '".$desde."' AND '".$hasta."' ORDER BY id DESC";
 
 
 $req = $bdd->prepare($sql);
@@ -150,11 +155,9 @@ foreach ($opds as $opd) {
 
 
 	
-    if ($opd["id"] < 104) {
-        $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$opd[id]");
-    }else{
-        $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$opd[conse]");
-    }
+  
+    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$opd[id]");
+    
 	
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$opd[fecha]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$opd[usuario]");
@@ -213,15 +216,43 @@ foreach ($opds as $opd) {
         $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$ent3[cant_entregada]");
         $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "$entrega3");
     }
-    
+    $total_entregas = 
+        ($ent1["cant_entregada"] ?? 0) + 
+        ($ent2["cant_entregada"] ?? 0) + 
+        ($ent3["cant_entregada"] ?? 0);
 
+    $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", "$total_entregas");
+
+    $sql="SELECT impresora FROM impresoras_taller WHERE id='".$opd["impresora"]."'";
+
+    $req = $bdd->prepare($sql);
+    $req->execute();
+    $impresora = $req->fetch();
+    if (!empty($impresora["impresora"])) {
+        $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "$impresora[impresora]");
+    }
     
+    $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", "$opd[click]");
+
+    $total_clicks=$total_entregas * $opd["click"];
+
+    $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", "$total_clicks");
+
+    $valor=$total_clicks* $opd["valor_click"];
+
+    $objSpreadsheet->getActiveSheet()->SetCellValue("U$conta", "$valor");
    
 	$conta++;
 
   
 
 }	
+
+$objSpreadsheet->getActiveSheet()->getStyle("U7:U$conta")
+    ->getNumberFormat()
+    ->setFormatCode(
+    '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+);
 
 	
 function excelColumnRange($start, $end) {
