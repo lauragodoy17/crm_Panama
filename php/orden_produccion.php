@@ -29,7 +29,7 @@
 
 	$conse["conse"]++;*/
 
-	$sql_p2 = "INSERT INTO ordenes_produccion(usuario,solicitante,cliente,descripcion,observaciones,adjunto,fecha_ent_s) VALUES('".$_SESSION["id"]."','".$_POST["solicitante"]."','".$_POST["cliente"]."','".$_POST["descrip"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$_POST["fecha_ent_s"]."')";
+	$sql_p2 = "INSERT INTO ordenes_produccion(usuario,solicitante,cliente,descripcion,observaciones,adjunto,fecha_ent_s,año) VALUES('".$_SESSION["id"]."','".$_POST["solicitante"]."','".$_POST["cliente"]."','".$_POST["descrip"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$_POST["fecha_ent_s"]."','".date("y")."')";
 				
 				
 	$query_p2 = $bdd->prepare( $sql_p2 );

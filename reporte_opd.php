@@ -105,7 +105,7 @@
                 </div>
               </div>
             </div>
-            <center><button class="btn btn-primary">Buscar</button></center>
+            <center><button class="btn btn-success">Exportar</button></center>
             </form>
 
           </div>

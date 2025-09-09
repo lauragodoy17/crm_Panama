@@ -103,7 +103,7 @@
                                   
 
                                   
-                  $sql = "SELECT o.id as opid, o.usuario, o.fecha, o.solicitante, o.estado, o.conse, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario FROM ordenes_produccion o JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario WHERE estado !=3";
+                  $sql = "SELECT o.id as opid, o.usuario, o.fecha, o.solicitante, o.estado, o.conse, o.año, c.*, CONCAT(u.nombres,' ',u.apellidos) AS usuario FROM ordenes_produccion o JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario WHERE estado !=3";
 
                   $req = $bdd->prepare($sql);
                   $req->execute();
@@ -130,7 +130,7 @@
 
                                             echo'<tr class="odd gradeX">';
 
-                                            echo'<td class="center"><a href="opd_solicitada.php?opd='.$op["opid"].'">'.date("y").' - '.$op["opid"].'</a></td>';
+                                            echo'<td class="center"><a href="opd_solicitada.php?opd='.$op["opid"].'">'.$op["año"].' - '.$op["opid"].'</a></td>';
                                             echo'<td class="center">'.$op["usuario"].'</td>';
                                             echo'<td class="center">'.$op["fecha"].'</td>';
 

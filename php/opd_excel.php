@@ -141,7 +141,7 @@ $objSpreadsheet->getActiveSheet()->getStyle('A6:U6')->applyFromArray([
 
 $desde=$_POST["desde"]." "."00:00:00";
 $hasta=$_POST["hasta"]." "."23:59:59";
-$sql="SELECT o.id, o.fecha, o.estado, o.solicitante, o.observaciones, o.fecha_ent_s, o.conse, CONCAT(u.nombres,' ',u.apellidos) AS usuario, c.cliente, l.id as lid, l.libro, l.cantidad, l.click, l.impresora, l.valor_click  FROM ordenes_produccion o JOIN usuarios u ON u.id=o.usuario JOIN clientes c ON c.id=o.cliente JOIN libros_opd l ON l.opid=o.id WHERE o.fecha BETWEEN '".$desde."' AND '".$hasta."' ORDER BY id DESC";
+$sql="SELECT o.id, o.fecha, o.estado, o.solicitante, o.observaciones, o.fecha_ent_s, o.conse, o.año, CONCAT(u.nombres,' ',u.apellidos) AS usuario, c.cliente, l.id as lid, l.libro, l.cantidad, l.click, l.impresora, l.valor_click  FROM ordenes_produccion o JOIN usuarios u ON u.id=o.usuario JOIN clientes c ON c.id=o.cliente JOIN libros_opd l ON l.opid=o.id WHERE o.fecha BETWEEN '".$desde."' AND '".$hasta."' ORDER BY id DESC";
 
 
 $req = $bdd->prepare($sql);
@@ -154,10 +154,9 @@ $conta=7;
 foreach ($opds as $opd) {
 
 
-	
+	$opdid=$opd["año"]." - ".$opd["id"];
   
-    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$opd[id]");
-    
+    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$opdid");  
 	
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$opd[fecha]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$opd[usuario]");
