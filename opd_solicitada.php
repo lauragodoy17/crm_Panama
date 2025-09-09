@@ -120,7 +120,7 @@
             
                 <?php 
 
-                  $sql_pedido="SELECT o.observaciones, o.fecha, o.descripcion, o.orden_pedido, o.conse, c.cliente, o.cliente as cid, o.adjunto, u.nombres, u.apellidos, o.fecha_ent_s, o.estado, o.solicitante, o.fecha_cumplida FROM ordenes_produccion o JOIN clientes c ON o.cliente=c.id JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["opd"]."'";
+                  $sql_pedido="SELECT o.observaciones, o.fecha, o.descripcion, o.orden_pedido, o.conse,o.año, c.cliente, o.cliente as cid, o.adjunto, u.nombres, u.apellidos, o.fecha_ent_s, o.estado, o.solicitante, o.fecha_cumplida FROM ordenes_produccion o JOIN clientes c ON o.cliente=c.id JOIN usuarios u ON u.id=o.usuario WHERE o.id='".$_GET["opd"]."'";
                   
 
                   $req_pedido = $bdd->prepare($sql_pedido);
@@ -147,7 +147,7 @@
                   <tr>
                    
 
-                      <td>OPD #: <?php echo date("y")." - ".$_GET["opd"] ?></td>
+                      <td>OPD #: <?php echo $pedido["año"]." - ".$_GET["opd"] ?></td>
 
                    
                                 
