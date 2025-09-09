@@ -131,7 +131,7 @@
                       <option selected="selected" value="">Seleccionar</option>
                       <option value="1">Libro estudiante</option>
                       <option value="2">Guía</option>
-                      <option value="2">Otro</option>
+                      <option value="3">Otro</option>
                       
                     </select>
                   </div>

@@ -158,7 +158,7 @@
                       <?php 
                         if ($pedido["descripcion"]==1) {
                           echo "Libro Suelto";
-                        }elseif ($pedido["descripcion"]==1) {
+                        }elseif ($pedido["descripcion"]==2) {
                           echo "Guía";
                         }else{
                           echo "Otro";
