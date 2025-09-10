@@ -246,20 +246,12 @@
                           <th>Cantidad</th>
                           <th># Click</th>
                           <th>Impresora</th>
-                          <?php if ($_SESSION['tipo']==2) { ?>
-
-                            <th class="hent1 d-none">Entrega 1</th>
-                            <th class="hent2 d-none">Entrega 2</th>
-                            <th class="hent3 d-none">Entrega 3</th>       
-
-                          <?php }else { ?>
-                            <th>Entrega 1</th>
-                            <th>Entrega 2</th>
-                            <th>Entrega 3</th>
-                          <?php } ?>
-                            <th>Total entregas</th>
-                            <th>Total Clicks</th>
-                            <th>Valor</th>                                        
+                          <th>Entrega 1</th>
+                          <th>Entrega 2</th>
+                          <th>Entrega 3</th>
+                          <th>Total entregas</th>
+                          <th>Total Clicks</th>
+                          <th>Valor</th>                                        
                         </tr>
                       </thead>
                       <tbody>
@@ -333,57 +325,26 @@
                               </td>';
 
 
-                              if ($_SESSION['tipo']!=2) {
+                             
 
-                                if ($ent1["cant_entregada"] =="") {
-                                  echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega1'.$libro["id"].'" ></td>';
-                                }else{
-                                  echo "<td>".$ent1["cant_entregada"]."</td>";
-                                }
-
-                                if ($ent2["cant_entregada"] =="") {
-                                  echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega2'.$libro["id"].'" ></td>';
-                                }else{
-                                  echo "<td>".$ent2["cant_entregada"]."</td>";
-                                }
-
-                                if ($ent3["cant_entregada"] =="") {
-                                  echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega3'.$libro["id"].'" ></td>';
-                                }else{
-                                  echo "<td>".$ent3["cant_entregada"]."</td>";
-                                }
-
-
+                              if ($ent1["cant_entregada"] =="") {
+                                echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega1'.$libro["id"].'" ></td>';
                               }else{
-
-                                if ($ent1["cant_entregada"] =="") {
-                                  echo "<td class='d-none'>".$ent1["cant_entregada"]."</td>";
-                                }else{
-                                  echo "<script>
-                                    $('.hent1').removeClass('d-none');
-                                  </script>";
-                                  echo "<td>".$ent1["cant_entregada"]."</td>";
-                                }
-
-                                if ($ent2["cant_entregada"] =="") {
-                                  echo "<td class='d-none'>".$ent2["cant_entregada"]."</td>";
-                                }else{
-                                  echo "<script>
-                                    $('.hent2').removeClass('d-none');
-                                  </script>";
-                                  echo "<td>".$ent2["cant_entregada"]."</td>";
-                                }
-
-                                if ($ent3["cant_entregada"] =="") {
-                                  echo "<td class='d-none'>".$ent3["cant_entregada"]."</td>";
-                                }else{
-                                  echo "<script>
-                                    $('.hent3').removeClass('d-none');
-                                  </script>";
-                                  echo "<td>".$ent3["cant_entregada"]."</td>";
-                                }
-
+                                echo "<td>".$ent1["cant_entregada"]."</td>";
                               }
+
+                              if ($ent2["cant_entregada"] =="") {
+                                echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega2'.$libro["id"].'" ></td>';
+                              }else{
+                                echo "<td>".$ent2["cant_entregada"]."</td>";
+                              }
+
+                              if ($ent3["cant_entregada"] =="") {
+                                echo'<td class=""><input type="number" class="form-control dc" min="0" max="5000" id="entrega3'.$libro["id"].'" ></td>';
+                              }else{
+                                echo "<td>".$ent3["cant_entregada"]."</td>";
+                              }
+
 
                               $total_entr=$ent1["cant_entregada"] +$ent2["cant_entregada"] +$ent3["cant_entregada"];
                               $total_click=$total_entr * $libro["click"];
@@ -539,7 +500,7 @@
                   <div class="col-sm-6">
                     <?php if ($_SESSION['tipo']!=8) { ?>
                       <label for="observaciones">Observaciones de solicitud:</label><br>
-                      <textarea name="observaciones" id="observaciones" cols="70" rows="9" class="form-control"><?php echo $pedido["observaciones"] ?></textarea><br>
+                      <textarea name="observaciones" id="observaciones" cols="70" rows="9" class="form-control" placeholder="Tipo de insumo"><?php echo $pedido["observaciones"] ?></textarea><br>
                     <?php }else{ ?>
                       <label for="observaciones">Observaciones de solicitud:</label>
                       <?php echo $pedido["observaciones"] ?>
@@ -584,7 +545,7 @@
                   ?>
                   <?php if ($_SESSION['tipo']!=2) { ?>
                     <br><label for="observaciones_ent">Observaciones de entrega:<small style="color: red">*</small></label><br>
-                    <textarea name="observaciones_ent" id="observaciones_ent" cols="80" rows="12" class="form-control" required placeholder="Tipo de insumo"></textarea><br>
+                    <textarea name="observaciones_ent" id="observaciones_ent" cols="80" rows="12" class="form-control" placeholder="Tipo de insumo"></textarea><br>
                   <?php } ?>
                 </div>
               </div><br>
