@@ -93,7 +93,7 @@
                   if ($_SESSION["tipo"] ==1) {
                     $sql = "SELECT p.id, z.zona, u.nombres, u.apellidos, u.tipo, p.fecha, c.colegio, e.estado, c.sub_zona, c.responsable FROM muestreos_e p JOIN colegios c ON p.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=p.estado  WHERE p.estado=1 GROUP BY p.id ";
                   }else{
-                    $sql = "SELECT p.id, z.zona, u.nombres, u.apellidos, u.tipo, p.fecha, c.colegio, e.estado, c.sub_zona, c.responsable FROM muestreos_e p JOIN colegios c ON p.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=p.estado  WHERE p.id_usuario='".$_SESSION["id"]."' AND p.estado=1 GROUP BY p.id ";
+                    $sql = "SELECT p.id, z.zona, u.nombres, u.apellidos, u.tipo, p.fecha, c.colegio, e.estado, c.sub_zona, c.responsable FROM muestreos_e p JOIN colegios c ON p.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=p.estado  WHERE (p.id_usuario='".$_SESSION["id"]."' OR c.cod_zona='".$_SESSION["zona"]."') AND p.estado=1 GROUP BY p.id ";
                   }
 
                   
