@@ -138,7 +138,10 @@ $objSpreadsheet->getActiveSheet()->getStyle('D2')->applyFromArray($estilo_centra
 $objSpreadsheet->getActiveSheet()->SetCellValue("D2", "REPORTE DE ADOPCION");
 $objSpreadsheet->getActiveSheet()->getStyle('G2')->applyFromArray($estilo_negrita);
 $objSpreadsheet->getActiveSheet()->getStyle('G2')->applyFromArray($estilo_centrar);
-$objSpreadsheet->getActiveSheet()->SetCellValue("G2", "$recurso[fecha]");
+if (!empty($recurso["fecha"])) {
+	$objSpreadsheet->getActiveSheet()->SetCellValue("G2", "$recurso[fecha]");
+}
+
 
 $objSpreadsheet->getActiveSheet()->getStyle('B5')->applyFromArray($estilo_negrita);
 $objSpreadsheet->getActiveSheet()->getStyle('B5')->applyFromArray($estilo_centrar);
@@ -672,11 +675,15 @@ $objSpreadsheet->getActiveSheet()->getStyle('A'.$conta2.':'.'D'.$conta4)->applyF
 
 $conta4=$conta4+2;
 
-$sql_canal = "SELECT  canal_venta FROM canales_venta WHERE id='".$recurso["id_canal"]."'";
+if (!empty($recurso["id_canal"])) {
+	$sql_canal = "SELECT  canal_venta FROM canales_venta WHERE id='".$recurso["id_canal"]."'";
                            
-$req_canal = $bdd->prepare($sql_canal);
-$req_canal->execute();
-$canal = $req_canal->fetch();
+	$req_canal = $bdd->prepare($sql_canal);
+	$req_canal->execute();
+	$canal = $req_canal->fetch();
+}
+
+
 
 if (!empty($recurso["fecha"]) ) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta4", "Fecha: ".$recurso["fecha"]);
