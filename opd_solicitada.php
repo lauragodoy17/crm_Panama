@@ -232,7 +232,8 @@
                       </select>
                     </div>
                     <?php }else{ ?>
-                      <?php echo "<h5>Cliente: ".$pedido["cliente"]."</h5><br>"; ?>
+                      <?php echo "<h5>Cliente: ".$pedido["cliente"]."</h5><br>";
+                      echo "<input type='hidden' name='persona' value='".$pedido["cid"]."'>"?>
                     <?php } ?>
                           
                     <div class="">
