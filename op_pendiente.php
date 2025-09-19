@@ -208,10 +208,10 @@
 
                   $pedido= $req->fetch();
                   if ($pedido["estado"] ==2) {
-                    echo'<td><b>Pedido de venta sin adopción:</b> <a href="pedido_colegio_sa.php?id_pedido='.$op["id_pedido"].'8&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
+                    echo'<td><b>Pedido de venta sin adopción:</b> <a href="pedido_colegio_sa.php?id_pedido='.$op["id_pedido_dist"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
 
                   }else{
-                    echo'<td><b>Pedido de venta sin adopción:</b> <a href="pedido_colegio_sa.php?id_pedido='.$op["id_pedido"].'8&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
+                    echo'<td><b>Pedido de venta sin adopción:</b> <a href="pedido_colegio_sa.php?id_pedido='.$op["id_pedido_dist"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
                   }
 
                     
