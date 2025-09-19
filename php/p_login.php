@@ -39,5 +39,4 @@
 			
 	}
 	else echo "<script>alert('Clave Invalida');window.location='../login.php';</script>";
-	mysqli_close($mysqli);
 ?>
