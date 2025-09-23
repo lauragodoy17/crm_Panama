@@ -186,7 +186,8 @@
                       </span>
                     </div>
                     <?php }else{ 
-                      echo "Fecha de entrega solicitada: ".$pedido["fecha_ent_s"]
+                      echo "Fecha de entrega solicitada: ".$pedido["fecha_ent_s"];
+                      echo '<input type="hidden" name="fecha_ent_s" data-date-format="yyyy-mm-dd" value="'.$pedido["fecha_ent_s"].'" />';
                     ?>
 
                     <?php }?>
@@ -503,8 +504,8 @@
                       <label for="observaciones">Observaciones de solicitud:</label><br>
                       <textarea name="observaciones" id="observaciones" cols="70" rows="9" class="form-control" placeholder="Tipo de insumo"><?php echo $pedido["observaciones"] ?></textarea><br>
                     <?php }else{ ?>
-                      <label for="observaciones">Observaciones de solicitud:</label>
-                      <?php echo $pedido["observaciones"] ?>
+                      <label for="observaciones">Observaciones de solicitud:</label><br>
+                      <textarea name="observaciones" id="observaciones" cols="70" rows="9" class="form-control" readonly><?php echo $pedido["observaciones"] ?></textarea><br>
                     <?php } ?>
                   </div>
 

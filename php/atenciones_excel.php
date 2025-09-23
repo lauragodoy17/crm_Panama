@@ -261,9 +261,15 @@ $objSpreadsheet->getActiveSheet()->getStyle("O$conta")
           '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
         );
 
-$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$total_p");
+if (!empty($total_p)) {
+    $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$total_p");
+}
 
-$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$total_l");
+if (!empty($total_l)) {
+    $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$total_l");
+}
+
+
 
 $conta++;
 
