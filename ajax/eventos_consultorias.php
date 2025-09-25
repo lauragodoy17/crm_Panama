@@ -13,7 +13,7 @@ include("../conexion/bdd.php");
 
 // Consulta eventos en el rango
 
-$sql = "SELECT p.id, p.codigo, p.id_colegio, p.color, p.start, p.end, p.id_objetivo, u.id as uid, CONCAT(u.nombres,' ',u.apellidos) as fullname FROM plan_trabajo p JOIN usuarios u ON u.id=p.id_promotor WHERE (start BETWEEN :start AND :end OR end BETWEEN :start AND :end) AND (u.tipo=4 OR tipo=1 OR u.cod_zona='5656')";
+$sql = "SELECT p.id, p.codigo, p.id_colegio, p.color, p.start, p.end, p.id_objetivo, u.id as uid, CONCAT(u.nombres,' ',u.apellidos) as fullname FROM plan_trabajo p JOIN usuarios u ON u.id=p.id_promotor WHERE (start BETWEEN :start AND :end OR end BETWEEN :start AND :end) AND (u.tipo=4 OR u.cod_zona='5656')";
 
 
 $stmt = $bdd->prepare($sql);
@@ -56,7 +56,8 @@ while ($event = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
   $events[] = [
     'id' => $event['id'],
-    'title' => $col['colegio']."\n".$objetivo['objetivo']."\nCon: ".$partics,
+    'title' => ( !empty($col['colegio']) ? $col['colegio'] : '' ) . "\n" .
+           $objetivo['objetivo'] . "\nCon: " . $partics,
     'start' => $start,
     'end' => $end,
     'color' => $event['color'],
