@@ -116,7 +116,7 @@
 		}
 	}
 
-
+	$_POST["observaciones"] = str_replace(["'", '"'], "", $_POST["observaciones"]);
 	if ($_POST["tp"]==1) {
 		$sql_p2 = "INSERT INTO devoluciones(codigo,tipo,id_periodo,persona,id_usuario,observaciones,archivo,estado) VALUES('".$cod_pedido."','1','1','".$_POST["cliente"]."','".$_SESSION["id"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$estado."')";
 	}
