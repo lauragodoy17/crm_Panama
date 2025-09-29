@@ -340,7 +340,7 @@
                  
                  <?php 
                   if ($pedido["eid"]==1 && $n_op["estado"]!=2) {
-                     if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==22) {
+                     if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {
                       echo '<h3>'.$pedido["estado"].'</h3><br>';
                       echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
                       echo '<button class="btn btn-success d-print-none" id="aprobar" type="button">Recibir</button> <br><br>';
