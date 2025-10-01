@@ -166,7 +166,7 @@
                   $req_cliente->execute();
                   $cliente = $req_cliente->fetch();
 
-                  $sql = "SELECT pe.id, l.id as libroid, l.id_grado, l.libro, l.precio, l.isbn, m.materia, lp.cantidad, p.cod_area, p.descuento,p.descuento_d, p.tasa_compra_d, lp.cod_pedido,lp.cantidad_aprob, lp.descuento_aprob,lp.id as lpid,lp.plataforma FROM pedidos pe JOIN libros_pedidos lp ON lp.cod_pedido=pe.codigo JOIN libros l ON l.id=lp.id_libro JOIN materias m ON l.id_materia=m.id JOIN presupuestos p ON p.id_colegio=pe.id_colegio AND p.id_libro=lp.id_libro AND lp.cod_area=p.cod_area AND pe.id_periodo=p.id_periodo WHERE pe.id='".$_GET["id_pedido"]."' AND p.definido=1 AND lp.cantidad!=0 GROUP BY l.id,p.cod_area";
+                  $sql = "SELECT pe.id, l.id as libroid, l.id_grado, l.libro, l.precio, l.isbn, m.materia, lp.cantidad, p.cod_area, p.descuento,p.descuento_d, p.tasa_compra_d, lp.cod_pedido,lp.cantidad_aprob, lp.descuento_aprob,lp.id as lpid,lp.plataforma FROM pedidos pe LEFT JOIN libros_pedidos lp ON lp.cod_pedido=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON l.id_materia=m.id LEFT JOIN presupuestos p ON p.id_colegio=pe.id_colegio AND p.id_libro=lp.id_libro AND lp.cod_area=p.cod_area AND pe.id_periodo=p.id_periodo WHERE pe.id='".$_GET["id_pedido"]."' AND p.definido=1 AND lp.cantidad!=0 GROUP BY l.id,p.cod_area";
                   $req = $bdd->prepare($sql);
                   $req->execute();
           
@@ -368,8 +368,18 @@
       
                                                                                            
                       }
-                      $total_v=array_sum($total_venta);
-                      $total_c=array_sum($total_cantidad);
+                      if (!empty($total_venta)) {
+                        $total_v=array_sum($total_venta);
+                      }else{
+                        $total_v=0;
+                      }
+
+                      if (!empty($total_cantidad)) {
+                        $total_c=array_sum($total_cantidad);
+                      }else{
+                        $total_c=0;
+                      }
+                      
                     ?>
 
                   </tbody>
