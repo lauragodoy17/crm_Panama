@@ -96,7 +96,7 @@ $drawing = new Drawing();
 $drawing->setName('test_img');
 $drawing->setDescription('test_img');
 $drawing->setPath('../vendors/images/logo_eureka.png'); // Ruta relativa o absoluta a la imagen
-$drawing->setHeight(100); // Puedes ajustar el tamaño si deseas
+$drawing->setHeight(80); // Puedes ajustar el tamaño si deseas
 $drawing->setCoordinates('A1'); // Posición en la hoja
 $drawing->setWorksheet($objSpreadsheet->getActiveSheet());
 
