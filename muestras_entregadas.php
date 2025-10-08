@@ -4,7 +4,7 @@
   <head>
     <!-- Basic Page Info -->
     <meta charset="utf-8" />
-    <title>Inkpulse - Muestras entregadas</title>
+    <title>Inkpulse - Muestras legalizadas</title>
 
     <!-- Site favicon -->
     <link
@@ -67,7 +67,7 @@
             <div class="row">
               <div class="col-md-6 col-sm-12">
                 <div class="title">
-                  <h4>Muestras entregadas</h4>
+                  <h4>Muestras legalizadas</h4>
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
                   <ol class="breadcrumb">
@@ -75,7 +75,7 @@
                       Muestreo
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                      Muestras entregadas
+                      Muestras legalizadas
                     </li>
                   </ol>
                 </nav>

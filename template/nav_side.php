@@ -345,7 +345,7 @@
 											<a href="lista_muestreo.php?tp=5" id="">Anulados</a>
 										</li>
 										<li>
-											<a href="muestras_entregadas.php" id="">Muestras entregadas</a>
+											<a href="muestras_entregadas.php" id="">Muestras legalizadas</a>
 										</li>
 									<?php }else{ ?>
 										<li>
@@ -355,10 +355,10 @@
 											<a href="ver_muestreo.php" id="">Muestras solicitadas</a>
 										</li>
 										<li>
-											<a href="solicitar_muestreo.php?tp=2" id="">Entregar muestras</a>
+											<a href="solicitar_muestreo.php?tp=2" id="">Legalizar muestras</a>
 										</li>
 										<li>
-											<a href="muestras_entregadas.php" id="">Muestras entregadas</a>
+											<a href="muestras_entregadas.php" id="">Muestras legalizadas</a>
 										</li>
 									<?php } ?>
 									

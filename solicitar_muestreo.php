@@ -75,7 +75,7 @@
                   <?php if ($_GET['tp']!=2) { ?>
                     <h4>Solicitar muestreo</h4>
                   <?php }else{ ?>
-                    <h4>Entregar muestras</h4>
+                    <h4>Legalizar muestras</h4>
                   <?php } ?>
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
@@ -87,7 +87,7 @@
                       <?php if ($_GET['tp']!=2) { ?>
                         Solicitar
                       <?php }else{ ?>
-                        Entregar
+                        Legalizar
                       <?php } ?>
                     </li>
                   </ol>
@@ -240,7 +240,11 @@
                   <label for="observaciones">Observaciones:</label><br>
                   <textarea name="observaciones" id="observaciones" cols="30" rows="3"></textarea><br><br>
                   <input type="hidden" name="tp"  value="<?php echo  $_GET['tp'] ?>">
-                  <button class="btn btn-primary" id="solicitar">Solicitar</button></center>
+                  <?php if ($_GET['tp']!=2) { ?>
+                    <button class="btn btn-primary" id="solicitar">Solicitar</button></center>
+                  <?php }else {?>
+                    <button class="btn btn-primary" id="solicitar">Legalizar</button></center>
+                  <?php } ?>
                 </div>
 
 
