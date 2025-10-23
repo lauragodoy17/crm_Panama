@@ -121,7 +121,7 @@
 
                 <?php 
                   
-                  $sql = "SELECT p.id, p.tipo,  u.nombres, u.apellidos, p.fecha, e.estado,c.cliente FROM devoluciones_prov p JOIN usuarios u ON u.id=p.id_usuario JOIN estados_pedidos e ON e.id=p.estado JOIN clientes c ON c.id=p.persona WHERE p.tipo='2'";
+                  $sql = "SELECT p.id, p.tipo,  u.nombres, u.apellidos, p.fecha, e.estado,c.proveedor as cliente FROM devoluciones_prov p JOIN usuarios u ON u.id=p.id_usuario JOIN estados_pedidos e ON e.id=p.estado JOIN proveedores c ON c.id=p.persona WHERE p.tipo='2'";
                   $req = $bdd->prepare($sql);
                   $req->execute();             
 

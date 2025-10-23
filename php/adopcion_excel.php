@@ -302,7 +302,7 @@ foreach($adopciones as $adopcion) {
 	$req_go->execute();
 	$go = $req_go->fetch();
 
-	if ($go["id_grado_otro"] == 0) {
+	if (($go['id_grado_otro'] ?? null) == 0) {
 
 		$sq_gp = "SELECT  SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$_GET["cole"]."' AND id_grado='".$adopcion["id_grado"]."' AND id_periodo='".$_GET["periodo"]."'";
 
@@ -358,7 +358,7 @@ foreach($adopciones as $adopcion) {
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$adopcion[libro]");
 
-	if ($go["id_grado_otro"] == 0) {
+	if (($go['id_grado_otro'] ?? null) == 0) {
 
 		$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$adopcion[grado]");
 		if ($adopcion["id_grado"] < 4) {

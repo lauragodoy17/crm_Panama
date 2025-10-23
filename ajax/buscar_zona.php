@@ -8,6 +8,7 @@
 		$req->execute();
 		$zonas = $req->fetchAll();
 		echo"<option value=''>Seleccione</option>";
+		echo"<option value='356587'>EMPRESA</option>";
 		foreach($zonas as $zona) {
 			list($emp,$n_zona)=explode("/", $zona["zona"]);
 			echo"<option value=".$zona["codigo"].">".$n_zona." ( ".$zona["promotor"]." )</option>";

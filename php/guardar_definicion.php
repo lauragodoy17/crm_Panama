@@ -219,10 +219,10 @@
 
 				if ($nconse["conse"] ==0 ) {
 
-					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$conse["conse"]."' WHERE id='".$id_presupuesto."'";
+					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$conse["conse"]."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
 
 				}else{
-					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$nconse["conse"]."' WHERE id='".$id_presupuesto."'";
+					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$nconse["conse"]."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
 				}
 
 				
@@ -242,11 +242,11 @@
 
 				if ($nconse["conse"] ==0 ) {
 
-					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$conse["conse"]."' WHERE id='".$id_presupuesto."'";
+					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$conse["conse"]."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
 
 				}else{
 						
-					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$nconse["conse"]."' WHERE id='".$id_presupuesto."'";
+					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$nconse["conse"]."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
 				}
 
 					

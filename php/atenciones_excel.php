@@ -187,7 +187,9 @@ foreach ($solicitudes as $solicitud) {
 	
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$solicitud[promotor]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$solicitud[colegio]");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$promo_colegio[promotor]");
+    if (!empty($promo_colegio["promotor"])) {
+        $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$promo_colegio[promotor]");
+    }
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$solicitud[fecha]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$solicitud[recurso]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$solicitud[tipo]");

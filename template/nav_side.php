@@ -345,6 +345,9 @@
 											<a href="lista_muestreo.php?tp=5" id="">Anulados</a>
 										</li>
 										<li>
+											<a href="solicitar_muestreo.php?tp=2" id="">Legalizar muestras</a>
+										</li>
+										<li>
 											<a href="muestras_entregadas.php" id="">Muestras legalizadas</a>
 										</li>
 									<?php }else{ ?>
@@ -540,9 +543,9 @@
 										<li><a href="solicitar_orden_pd.php">Solicitar</a></li>
 									<?php }?>
 									<li><a href="ver_opds.php">Ver</a></li>
-									<?php if ($_SESSION["tipo"] !=8) {?>
-										<li><a href="reporte_opd.php">Reporte</a></li>
-									<?php }?>
+									
+									<li><a href="reporte_opd.php">Reporte</a></li>
+									
 									
 								</ul>
 							</li>

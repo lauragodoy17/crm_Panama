@@ -286,8 +286,15 @@ foreach ($colegios as $colegio) {
     $req->execute();
     $total = $req->fetch();
 
+    $sql = "SELECT MAX(conse) as conse FROM presupuestos WHERE id_colegio='".$colegio["id"]."' AND id_periodo='".$_POST['periodo']."' ";
+
+
+    $req = $bdd->prepare($sql);
+    $req->execute();
+    $conse = $req->fetch();
     
-    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$colegio[conse]");
+
+    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$conse[conse]");
     if ($colegio["tipouser"]!=6) {
         list($empresa,$n_zona) = explode("/", $colegio["zona"]);
         $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$empresa");

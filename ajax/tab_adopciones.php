@@ -877,43 +877,47 @@
 			                                        	echo "var desc_max=parseFloat(".$libro_p["desc_max_dist"].")* 100;";
 			                                }
 
+                                            if ($_SESSION['id']!=1) {
+                                                
+                                                if (isset($libro_100)) {
+                                                    if ($libro_100 !=3481 && $libro_100 !=3482) {
+                                                        echo "if (descuento > 69){
+                                                            alert('el descuento no debe superar el 69%');
+                                                            $('#descuento_d".$libro_p["id"]."').val('20');
+                                                            $('#descuento_d".$libro_p["id"]."').focus();
+                                                            descuento=20;
+                                                        }
+                                                        ";
 
-		                                    if (isset($libro_100)) {
-		                                        if ($libro_100 !=3481 && $libro_100 !=3482) {
-			                                        echo "if (descuento > 69){
-			                                            alert('el descuento no debe superar el 69%');
-			                                            $('#descuento_d".$libro_p["id"]."').val('20');
-			                                            $('#descuento_d".$libro_p["id"]."').focus();
-			                                            descuento=20;
-			                                        }
-			                                        ";
 
+                                                    }
+                                                }else{
+                                                     echo "if (descuento > 69){
+                                                        alert('el descuento no debe superar el 69%');
+                                                        $('#descuento_d".$libro_p["id"]."').val('20');
+                                                        $('#descuento_d".$libro_p["id"]."').focus();
+                                                        descuento=20;
+                                                    }
+                                                    ";
+                                                }
 
-			                                    }
-		                                    }else{
-		                                    	echo "if (descuento > 69){
-			                                        alert('el descuento no debe superar el 69%');
-			                                        $('#descuento_d".$libro_p["id"]."').val('20');
-			                                        $('#descuento_d".$libro_p["id"]."').focus();
-			                                        descuento=20;
-			                                    }
-			                                    ";
-		                                    }
+                                            }
+		                                    
                                             
+                                            if ($_SESSION['id']!=1) {
+    		                                    echo"
 
-		                                    echo"
+    		                                    if (desc_max > 0){
+    		                                    	if (descuento > desc_max){
 
-		                                    if (desc_max > 0){
-		                                    	if (descuento > desc_max){
-
-				                                    alert('el descuento no debe superar: '+desc_max);
-				                                    $('#descuento_d".$libro_p["id"]."').val(desc_max);
-				                                    $('#descuento_d".$libro_p["id"]."').focus();
-				                                    descuento=desc_max;
-			                                	}
-		                                    }
-
-                                            descuento= descuento/100;
+    				                                    alert('el descuento no debe superar: '+desc_max);
+    				                                    $('#descuento_d".$libro_p["id"]."').val(desc_max);
+    				                                    $('#descuento_d".$libro_p["id"]."').focus();
+    				                                    descuento=desc_max;
+    			                                	}
+    		                                    }";
+                                            }
+                                           echo"descuento= descuento/100;
 
 
 
