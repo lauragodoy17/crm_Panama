@@ -350,7 +350,7 @@ foreach ($colegios as$colegio) {
 
         $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$colegio[promotor]");
         $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$sub_zona[sub_zona]");
-        $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$colegio[responsable]");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$colegio[responsable]");
     }
 	
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$colegio[dane]");
