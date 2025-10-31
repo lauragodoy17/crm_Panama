@@ -106,7 +106,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("F4", "$fecha");
 $objSpreadsheet->getActiveSheet()->SetCellValue("A6", "#");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B6", "Empresa");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C6", "Zona");
-$objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Responsable");
+$objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Asesor");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E6", "Dane");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Colegio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Departamento");
@@ -137,25 +137,25 @@ if ($_SESSION['tipo']==1 || $_SESSION['tipo']==2 || $_SESSION['tipo']==7) {
     if ($_POST['promotor']!=0) {
 
 
-     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.id_usuario='".$_POST['promotor']."' AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
+     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.id_usuario='".$_POST['promotor']."' AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
                                   
 
  
 
     }else{
 
-         $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
+         $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
      
     }
 
 }elseif($_SESSION['tipo']==3){
 
-    $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."' GROUP BY c.id ORDER BY p.conse DESC";
+    $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."' GROUP BY c.id ORDER BY p.conse DESC";
 
   
 }else{
 
-     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND (c.cod_zona='".$_SESSION['zona']."' OR c.zona_madre='".$_SESSION['zona']."') GROUP BY c.id ORDER BY p.conse DESC";
+     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND (c.cod_zona='".$_SESSION['zona']."' OR c.zona_madre='".$_SESSION['zona']."') GROUP BY c.id ORDER BY p.conse DESC";
 }
 
 
@@ -286,15 +286,8 @@ foreach ($colegios as $colegio) {
     $req->execute();
     $total = $req->fetch();
 
-    $sql = "SELECT MAX(conse) as conse FROM presupuestos WHERE id_colegio='".$colegio["id"]."' AND id_periodo='".$_POST['periodo']."' ";
-
-
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $conse = $req->fetch();
-    
-
-    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$conse[conse]");
+    $conse=$colegio["year"]."-".$colegio["conse"];
+    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$conse");
     if ($colegio["tipouser"]!=6) {
         list($empresa,$n_zona) = explode("/", $colegio["zona"]);
         $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$empresa");
@@ -311,8 +304,8 @@ foreach ($colegios as $colegio) {
         $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$sub_zona[sub_zona]");
         $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$colegio[responsable]");
     }
-	
-	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$colegio[dane]");
+    
+    $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$colegio[dane]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$colegio[colegio]");
 
     $sql_dep="SELECT departamento FROM departamentos WHERE id='".$colegio['departamento']."' ";
@@ -343,14 +336,14 @@ foreach ($colegios as $colegio) {
 
     
    
-	$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$total[total]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$total[total]");
    
 
-	$conta++;
+    $conta++;
   
 
 
-}	
+}   
 
 
 $objSpreadsheet->getActiveSheet()->getStyle("K7:K$conta")
@@ -371,7 +364,7 @@ $objSpreadsheet->getActiveSheet()->getStyle("M7:M$conta")
           '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
         );
 
-	
+    
 function excelColumnRange($start, $end) {
     $columns = [];
     $current = $start;
