@@ -28,7 +28,7 @@
 	$conse = $req->fetch();
 
 	$conse["conse"]++;*/
-
+	$_POST["observaciones"] = str_replace(['"', "'"], '', $_POST["observaciones"]);
 	$sql_p2 = "INSERT INTO ordenes_produccion(usuario,solicitante,cliente,descripcion,observaciones,adjunto,fecha_ent_s,año) VALUES('".$_SESSION["id"]."','".$_POST["solicitante"]."','".$_POST["cliente"]."','".$_POST["descrip"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$_POST["fecha_ent_s"]."','".date("y")."')";
 				
 				
@@ -57,6 +57,7 @@
 			
 		if ($libro !="") {
 			
+			$libro = str_replace(['"', "'"], '', $libro);
 			$sql_p = "INSERT INTO libros_opd(opid,libro,encaratulado,cantidad) VALUES('".$pedido["id"]."','".$libro."','".$enca."','".$cantidad."')";
 				
 				
