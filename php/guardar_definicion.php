@@ -2,8 +2,17 @@
 	require_once("../php/aut.php");
 	include("../conexion/bdd.php");
 
+	$sql_y = "SELECT 
+			    CASE 
+			        WHEN p.id_calendario = 1 THEN RIGHT(p.periodo, 2)
+			        ELSE RIGHT(p.periodo, 3)
+			    END AS ultimos
+			FROM periodos p JOIN calendarios c ON c.id=p.id_calendario WHERE p.id='".$_POST["periodo"]."'";
+	$req_y = $bdd->prepare($sql_y);
+	$req_y->execute();
+	$row_y = $req_y->fetch();
 
-
+	$year=$row_y["ultimos"];
 	foreach ($_POST["presupuesto_d"] as $presups => $presup) {
 
 		list($libro,$tasa_c,$descuento, $precio,$precio_padre) = explode("/", $presup);
@@ -219,50 +228,142 @@
 
 				if ($nconse["conse"] ==0 ) {
 
-					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$conse["conse"]."' WHERE id='".$id_presupuesto."'";
+					$sql_e = "UPDATE presupuestos SET definido='1' WHERE id='".$id_presupuesto."'";
+
+
+					$query_e = $bdd->prepare( $sql_e );
+					if ($query_e == false) {
+						print_r($bdd->errorInfo());
+						die ('Erreur prepare');
+					}
+					$sth_e = $query_e->execute();
+					if ($sth_e == false) {
+						print_r($query_e->errorInfo());
+						die ('Erreur execute');
+					}
+
+					
+					$sql_c = "UPDATE presupuestos SET conse='".$conse["conse"]."', year='".$year."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
+
+					$query_c = $bdd->prepare( $sql_c );
+						if ($query_c == false) {
+						print_r($bdd->errorInfo());
+						die ('Erreur prepare');
+					}
+					$sth_c = $query_c->execute();
+					if ($sth_c == false) {
+						print_r($query_c->errorInfo());
+						die ('Erreur execute');
+					}
 
 				}else{
-					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$nconse["conse"]."' WHERE id='".$id_presupuesto."'";
+					$sql_e = "UPDATE presupuestos SET definido='1' WHERE id='".$id_presupuesto."'";
+
+					$query_e = $bdd->prepare( $sql_e );
+					if ($query_e == false) {
+						print_r($bdd->errorInfo());
+						die ('Erreur prepare');
+					}
+					$sth_e = $query_e->execute();
+					if ($sth_e == false) {
+						print_r($query_e->errorInfo());
+						die ('Erreur execute');
+					}
+
+					$sql_c = "UPDATE presupuestos SET conse='".$nconse["conse"]."', year='".$year."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
+
+					$query_c = $bdd->prepare( $sql_c );
+						if ($query_c == false) {
+						print_r($bdd->errorInfo());
+						die ('Erreur prepare');
+					}
+					$sth_c = $query_c->execute();
+					if ($sth_c == false) {
+						print_r($query_c->errorInfo());
+						die ('Erreur execute');
+					}
 				}
 
-				
-				
+					
 
-				$query_e = $bdd->prepare( $sql_e );
-				if ($query_e == false) {
-					print_r($bdd->errorInfo());
-					die ('Erreur prepare');
-				}
-				$sth_e = $query_e->execute();
-				if ($sth_e == false) {
-					print_r($query_e->errorInfo());
-					die ('Erreur execute');
-				}
 				
 			}else{
 
 				if ($nconse["conse"] ==0 ) {
 
-					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$conse["conse"]."' WHERE id='".$id_presupuesto."'";
+					$sql_e = "UPDATE presupuestos SET definido='1' WHERE id='".$id_presupuesto."'";
+
+					$query_e = $bdd->prepare( $sql_e );
+					if ($query_e == false) {
+						print_r($bdd->errorInfo());
+						die ('Erreur prepare');
+					}
+					$sth_e = $query_e->execute();
+					if ($sth_e == false) {
+						print_r($query_e->errorInfo());
+						die ('Erreur execute');
+					}
+
+					$sql_c = "UPDATE presupuestos SET conse='".$conse["conse"]."', year='".$year."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
+
+					$query_c = $bdd->prepare( $sql_c );
+						if ($query_c == false) {
+						print_r($bdd->errorInfo());
+						die ('Erreur prepare');
+					}
+					$sth_c = $query_c->execute();
+					if ($sth_c == false) {
+						print_r($query_c->errorInfo());
+						die ('Erreur execute');
+					}
 
 				}else{
 						
-					$sql_e = "UPDATE presupuestos SET definido='1', conse='".$nconse["conse"]."' WHERE id='".$id_presupuesto."'";
+					$sql_e = "UPDATE presupuestos SET definido='1' WHERE id='".$id_presupuesto."'";
+
+					$query_e = $bdd->prepare( $sql_e );
+					if ($query_e == false) {
+						print_r($bdd->errorInfo());
+						die ('Erreur prepare');
+					}
+					$sth_e = $query_e->execute();
+					if ($sth_e == false) {
+						print_r($query_e->errorInfo());
+						die ('Erreur execute');
+					}
+
+					$sql_c = "UPDATE presupuestos SET conse='".$nconse["conse"]."', year='".$year."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
+
+					$query_c = $bdd->prepare( $sql_c );
+						if ($query_c == false) {
+						print_r($bdd->errorInfo());
+						die ('Erreur prepare');
+					}
+					$sth_c = $query_c->execute();
+					if ($sth_c == false) {
+						print_r($query_c->errorInfo());
+						die ('Erreur execute');
+					}
 				}
 
-					
-
-				$query_e = $bdd->prepare( $sql_e );
-				if ($query_e == false) {
-					print_r($bdd->errorInfo());
-					die ('Erreur prepare');
-				}
-				$sth_e = $query_e->execute();
-				if ($sth_e == false) {
-					print_r($query_e->errorInfo());
-					die ('Erreur execute');
-				}
 				
+				
+
+				
+				
+			}
+
+			
+
+			$query_e = $bdd->prepare( $sql_e );
+			if ($query_e == false) {
+				print_r($bdd->errorInfo());
+				die ('Erreur prepare');
+			}
+			$sth_e = $query_e->execute();
+			if ($sth_e == false) {
+				print_r($query_e->errorInfo());
+				die ('Erreur execute');
 			}
 			
 		}
