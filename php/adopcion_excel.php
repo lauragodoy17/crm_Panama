@@ -513,14 +513,15 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("H11", "V. BRUTA");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I11", "P. FACT");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J11", "VENTA ESTIMADA");
 
-$sql_conse =  "SELECT conse FROM presupuestos p WHERE p.id_colegio='".$_GET["cole"]."' AND p.id_periodo='".$_GET["periodo"]."' AND p.definido='1' ";
+$sql_conse =  "SELECT conse, year FROM presupuestos p WHERE p.id_colegio='".$_GET["cole"]."' AND p.id_periodo='".$_GET["periodo"]."' AND p.definido='1' ";
 
 $req_conse = $bdd->prepare($sql_conse);
 $req_conse->execute();
 $conse = $req_conse->fetch();
 
+$conse_f =$conse["year"]."-".$conse["conse"];
 $objSpreadsheet->getActiveSheet()->getStyle('C2')->applyFromArray($estilo_negrita);
-$objSpreadsheet->getActiveSheet()->SetCellValue("C2", "# $conse[conse]");
+$objSpreadsheet->getActiveSheet()->SetCellValue("C2", "# $conse_f");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G5", "Potencial compra preescolar %");
 $objSpreadsheet->getActiveSheet()->getStyle('I5')->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->SetCellValue("I5", "$p_pre");
