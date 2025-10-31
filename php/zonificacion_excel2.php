@@ -63,7 +63,7 @@ $fecha=date("Y-m-d");
 list($empresa,$n_zona) = explode("/", $zona["zona"]);
 $objSpreadsheet->getActiveSheet()->SetCellValue("A1", "Zona");
 $objSpreadsheet->getActiveSheet()->SetCellValue("A2", "$zona[zona]");
-$objSpreadsheet->getActiveSheet()->SetCellValue("B1", "Responsable");
+$objSpreadsheet->getActiveSheet()->SetCellValue("B1", "Asesor");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B2", "$nombre_completo");
 
 
@@ -78,7 +78,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Calendario");
 if ($usuario["tipo"]==3 || $usuario["tipo"]==1) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Empresa");
 }else{
-	$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Zona / Responsable");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Zona / Asesor");
 }
 
 

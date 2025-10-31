@@ -141,7 +141,7 @@ $objSpreadsheet->getActiveSheet()->mergeCells('B5:D5');
 $objSpreadsheet->getActiveSheet()->mergeCells('B6:C6');
 $objSpreadsheet->getActiveSheet()->SetCellValue("A5", "Colegio:");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B5", "$cole[colegio]");
-$objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Promotor:");
+$objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Asesor:");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B6", "$nombre_completo");
 $objSpreadsheet->getActiveSheet()->mergeCells('G5:I5');
 $objSpreadsheet->getActiveSheet()->mergeCells('G6:I6');

@@ -44,7 +44,7 @@ $objSpreadsheet->getActiveSheet()->getPageSetup()->setFitToHeight(0);
 //~ Ingreo de datos en la hojda de excel
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A1", "Zona");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B1", "Promotor");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B1", "Asesor");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C1", "Colegio");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D1", "Nombre");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E1", "Cargo");

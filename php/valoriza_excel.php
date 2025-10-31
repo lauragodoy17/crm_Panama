@@ -100,7 +100,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Fecha");
 $objSpreadsheet->getActiveSheet()->SetCellValue("D4", "$fecha");
 
 $objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Empresa");
-$objSpreadsheet->getActiveSheet()->SetCellValue("B6", "Responsable");
+$objSpreadsheet->getActiveSheet()->SetCellValue("B6", "Asesor");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C6", "Colegio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Dane");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E6", "Zona");

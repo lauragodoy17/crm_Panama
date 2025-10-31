@@ -182,7 +182,7 @@ if ($usuario['tipo']!=6) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E5", "$n_zona");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Periodo:");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E6", "$gp_periodo[periodo]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Responsable: $nombre_completo");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Asesor: $nombre_completo");
 	//$objSpreadsheet->getActiveSheet()->SetCellValue("B6", "$nombre_completo");
 }else{
 
@@ -197,7 +197,7 @@ if ($usuario['tipo']!=6) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E5", "$sub_zona[sub_zona]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D5", "Periodo:");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E5", "$gp_periodo[periodo]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Responsable: $cole[responsable]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Asesor: $cole[responsable]");
 	//$objSpreadsheet->getActiveSheet()->SetCellValue("B6", "$cole[responsable]");
 
 }

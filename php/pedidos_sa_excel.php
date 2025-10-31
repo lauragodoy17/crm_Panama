@@ -84,7 +84,7 @@ $fecha=date("Y-m-d");
 		$req->execute();
 		$usuario = $req->fetch();
 
-		$objSpreadsheet->getActiveSheet()->SetCellValue("B1", "Ascesor");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("B1", "Asesor");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("B2", "$usuario[nombre_c]");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("D1", "Fecha");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("D2", "$fecha");
