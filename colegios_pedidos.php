@@ -101,7 +101,14 @@
                   $req_periodo->execute();
                   $gp_periodo = $req_periodo->fetch();
 
-                  $sql = "SELECT c.id, c.dane as codigo, c.colegio, c.direccion, c.barrio,c.telefono FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio WHERE c.cod_zona='".$_SESSION["zona"]."' AND p.definido='1' AND p.id_periodo='".$gp_periodo["id"]."' GROUP BY c.id";
+                  if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2) {
+                    $sql = "SELECT c.id, c.dane as codigo, c.colegio, c.direccion, c.barrio,c.telefono FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio WHERE p.definido='1' AND p.id_periodo='".$gp_periodo["id"]."' GROUP BY c.id";
+                     
+                  }else{
+                    $sql = "SELECT c.id, c.dane as codigo, c.colegio, c.direccion, c.barrio,c.telefono FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio WHERE c.cod_zona='".$_SESSION["zona"]."' AND p.definido='1' AND p.id_periodo='".$gp_periodo["id"]."' GROUP BY c.id";
+                  }
+
+                 
                   $req = $bdd->prepare($sql);
                   $req->execute();
 
