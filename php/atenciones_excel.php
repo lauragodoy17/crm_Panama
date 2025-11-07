@@ -126,7 +126,8 @@ if ($_POST['promotor']==0) {
 
 }else{
 
-	$sql="SELECT s.id,e.estado,s.fecha, s.solicitante, s.estado as idestado, s.contab, s.conse, c.colegio, c.cod_zona, c.id as cid, r.recurso, t.tipo, cat.categoria, r.presupuesto, r.tipo_e, r.valor_e, r.fecha_e, r.legaliza, CONCAT(u.nombres,' ', u.apellidos) AS promotor FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN colegios c ON c.id=s.id_colegio JOIN recursos_solicitados r ON r.id_solicitud=s.id JOIN tipos_recursos t ON t.id=r.tipo JOIN categoria_recursos cat ON cat.id=r.categoria JOIN usuarios u ON u.id=s.usuario WHERE s.id_periodo='".$_POST["periodo"]."' AND s.usuario='".$_POST["promotor"]."' ORDER BY s.id DESC";
+    $sql="SELECT s.id,e.estado,s.fecha, s.solicitante, s.estado as idestado, s.contab, s.conse, c.colegio, c.cod_zona, c.id as cid, r.recurso, t.tipo, cat.categoria, r.presupuesto, r.tipo_e, r.valor_e, r.fecha_e, r.legaliza, CONCAT(u.nombres,' ', u.apellidos) AS promotor FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN colegios c ON c.id=s.id_colegio JOIN recursos_solicitados r ON r.id_solicitud=s.id JOIN tipos_recursos t ON t.id=r.tipo JOIN categoria_recursos cat ON cat.id=r.categoria JOIN usuarios u ON u.cod_zona=c.cod_zona WHERE s.id_periodo='".$_POST["periodo"]."' AND u.id='".$_POST["promotor"]."' ORDER BY `s`.`id` DESC";
+
 
 }
 
