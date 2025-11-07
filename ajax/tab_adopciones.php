@@ -234,8 +234,8 @@
                         <input type="hidden" name="cod_colegio" value="<?php echo $_GET['codigo'] ?>">
                         <input type="hidden" name="periodo" value="<?php echo $gp_periodo['id'] ?>">
                     </div>
-                    <?php  if($_SESSION["tipo"] !=2 ) { ?>
-                        <?php if($_SESSION["zona"] ==$_GET["cod_zona"] || $_SESSION["tipo"] == 1) { ?>
+                    
+                        <?php if($_SESSION["zona"] ==$_GET["cod_zona"] || $_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2) { ?>
 
                             <?php if ($_GET["f_cierre"] > date("Y-m-d")) { ?>
 
@@ -243,7 +243,7 @@
                                 <br><br><center><button class="btn btn-success miBoton">Guardar</button></center>
                             <?php } ?>
                         <?php  } ?>
-                    <?php  } ?>
+                   
                 </div>
                 </form>
     			     
@@ -1295,7 +1295,7 @@
                                       
                                         echo '<a class="btn btn-success float-right" href="php/adopcion_excel.php?cole='.$_GET['colegio'].'&periodo='.$_GET["periodo"].'">Exportar Excel</a><br>';
                               //adopcion solo admin
-                            if($_SESSION["tipo"] !=2 && $_SESSION["tipo"] != 4) { 
+                            if($_SESSION["tipo"] != 4) { 
                               //if ($_SESSION["tipo"]==1 || $gp_periodo["id"] == $u_periodo["id"]) {
 
                                         if ($_GET["f_cierre"] > date("Y-m-d")) {    
