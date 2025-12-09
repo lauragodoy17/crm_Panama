@@ -197,8 +197,11 @@
                               <select class="form-control select2" name="persona" id="persona" style="width: 100%;" required>
                                 <option selected="selected" value="">Seleccionar</option>
                                   <?php 
-
-                                    $sql = "SELECT * FROM clientes";
+                                    if ($_GET["tipo"] =="1") {
+                                      $sql = "SELECT * FROM clientes";
+                                    }else{
+                                      $sql = "SELECT * FROM proveedores";
+                                    }
 
                                     $req = $bdd->prepare($sql);
                                     $req->execute();
@@ -208,13 +211,20 @@
                                     foreach ($clientes as $cliente) {
 
                                       if ($cliente["id"] == $pedido["cid"]) {
+                                        if ($_GET["tipo"] =="1") {
+                                          echo '<option value="'.$cliente["id"].'" SELECTED>'.$cliente["cliente"].'</option>';
+                                        }else{
+                                          echo '<option value="'.$cliente["id"].'" SELECTED>'.$cliente["proveedor"].'</option>';
+                                        }
                                                 
-                                        echo '<option value="'.$cliente["id"].'" SELECTED>'.$cliente["cliente"].'</option>';
+                                        
 
                                       }else{
-
-                                        echo '<option value="'.$cliente["id"].'">'.$cliente["cliente"].'</option>';
-
+                                        if ($_GET["tipo"] =="1") {
+                                          echo '<option value="'.$cliente["id"].'">'.$cliente["cliente"].'</option>';
+                                        }else{
+                                          echo '<option value="'.$cliente["id"].'">'.$cliente["proveedor"].'</option>';
+                                        }
                                       }
                                               
                                               

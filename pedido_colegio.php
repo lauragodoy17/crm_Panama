@@ -403,8 +403,8 @@
               <br><center>
                   <label for="observaciones">Observaciones:</label><br>
                  <textarea name="observaciones" id="observaciones" cols="100" rows="9" class="form-control"><?php echo $pedido["observaciones"] ?></textarea><br><br>
-                 <label for="">Direción de entrega:</label>
-                <?php echo $pedido["dir_ent"]; ?><br><br>
+                 <h5><label for="">Direción de entrega:</label>
+                <?php echo $pedido["dir_ent"]; ?><br><br></h5>
                  <h3><?php echo $pedido["estado"]; ?></h3><br>
                  <input type="hidden" name="pedido" value="<?php echo $_GET["id_pedido"] ?>">
                  </form>
@@ -447,6 +447,7 @@
     <script src="src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
     <script src="src/plugins/datatables/js/dataTables.responsive.min.js"></script>
     <script src="src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+    <script src="src/plugins/datatables/js/natural.js"></script>
 
     <script>
       

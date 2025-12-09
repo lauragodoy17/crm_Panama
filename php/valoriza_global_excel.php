@@ -319,7 +319,16 @@ foreach ($colegios as $colegio) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "".$t_cant_presup[$colegio["id"]]."");
     $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "".$t_valor_presup[$colegio["id"]]."");
     $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "".$t_castigo[$colegio["id"]]."");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "".$t_valor_adopcion[$colegio["id"]]."");
+    if ($t_valor_adopcion[$colegio["id"]]==0) {
+        if ($colegio["conse"] > 0) {
+            $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "Anulada");
+        }else{
+            $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "".$t_valor_adopcion[$colegio["id"]]."");
+        }
+    }else{
+        $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "".$t_valor_adopcion[$colegio["id"]]."");
+    }
+    
 
     if (is_array($v_real) && isset($v_real['venta_real']) && $v_real['venta_real'] > 0) {
         $t_venta_real= $v_real["venta_real"];

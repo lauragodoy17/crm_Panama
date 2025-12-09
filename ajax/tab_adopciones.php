@@ -276,7 +276,7 @@
 		echo "<form action='php/guardar_definicion.php' class='miFormulario' method='POST' id='form_definicion' name='f2'>";
                               
             echo "<script src='../vendors/scripts/jquery-2.1.4.min.js'></script><div class='table-responsive'>
-                <table class='table table-sm table-bordered table-striped'>
+                <table class='table table-sm table-bordered table-striped' id='dataTables-adop'>
                 <thead>
                     <th>Título</th>
                     <th>Materia</th>
@@ -877,7 +877,7 @@
 			                                        	echo "var desc_max=parseFloat(".$libro_p["desc_max_dist"].")* 100;";
 			                                }
 
-                                            if ($_SESSION['id']!=1) {
+                                            if ($_SESSION['tipo']!=1) {
                                                 
                                                 if (isset($libro_100)) {
                                                     if ($libro_100 !=3481 && $libro_100 !=3482) {
@@ -904,7 +904,7 @@
                                             }
 		                                    
                                             
-                                            if ($_SESSION['id']!=1) {
+                                            if ($_SESSION['tipo']!=1) {
     		                                    echo"
 
     		                                    if (desc_max > 0){
@@ -1144,7 +1144,10 @@
                               }*/
                             }
                               }
-                              echo "<tr>
+                              echo "
+                              </tbody>
+                              <tfoot>
+                              <tr>
                                 <td><b>Total:</b></td>
                                 <td></td>
                                 <td></td>
@@ -1176,7 +1179,7 @@
                                 <td id='cumplimiento'></td>
                                 </tr>";
 
-                              echo '</tbody>
+                              echo '</tfoot>
                                   </table></div>
                                    <input type="hidden" name="id_colegio" id="cole" value="'.$_GET["colegio"].'">
                                     <input type="hidden" name="codigo" value="'.$_GET["codigo"].'">
@@ -1315,7 +1318,37 @@
 	
 </div>
 <script src="../vendors/scripts/core.js"></script>
+<script src="../src/plugins/datatables/js/jquery.dataTables.min.js"></script>
+<script src="../src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
+<script src="../src/plugins/datatables/js/dataTables.responsive.min.js"></script>
+<script src="../src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+<script src="src/plugins/datatables/js/natural.js"></script>
 <script>
+
+    $(document).ready(function () {
+        $('#dataTables-adop').dataTable({
+          "language": {
+            "lengthMenu": "Display _MENU_ registros por página",
+            "zeroRecords": "Nada encontrado, lo siento",
+            "info": "Mostrando página _PAGE_ de _PAGES_",
+            "infoEmpty": "No hay registros disponibles",
+            "infoFiltered": "(filtrado de _MAX_ registros en total )",
+            "search": "Buscar&nbsp;:",
+            paginate: {
+              first:"Primero",
+              previous:"Anterior",
+                next:"Siguiente",
+                last:"Último"
+            }
+          },
+          "paging": false,
+          "searching": false,
+          order: [[2, 'asc']],
+          columnDefs: [
+            { type: 'natural', targets: 2 }
+          ],
+        });
+    });
 	//libros definicion
 
     $('#gradod').on('change',function(){
