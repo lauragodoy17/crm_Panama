@@ -66,11 +66,6 @@ $data = [];
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $op) {
     if ($_GET['tp']==3) {
-        $sql = "SELECT CONCAT(nombres,' ',apellidos) AS usr_aten FROM usuarios WHERE id='".$op["usuario_at"]."' ";
-        $req = $bdd->prepare($sql);
-        $req->execute();
-        $aten= $req->fetch();
-        $op["usuario_at"]=$aten["usr_aten"];
         $op["id"]="<a href='op_pendiente.php?op=".$op["opid"]."'>".$op["opid"]."</a>";
     }elseif($_GET['tp']==4){
         $sql = "SELECT CONCAT(nombres,' ',apellidos) AS usr_anu FROM usuarios WHERE id='".$op["usuario_anu"]."' ";

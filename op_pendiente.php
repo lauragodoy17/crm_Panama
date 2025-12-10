@@ -121,7 +121,7 @@
             <table class="table table-bordered" style="font-size: 15px;">
               <tr>
                 <td><b>Tipo de documento:</b>
-                    <?php if ($op["estado"] == 2) {
+                    <?php if ($op["estado"] == 4) {
                         echo $op["tipo"];
                     ?>
 
@@ -144,9 +144,8 @@
                       </select>
                     <?php } ?>
                 </td>
-                <td><b>Número de documento:</b> <?php echo $op["n_doc"]; ?></td>
                 <td><b>Cliente:</b>
-                  <?php if ($op["estado"] == 2) {
+                  <?php if ($op["estado"] == 4) {
                     echo $op["cliente"];
                   ?>
 
@@ -334,29 +333,43 @@
 
               
             </div><br><br>
-            <?php if ($op["estado"] == 2) { ?>
-              <table class="table table-bordered" style="font-size: 15px;">
-                
-                <tr>
-                  <td><b>Transportista:</b> <?php echo $op["transportista"]; ?></td>
-                  <td><b>Guía:</b> <?php echo $op["guia"]; ?></td>
-                  <td><b>Fecha de despacho:</b> <?php echo $op["fecha_entrega"]; ?></td>
-                  <td><b>Valor despachado:</b> <?php echo $op["valor"]; ?></td>
-                </tr>
-                
-              </table>
+            <?php if ($op["estado"] != 4) { ?>
+              <?php if ($op["estado"] == 2) {
+
+              $sql = "SELECT transportista,n_doc, guia, fecha_entrega,valor,obs_envio,adjunto_envio FROM op_atendidas WHERE opid='".$_GET["op"]."'";
+
+
+              $req = $bdd->prepare($sql);
+              $req->execute();
+
+              $ats = $req->fetchAll();
+
+
+              ?>
+              <?php foreach ($ats as $at) { ?>
+                <table class="table table-bordered" style="font-size: 15px;">
+                  
+                  <tr>
+                    <td><b>Número de documento:</b> <?php echo $at["n_doc"]; ?></td>
+                    <td><b>Transportista:</b> <?php echo $at["transportista"]; ?></td>
+                    <td><b>Guía:</b> <?php echo $at["guia"]; ?></td>
+                    <td><b>Fecha de despacho:</b> <?php echo $at["fecha_entrega"]; ?></td>
+                    <td><b>Valor despachado:</b> <?php echo $at["valor"]; ?></td>
+                  </tr>
+                  
+                </table>
+                <div class="col-sm-3 offset-sm-4">
+                              
+                <h5><b>Observaciones de despacho:</b> <?php echo $at["obs_envio"]; ?></h5><br>
+              </div>
+                 <center><b>Adjunto soporte de entrega:</b> <a href="adjuntos/envio/<?php echo $at["adjunto_envio"] ?>" style="cursor: pointer;" target="_blank"><?php echo $at["adjunto_envio"] ?></a></center><br><br>
+              <?php } ?>
 
               <div class="row">
-              
-              <div class="col-sm-3 offset-sm-4">
-                              
-                <h5><b>Observaciones de despacho:</b> <?php echo $op["obs_envio"]; ?></h5>
-              </div>
-
-              
-            </div><br><br>
             
-            <?php }elseif($op["estado"] == 1 && ($_SESSION['tipo']==1 || $_SESSION['tipo']==2 || $_SESSION['tipo']==5 || $_SESSION['tipo']==7) ){ ?>
+            </div><br><br>
+            <?php } ?>
+            
               <div class="row">
                 <div class="col-sm-2">
                   <!-- PAGE CONTENT BEGINS -->              
@@ -368,8 +381,8 @@
                   </div>
                 </div>
 
-                <div class="col-sm-2">
-                  <!-- PAGE CONTENT BEGINS -->              
+                <!--<div class="col-sm-2">
+                  
                   <div class="form-group">
                     <label class="control-label no-padding-right" for="recoge"> Recoge<small style="color:red;"> *</small></label>
 
@@ -380,7 +393,7 @@
                     </select>
                       
                   </div>
-                </div>
+                </div>-->
 
                 <div class="col-sm-2">
                   <!-- PAGE CONTENT BEGINS -->              
@@ -443,7 +456,7 @@
             
             
             
-            <?php if ($op["estado"] ==1 && $op["adjunto_envio"] =="") { ?>
+            <?php if ($op["estado"] !=4) { ?>
               <div class="row">
                 
                 <div class="col-sm-3 offset-sm-4">
@@ -457,21 +470,19 @@
 
                 
               </div>
-            <?php }elseif ($op["estado"] ==2 && $op["adjunto_envio"] !="") { ?>
-              <center><b>Adjunto soporte de entrega:</b> <a href="adjuntos/envio/<?php echo $op["adjunto_envio"] ?>" style="cursor: pointer;" target="_blank"><?php echo $op["adjunto_envio"] ?></a></center>
             <?php } ?>
             <input type="hidden" name="op" value="<?php echo $op["opid"] ?>">
-            <?php if ($op["estado"] ==1) { ?>
+            <?php if ($op["estado"] !=4) { ?>
               <br><center><button class="btn btn-success">Atender</button>
-              
+            <?php } ?>
+            <?php if ($op["estado"] ==1) { ?>
+                  
               <a class="btn btn-danger" data-toggle="modal" data-target="#ModalAnu">Anular</a></center>
             <?php }?>
           <?php } ?>          
             </form>
             <hr>
-            <?php if ($op["estado"] ==2) { ?>
-            <center><b>Adjunto soporte de entrega:</b> <a href="adjuntos/envio/<?php echo $op["adjunto_envio"] ?>" style="cursor: pointer;" target="_blank"><?php echo $op["adjunto_envio"] ?></a></center>
-            <?php } ?>  
+         
             <div class="modal fade" id="ModalAnu" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                 <div class="modal-dialog" role="document">
                 <div class="modal-content">

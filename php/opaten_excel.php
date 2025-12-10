@@ -97,12 +97,12 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Cliente");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Contacto");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H6", "Ciudad destino");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I6", "Observaciones");
-$objSpreadsheet->getActiveSheet()->SetCellValue("J6", "Transportista");
+/*$objSpreadsheet->getActiveSheet()->SetCellValue("J6", "Transportista");
 $objSpreadsheet->getActiveSheet()->SetCellValue("K6", "Guía");
 $objSpreadsheet->getActiveSheet()->SetCellValue("L6", "Fecha despacho");
 $objSpreadsheet->getActiveSheet()->SetCellValue("M6", "Valor despacho");
 $objSpreadsheet->getActiveSheet()->SetCellValue("N6", "Observaciones despacho");
-$objSpreadsheet->getActiveSheet()->SetCellValue("O6", "Usuario atendida");
+$objSpreadsheet->getActiveSheet()->SetCellValue("O6", "Usuario atendida");*/
 
 
 $objSpreadsheet->getActiveSheet()->getStyle('A6:O6')->applyFromArray([
@@ -141,7 +141,7 @@ foreach($ops as $op) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$op[solicitante]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$op[ciudad_destino]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$op[observaciones]");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$op[transportista]");
+    /*$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$op[transportista]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$op[guia]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$op[fecha_entrega]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$op[valor]");
@@ -150,7 +150,7 @@ foreach($ops as $op) {
         $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$at[usr_at]");
     }else{
         $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "");
-    }
+    }*/
 
     $conta++;
 }

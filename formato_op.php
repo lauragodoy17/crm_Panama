@@ -196,28 +196,42 @@
 
 			<?php if ($op["estado"] ==2) {
 
-				$sql = "SELECT CONCAT(nombres,' ',apellidos) AS usr_aten FROM usuarios WHERE id='".$op["usuario_at"]."' ";
+				$sql = "SELECT transportista,n_doc, guia, fecha_entrega,valor,obs_envio,adjunto_envio, fecha_at, usuario_at FROM op_atendidas WHERE opid='".$_GET["op"]."'";
+	            $req = $bdd->prepare($sql);
+	            $req->execute();
+	            $ats = $req->fetchAll();
 
-				$req = $bdd->prepare($sql);
-				$req->execute();
-
-				$aten= $req->fetch();
 
 			?>
 				<hr>
-				<b>Fecha atendida:</b> <?php echo $op["fecha_at"] ?> <br>
-				<b>Usuario atendida:</b> <?php echo $aten["usr_aten"]; ?> <br>
-				<b>Entregado a:</b> <?php echo $op["transportista"] ?> <br>
-				<b>Guía:</b> <?php echo $op["guia"] ?> <br>
-				<b>Valor:</b> <?php echo $op["valor"] ?><br>
-				<b>Fecha de despacho:</b> <?php echo $op["fecha_entrega"] ?><br><br>
-				<?php if ($op["estado"] ==2) {
-					list($antes,$archivo_env)=explode("_", $op["adjunto_envio"]);
-				?>
-				<span class="d-print-none"> <b>Adjunto soporte de entrega:</b> <a href="adjuntos/envio/<?php echo $op["adjunto_envio"] ?>" style="cursor: pointer;" target="_blank" download="<?php echo $archivo_env; ?>"><?php echo $archivo_env; ?></a><br><br></span>
-				<?php } ?>
+				<?php foreach ($ats as $at) {
 
-				<b>Observaciones de despacho:</b> <?php echo $op["obs_envio"] ?><br><br>
+
+					$sql = "SELECT CONCAT(nombres,' ',apellidos) AS usr_aten FROM usuarios WHERE id='".$at["usuario_at"]."' ";
+					$req = $bdd->prepare($sql);
+					$req->execute();
+					$aten= $req->fetch();
+				?>
+
+
+
+					<b>Fecha atendida:</b> <?php echo $at["fecha_at"] ?> <br>
+					<b>Usuario atendida:</b> <?php echo $aten["usr_aten"]; ?> <br>
+					<b>Entregado a:</b> <?php echo $at["transportista"] ?> <br>
+					<b>Guía:</b> <?php echo $at["guia"] ?> <br>
+					<b>Valor:</b> <?php echo $at["valor"] ?><br>
+					<b>Fecha de despacho:</b> <?php echo $at["fecha_entrega"] ?><br><br>
+					<?php 
+						list($antes,$archivo_env)=explode("_", $at["adjunto_envio"]);
+					?>
+					<span class="d-print-none"> <b>Adjunto soporte de entrega:</b> <a href="adjuntos/envio/<?php echo $at["adjunto_envio"] ?>" style="cursor: pointer;" target="_blank" download="<?php echo $archivo_env; ?>"><?php echo $archivo_env; ?></a><br><br></span>
+					<b>Observaciones de despacho:</b> <?php echo $at["obs_envio"] ?><br><br>
+
+				<?php } ?>
+				
+						
+
+				
 			<?php }?>
 
 			<?php if ($op["estado"] ==4) { 

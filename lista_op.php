@@ -114,11 +114,7 @@
                       <th>Fecha</th>
                       <th>Cliente</th>
                       <th>Estado</th>
-                      <?php if ($_GET['tp']==3) {?>
-                        <th>Fecha despacho</th>
-                        <th>Usuario atendida</th>
-                        <th>Fecha atendida</th>
-                      <?php }elseif ($_GET['tp']==4) { ?>
+                      <?php if ($_GET['tp']==4) { ?>
                         <th>Fecha anulada</th>
                         <th>Usuario anulación</th>
                       <?php } ?>
@@ -162,11 +158,8 @@
               { data: "fecha" },
               { data: "cliente" },
               { data: "estado" },
-              <?php if ($_GET['tp']==3) {?>
-                { data: "fecha_entrega" },
-                { data: "usuario_at" },
-                { data: "fecha_at" },
-              <?php }elseif ($_GET['tp']==4) {?>
+
+              <?php if ($_GET['tp']==4) {?>
                 { data: "usuario_anu" },
                 { data: "fecha_anu" },
               <?php } ?>
