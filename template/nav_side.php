@@ -393,6 +393,7 @@
 											<a href="lista_pedidos.php?tp=2" >Pendientes</a>
 											<a href="lista_pedidos.php?tp=3" >Aprobados</a>
 											<a href="lista_pedidos.php?tp=4" >Entregados</a>
+											<a href="agrupar_pedidos.php" >Agrupar pedidos</a>
 											<a href="lista_pedidos.php?tp=5" >Anulados</a>
 										</li>
 									<?php } ?>
