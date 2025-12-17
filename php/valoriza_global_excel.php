@@ -212,7 +212,9 @@ foreach ($colegios as $colegio) {
             $req_go->execute();
             $grado_o = $req_go->fetch();
 
-            $sq_gp = "SELECT  SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$colegio["id"]."' AND id_grado='".$grado_o["id_grado_otro"]."' AND id_periodo='".$_POST['periodo']."' AND alumnos > 0";
+            $id_grado_o = $grado_o['id_grado_otro'] ?? 0;
+
+            $sq_gp = "SELECT  SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$colegio["id"]."' AND id_grado='".$id_grado_o."' AND id_periodo='".$_POST['periodo']."' AND alumnos > 0";
         }
 
         $req_gp = $bdd->prepare($sq_gp);
