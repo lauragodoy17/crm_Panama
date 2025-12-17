@@ -237,11 +237,11 @@
                     
                         <?php if($_SESSION["zona"] ==$_GET["cod_zona"] || $_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2) { ?>
 
-                            <?php if ($_GET["f_cierre"] > date("Y-m-d")) { ?>
+                            
 
                                 <a id="agregar_aod" style="cursor: pointer;">Agregar Otro +</a>
                                 <br><br><center><button class="btn btn-success miBoton">Guardar</button></center>
-                            <?php } ?>
+                            
                         <?php  } ?>
                    
                 </div>
@@ -1300,11 +1300,15 @@
                               //adopcion solo admin
                             if($_SESSION["tipo"] != 4) { 
                               //if ($_SESSION["tipo"]==1 || $gp_periodo["id"] == $u_periodo["id"]) {
-
-                                        if ($_GET["f_cierre"] > date("Y-m-d")) {    
+                                        if ($_SESSION['tipo']==3 && $_SESSION["zona"]!='5656' ) {
+                                            if ($_GET["f_cierre"] > date("Y-m-d")) {    
                                           //echo '<center><button class="btn btn-primary">Guardar</button></center>';
-                                          echo '<center><button class="btn btn-primary miBoton">Guardar</button></center>';
+                                            echo '<center><button class="btn btn-primary miBoton">Guardar</button></center>';
+                                            }
+                                        }else{
+                                            echo '<center><button class="btn btn-primary miBoton">Guardar</button></center>';
                                         }
+                                        
                                 //}
 
                                 

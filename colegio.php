@@ -660,6 +660,16 @@
 
                 </div>
         </div>
+        <?php
+
+          $sql = "SELECT f_cierre FROM periodos WHERE id='".$_GET['periodo']."'";
+
+          $req = $bdd->prepare($sql);
+          $req->execute();
+
+          $gp_periodo = $req->fetch();
+
+        ?>
         <?php include("template/footer.php"); ?>
       </div>
     </div>
