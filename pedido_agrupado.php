@@ -389,6 +389,10 @@
 
       })
 
+      $("#imprimir").click(function(){
+        window.print();
+      })
+
 
     </script>
     
