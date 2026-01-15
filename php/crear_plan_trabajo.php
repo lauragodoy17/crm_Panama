@@ -50,6 +50,13 @@ do {
 	   
 } while ($cod_plan=="");
 
+if (isset($_POST["descripcion"])) {
+	$_POST["descripcion"]= str_replace(["'", '"'], ' ', $_POST["descripcion"]);
+}else{
+	$_POST["descripcion"]='';
+}
+
+
 $_POST["participantes"] [] =$_SESSION['id'];
 
 if(isset($_POST["oficina"])) {
