@@ -418,7 +418,7 @@
                         echo '<a href="solicitar_op.php?id_pedido='.$_GET["id_pedido"].'" target="_blank" class="btn btn-warning d-print-none">Solicitar OP</a> ';
                       }
 
-                      echo '<button class="btn btn-danger d-print-none" id="rechazar">Anular</button> <button class="btn btn-success d-print-none" id="entregar" type="button">Entregar</button> <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>';
+                      echo '<button type="button" class="btn btn-danger d-print-none" id="rechazar">Anular</button> <button class="btn btn-success d-print-none" id="entregar" type="button">Entregar</button> <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button>';
                     }
 
                   ?>
