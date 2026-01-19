@@ -412,7 +412,7 @@
                  <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 ||  $_SESSION["id"]==21 || $_SESSION["tipo"]==10 ) {
 
                     if ($pedido["eid"]==1) {
-                      echo '<button class="btn btn-success d-print-none" id="aprobar">Aprobar</button> <button class="btn btn-danger d-print-none" id="rechazar">Rechazar</button>';
+                      echo '<button class="btn btn-success d-print-none" id="aprobar">Aprobar</button> <button type="button" class="btn btn-danger d-print-none" id="rechazar">Rechazar</button>';
                     }elseif ($pedido["eid"]==2) {
                       if ($op ==0 && $op_agp ==0) {
                         echo '<a href="solicitar_op.php?id_pedido='.$_GET["id_pedido"].'" target="_blank" class="btn btn-warning d-print-none">Solicitar OP</a> ';
