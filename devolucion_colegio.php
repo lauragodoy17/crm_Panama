@@ -135,7 +135,9 @@
                   $n_cole = $req_pedido->rowCount();
                   
                   if ($n_cole > 0) {
-                    $sql = "SELECT pe.id, l.id as libroid, l.id_grado, l.libro, l.precio, l.isbn, m.materia, lp.cantidad, p.cod_area, p.descuento,p.descuento_d, p.tasa_compra_d, lp.cod_pedido, lp.id as lpid FROM devoluciones_v pe JOIN libros_devol_v lp ON lp.cod_pedido=pe.codigo JOIN libros l ON l.id=lp.id_libro JOIN materias m ON l.id_materia=m.id JOIN presupuestos p ON p.id_colegio=pe.id_colegio AND p.id_libro=lp.id_libro AND lp.cod_area=p.cod_area AND pe.id_periodo=p.id_periodo WHERE pe.id='".$_GET["id_pedido"]."' AND p.definido=1 AND lp.cantidad!=0 GROUP BY l.id,p.cod_area";
+        
+
+                    $sql="SELECT pe.id, l.id as libroid, l.id_grado, l.libro, l.precio, l.isbn, m.materia, lp.cantidad, p.cod_area, p.descuento,p.descuento_d, p.tasa_compra_d, lp.cod_pedido, lp.id as lpid FROM devoluciones_v pe LEFT JOIN libros_devol_v lp ON lp.cod_pedido=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON l.id_materia=m.id LEFT JOIN presupuestos p ON p.id_colegio=pe.id_colegio AND p.id_libro=lp.id_libro AND lp.cod_area=p.cod_area AND pe.id_periodo=p.id_periodo WHERE pe.id='".$_GET["id_pedido"]."'  GROUP BY l.id,p.cod_area;";
 
                     $sql_cliente="SELECT cliente FROM clientes WHERE id='".$pedido["cliente"]."'";
 
@@ -460,7 +462,7 @@
         window.print();
       })
 
-      <?php if($_SESSION["tipo"]==1 || $_SESSION["id"]==22)   { ?>
+      <?php if($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2)   { ?>
 
         window.addEventListener("beforeprint", function(event) {
             $("#impre").html("<h4>Fecha recibido bodega: <?php echo date("Y-m-d H:i") ?></h4>");
