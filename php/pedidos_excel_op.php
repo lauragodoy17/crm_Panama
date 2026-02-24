@@ -205,11 +205,14 @@ $estilo_negrita = array(
 				$op2 = $req2->fetch();
 
 				$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$op2[op]");
-				if ($op["estado"]==2) {
-					$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "Si");
-				}else{
-					$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "No");
+				if (!empty($op["estado"])) {
+					if ($op["estado"]==2) {
+						$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "Si");
+					}else{
+						$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "No");
+					}
 				}
+				
 
 				$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$op2[tipo]");
 				$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$op2[n_doc]");
