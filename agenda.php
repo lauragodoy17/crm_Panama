@@ -173,7 +173,7 @@
 										  	<select name="participantes[]" id="parti" class="form-control custom-select2"  multiple="multiple" style="width: 300px;">
 										  		
 										  		<?php 
-											 		$sql = "SELECT id, CONCAT(nombres, ' ', apellidos) as parti FROM usuarios WHERE id !=1";
+											 		$sql = "SELECT id, CONCAT(nombres, ' ', apellidos) as parti FROM usuarios WHERE id !=1 AND act=1 AND (tipo=3 ||tipo=6 || tipo=4)";
 
 													$req = $bdd->prepare($sql);
 													$req->execute();
