@@ -127,7 +127,7 @@
                   $req_pedido->execute();
                   $pedido = $req_pedido->fetch();
 
-                  $sql_pedido="SELECT pe.fecha,pe.tipo as petipo,pe.observaciones, pe.cliente,z.codigo as codzona, z.zona, c.colegio, c.sub_zona, c.responsable, u.nombres, u.apellidos, u.tipo, e.id as eid,e.estado FROM devoluciones_v pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_dev e ON e.id=pe.estado WHERE pe.id='".$pedido["id"]."' AND id_colegio > 0";
+                  $sql_pedido="SELECT pe.fecha,pe.tipo as petipo,pe.observaciones, pe.cliente,z.codigo as codzona, z.zona, c.id as cid, c.colegio, c.sub_zona, c.responsable, u.nombres, u.apellidos, u.tipo, e.id as eid,e.estado FROM devoluciones_v pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_dev e ON e.id=pe.estado WHERE pe.id='".$pedido["id"]."' AND id_colegio > 0";
 
                   $req_pedido = $bdd->prepare($sql_pedido);
                   $req_pedido->execute();
@@ -154,7 +154,7 @@
                     $req_cliente->execute();
                     $cliente = $req_cliente->fetch();
 
-                    $sql_cliente="SELECT observaciones FROM devoluciones_v d WHERE id='".$_GET["id_pedido"]."'";
+                    $sql_cliente="SELECT estado, observaciones FROM devoluciones_v d WHERE id='".$_GET["id_pedido"]."'";
 
                     $req_cliente = $bdd->prepare($sql_cliente);
                     $req_cliente->execute();
@@ -347,13 +347,25 @@
                       echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
                       echo '<button class="btn btn-success d-print-none" id="aprobar" type="button">Recibir</button> <br><br>';
                     }
-                   }elseif ($pedido["eid"]==2 && $n_op["estado"]!=2) {
+                   }elseif ($pedido["cid"]==0 && $observaciones["estado"]!=2) {
+                      echo '<h3>'.$pedido["estado"].'</h3><br>';
+                      echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
+                      echo '<button class="btn btn-success d-print-none" id="aprobar" type="button">Recibir</button> <br><br>';
+                   }
+
+                   elseif ($pedido["eid"]==2 && $n_op["estado"]!=2) {
                     if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==24) {
                       echo '<h3>'.$pedido["estado"].'</h3><br>';
                       echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
                       echo '<button class="btn btn-success d-print-none" id="proceso" type="button">En proceso</button> <br><br>';
                     }
-                   }elseif ($pedido["eid"]==4 && $n_op["estado"]!=2) {
+                   }elseif ($pedido["cid"]==0 && $observaciones["estado"]==1) {
+                      echo '<h3>'.$pedido["eid"].'</h3><br>';
+                      echo'<button class="btn btn-danger d-print-none" id="rechazar" type="button">Anular</button> <br><br>';
+                      echo '<button class="btn btn-success d-print-none" id="proceso" type="button">En proceso</button> <br><br>';
+                   }
+
+                   elseif ($pedido["eid"]==4 && $n_op["estado"]!=2) {
                     echo '<h3>'.$pedido["estado"].'</h3><br>';
                    }elseif ($pedido["eid"]==3 && $n_op["estado"]!=2) {
                     echo '<h3>'.$pedido["estado"].'</h3><br>';
