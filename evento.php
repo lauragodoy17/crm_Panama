@@ -387,7 +387,7 @@
               
               }
             }?>
-            <?php if ($visita["resultado"] ==0 && $visita['start'] >= date("Y-m-d 00:00:00")) {
+            <?php if ($visita["resultado"] ==0) {
             ?>
             <form action="php/llegada.php" method="POST">
             <INPUT TYPE='hidden' readonly='readonly' ID='latitud1' NAME='latitud1'>

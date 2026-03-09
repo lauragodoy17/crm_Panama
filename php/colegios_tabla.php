@@ -154,8 +154,10 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $colegio) {
             <i class="fa fa-trash-o bigger-120"></i>
         </a>';
     }
-
-    $colegio['colegio']='<a class="linkcole" id="'.$colegio["id"].'" href="colegio.php?codigo='.$colegio['codigo'].'&periodo='.$periodo2.'" data-id='.$colegio['id'].' data-codigo='.$colegio['codigo'].'>'.$colegio['colegio'].'</a>';
+    foreach ($gp_periodo as $periodo) {
+        $colegio['colegio']='<a class="linkcole" id="'.$colegio["id"].'" href="colegio.php?codigo='.$colegio['codigo'].'&periodo='.$periodo["id"].'" data-id='.$colegio['id'].' data-codigo='.$colegio['codigo'].'>'.$colegio['colegio'].'</a>';
+    }
+    
 
     $data[] = $colegio;
 }
