@@ -579,7 +579,7 @@
 									
 									<?php } ?>
 									
-									<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) {?>
+									<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) {?>
 										<li><a href="reporte_atenciones.php">Atenciones a clientes</a></li>
 									<?php } ?>
 
