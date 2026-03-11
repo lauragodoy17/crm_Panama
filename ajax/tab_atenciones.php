@@ -277,7 +277,7 @@
                                   <input type="hidden" name="cod_colegio" value="<?php echo $_GET['codigo'] ?>">       
                               </div>
                               <div class="modal-footer">
-                                <?php if($_SESSION["tipo"] !=2 && $_SESSION["tipo"] != 4) { ?>
+                                <?php if($_SESSION["tipo"] != 4) { ?>
                                   <br><center><button class="btn btn-primary">Solicitar</button></center><br>
                                 <?php } ?>
                               </form>
