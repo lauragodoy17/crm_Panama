@@ -340,7 +340,7 @@
 
                           if ($solicitud["idestado"] == 2) {
 
-                            if ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 7 || $_SESSION['tipo'] == 9) {
+                            if ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 2 || $_SESSION['tipo'] == 7 || $_SESSION['tipo'] == 9) {
 
                               echo"<center><button class='btn btn-primary' id='entregar'>Entregar</button></center><br>";
                               
@@ -350,7 +350,7 @@
                           }
 
                           if ($solicitud["idestado"] == 2 || $solicitud["idestado"] == 4) {
-                            if ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 7 || $_SESSION['tipo'] == 9) {
+                            if ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 2 || $_SESSION['tipo'] == 7 || $_SESSION['tipo'] == 9) {
                               echo"<center><button class='btn btn-success'>Legalizar</button></center>";
                             }
                           }
