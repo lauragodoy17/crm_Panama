@@ -125,7 +125,7 @@ $estilo_negrita = array(
 
     //if ($_POST["usuario"]==0) {
 
-    	$sql="SELECT d.id, d.fecha, d.observaciones,d.codigo, d.fecha_impre, d.fecha_proceso, d.tipo as dtipo, c.cliente, e.id as eid,e.estado, CONCAT(u.nombres, ' ',u.apellidos) as promotor, i.colegio FROM devoluciones_v d JOIN clientes c ON c.id=d.cliente JOIN estados_dev e ON d.estado=e.id JOIN usuarios u ON d.id_usuario=u.id JOIN colegios i ON i.id=d.id_colegio WHERE d.fecha BETWEEN '".$desde."' AND '".$hasta."' ORDER BY d.id DESC";
+    	$sql="SELECT d.id, d.fecha, d.observaciones,d.codigo, d.fecha_impre, d.fecha_proceso, d.tipo as dtipo, c.cliente, e.id as eid,e.estado, CONCAT(u.nombres, ' ',u.apellidos) as promotor, i.colegio FROM devoluciones_v d JOIN clientes c ON c.id=d.cliente JOIN estados_dev e ON d.estado=e.id JOIN usuarios u ON d.id_usuario=u.id LEFT JOIN colegios i ON i.id=d.id_colegio WHERE d.fecha BETWEEN '".$desde."' AND '".$hasta."' ORDER BY d.id DESC";
 
 
     //}
