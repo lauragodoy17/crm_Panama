@@ -196,7 +196,7 @@
 
                               }
                                         
-                              if ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 7 || $_SESSION['tipo'] == 9) {
+                              if ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 2 || $_SESSION['tipo'] == 7 || $_SESSION['tipo'] == 9) {
 
                                 if ($solicitud["idestado"] == 2) {
                                   echo'<td>
