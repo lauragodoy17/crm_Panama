@@ -76,7 +76,43 @@
           <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
             
             <h4 align="center">Devoluciones de ventas</h4><br>
+            <h5>General</h5><br>
             <form action="php/devol_ventas_c_excel.php" method="POST">
+            <div class="row">
+             
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="control-label no-padding-right" for="desde"> Desde:<small style="color:red;"> *</small> </label>
+                        
+                    <div class="input-group">
+                      <input type="text" class="form-control date-picker" name="desde" id="desde" type="text" data-date-format="yyyy-mm-dd" required/ autocomplete="off">
+                      <span class="input-group-addon">
+                        <i class="fa fa-calendar bigger-110"></i>
+                      </span>
+                    </div>
+                      
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="control-label no-padding-right" for="hasta"> Hasta:<small style="color:red;"> *</small> </label>
+                        
+                    <div class="input-group">
+                      <input type="text" class="form-control date-picker" name="hasta" id="hasta" type="text" data-date-format="yyyy-mm-dd" required/ autocomplete="off">
+                      <span class="input-group-addon">
+                        <i class="fa fa-calendar bigger-110"></i>
+                      </span>
+                    </div>
+                      
+                  </div>
+                </div>
+
+              </div>
+              <button class="btn btn-primary">Exportar excel</button><br><br>
+              </form>
+
+              <h5>Libro a libro</h5><br>
+            <form action="php/devoluciones_excel.php" method="POST">
             <div class="row">
              
                 <div class="col-sm-6">
