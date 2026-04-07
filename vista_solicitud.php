@@ -373,7 +373,7 @@
 
                          
 
-                          if ($_SESSION['tipo']==1) {
+                          if ($_SESSION['tipo']==1 || $_SESSION['id']==19) {
 
                             if ($solicitud["idestado"] == 1) {
                               echo "<br><center><a class='btn btn-success' href='php/accion_solicitudes.php?solicitud=".$solicitud["id"]."&aprobar=1&cod_colegio=".$solicitud["codigo"]."&periodo=".$solicitud["id_periodo"]."'>Aprobar</a> <a class='btn btn-danger' href='php/accion_solicitudes.php?solicitud=".$solicitud["id"]."&rechazar=1&cod_colegio=".$solicitud["codigo"]."&periodo=".$solicitud["id_periodo"]."'>Rechazar</a></center>";
