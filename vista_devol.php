@@ -271,7 +271,7 @@
 
                           echo'<tr class="odd gradeX" id="'.$libro["lpid"].'">';
                             echo'<td class="center">';
-                              if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==22) {
+                              if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {
 
                                 echo'<button type="button" class="btn btn-danger btn-xs d-print-none" id="e'.$libro["lpid"].'"><i class="fa fa-trash"></i></button> ';
                               }
@@ -301,7 +301,7 @@
                               $grado= $req_g->fetch();
                             }
                             echo'<td class="center">'.$grado["grado"].'</td>';
-                            if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==22 ) {
+                            if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {
                               echo'<td class="center"><input type="number" id="c'.$libro["lpid"].'" name="cantidad_a" value="'.$libro["cantidad"].'" class="form-control dc" size="4"></td>';
                             }else{
 
@@ -449,7 +449,7 @@
                 ?>
                  <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button>
 
-                  <?php if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==22) { ?>
+                  <?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) { ?>
                                <button type="button" class="btn btn-primary d-print-none" id="modificar">Modificar</button></center>
                             <?php } ?>
                           </center>

@@ -76,7 +76,7 @@ require '../lib/PHPMailer/src/SMTP.php';
 			    $mail->Host       = 'somoseureka.com.co';                    // Set the SMTP server to send through
 			    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
 			    $mail->SMTPAutoTLS = false; 
-			    $mail->Username   = 'crm@eurekalibros.com.co';                     // SMTP username
+			    $mail->Username   = 'crm@somoseureka.com.co';                     // SMTP username
 			    $mail->Password   = 'cRm14356$';                              // SMTP password
 				$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
 				$mail->Port       = 587;
@@ -89,8 +89,8 @@ require '../lib/PHPMailer/src/SMTP.php';
     			];                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_S	above                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 
 				//Recipients
-				$mail->setFrom('crm@eurekalibros.com.co', 'CRM Eureka');
-				$mail->addAddress("felipe.vargas@eurekalibros.com.co", 'Usuario');     // Add a recipient
+				$mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka');
+				$mail->addAddress("felipe.vargas@somoseureka.com.co", 'Usuario');     // Add a recipient
 
 
 				$sql = "SELECT p.id, c.colegio, c.cod_zona, CONCAT(u.nombres, ' ',u.apellidos ) as fullname, v.observaciones, v.fecha, o.objetivo FROM plan_trabajo p JOIN colegios c ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_promotor JOIN visitas v ON p.id=v.id_plan_trabajo JOIN objetivos o ON p.id_objetivo=o.id WHERE p.id='".$_POST["id_visita"]."'";
@@ -105,7 +105,7 @@ require '../lib/PHPMailer/src/SMTP.php';
 				$req->execute();
 				$vendedor = $req->fetch();
 					  
-				$mail->addReplyTo('crm@eurekalibros.com.co', 'CRM Eureka');
+				$mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
 				$mail->addCC("".$vendedor["correo"]."");
 
 				//$mail->addBCC('bcc@example.com');
