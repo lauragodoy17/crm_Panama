@@ -179,7 +179,7 @@
 				  
 			$mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
 			$mail->addCC("pedidos@somoseureka.com.co");
-
+			$mail->addCC("giovanni.barbosa@somoseureka.com.co");
 			//$mail->addBCC('bcc@example.com');
 
 				  
