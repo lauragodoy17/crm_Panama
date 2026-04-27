@@ -525,7 +525,7 @@ foreach($adopciones as $adopcion) {
 			$p_sec[]=$tasa_compra;
 		}
 
-		if ($go1["grado"] ==4){
+		if ($go["id_grado_otro"] ==4){
 
 			$t_alumnos_g4[]=$gp["alumnos"];
 			$t_compradores_g4[]=$comp_activos;
@@ -536,7 +536,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g4[]=$venta_real;
 
 		}
-		if ($go1["grado"] ==5){
+		if ($go["id_grado_otro"] ==5){
 			$t_alumnos_g5[]=$gp["alumnos"];
 			$t_compradores_g5[]=$comp_activos;
 			$t_descuento_g5[]=$descuento;
@@ -546,7 +546,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g5[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==6){
+		if ($go["id_grado_otro"] ==6){
 			$t_alumnos_g6[]=$gp["alumnos"];
 			$t_compradores_g6[]=$comp_activos;
 			$t_descuento_g6[]=$descuento;
@@ -556,7 +556,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g6[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==7){
+		if ($go["id_grado_otro"] ==7){
 			$t_alumnos_g7[]=$gp["alumnos"];
 			$t_compradores_g7[]=$comp_activos;
 			$t_descuento_g7[]=$descuento;
@@ -566,7 +566,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g7[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==8){
+		if ($go["id_grado_otro"] ==8){
 			$t_alumnos_g8[]=$gp["alumnos"];
 			$t_compradores_g8[]=$comp_activos;
 			$t_descuento_g8[]=$descuento;
@@ -576,7 +576,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g8[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==9){
+		if ($go["id_grado_otro"] ==9){
 			$t_alumnos_g9[]=$gp["alumnos"];
 			$t_compradores_g9[]=$comp_activos;
 			$t_descuento_g9[]=$descuento;
@@ -586,7 +586,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g9[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==10){
+		if ($go["id_grado_otro"] ==10){
 			$t_alumnos_g10[]=$gp["alumnos"];
 			$t_compradores_g10[]=$comp_activos;
 			$t_descuento_g10[]=$descuento;
@@ -596,7 +596,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g10[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==11){
+		if ($go["id_grado_otro"] ==11){
 			$t_alumnos_g11[]=$gp["alumnos"];
 			$t_compradores_g11[]=$comp_activos;
 			$t_descuento_g11[]=$descuento;
@@ -606,7 +606,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g11[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==12){
+		if ($go["id_grado_otro"] ==12){
 			$t_alumnos_g12[]=$gp["alumnos"];
 			$t_compradores_g12[]=$comp_activos;
 			$t_descuento_g12[]=$descuento;
@@ -616,7 +616,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g12[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==13){
+		if ($go["id_grado_otro"] ==13){
 			$t_alumnos_g13[]=$gp["alumnos"];
 			$t_compradores_g13[]=$comp_activos;
 			$t_descuento_g13[]=$descuento;
@@ -626,7 +626,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g13[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==14){
+		if ($go["id_grado_otro"] ==14){
 			$t_alumnos_g14[]=$gp["alumnos"];
 			$t_compradores_g14[]=$comp_activos;
 			$t_descuento_g14[]=$descuento;
@@ -636,7 +636,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g14[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==1){
+		if ($go["id_grado_otro"] ==1){
 			$t_alumnos_g1[]=$gp["alumnos"];
 			$t_compradores_g1[]=$comp_activos;
 			$t_descuento_g1[]=$descuento;
@@ -646,7 +646,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g1[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==2){
+		if ($go["id_grado_otro"] ==2){
 			$t_alumnos_g2[]=$gp["alumnos"];
 			$t_compradores_g2[]=$comp_activos;
 			$t_descuento_g2[]=$descuento;
@@ -656,7 +656,7 @@ foreach($adopciones as $adopcion) {
 			$t_venta_real_g2[]=$venta_real;
 		}
 
-		if ($go1["grado"] ==3){
+		if ($go["id_grado_otro"] ==3){
 			$t_alumnos_g3[]=$gp["alumnos"];
 			$t_compradores_g3[]=$comp_activos;
 			$t_descuento_g3[]=$descuento;
