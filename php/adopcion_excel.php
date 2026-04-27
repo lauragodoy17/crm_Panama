@@ -668,42 +668,6 @@ foreach($adopciones as $adopcion) {
 	}
 
 
-	$objSpreadsheet->getActiveSheet()->getStyle("F$conta")
-        ->getNumberFormat()
-        ->setFormatCode(
-        '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
-    );
-
-    $objSpreadsheet->getActiveSheet()->getStyle("H$conta")
-        ->getNumberFormat()
-        ->setFormatCode(
-        '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
-    );
-
-    $objSpreadsheet->getActiveSheet()->getStyle("I$conta")
-        ->getNumberFormat()
-        ->setFormatCode(
-        '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
-    );
-
-    $objSpreadsheet->getActiveSheet()->getStyle("J$conta")
-        ->getNumberFormat()
-        ->setFormatCode(
-        '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
-    );
-
-    $objSpreadsheet->getActiveSheet()->getStyle("L$conta")
-        ->getNumberFormat()
-        ->setFormatCode(
-        '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
-    );
-
-    $objSpreadsheet->getActiveSheet()->getStyle("k$conta")
-        ->getNumberFormat()
-        ->setFormatCode(
-        '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
-    );
-
 	
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$gp[alumnos]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$tasa_compra");
@@ -825,6 +789,7 @@ if (isset($t_alumnos_g4)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g4");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g4");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g4");
+
 	
 }
 if (isset($t_alumnos_g5)) {
@@ -846,6 +811,7 @@ if (isset($t_alumnos_g5)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g5");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g5");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g5");
+
 	
 }
 
@@ -868,6 +834,7 @@ if (isset($t_alumnos_g6)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g6");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g6");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g6");
+
 	
 }
 
@@ -890,6 +857,7 @@ if (isset($t_alumnos_g7)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g7");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g7");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g7");
+
 	
 }
 
@@ -912,6 +880,7 @@ if (isset($t_alumnos_g8)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g8");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g8");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g8");
+
 	
 }
 
@@ -934,6 +903,7 @@ if (isset($t_alumnos_g9)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g9");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g9");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g9");
+
 	
 }
 
@@ -956,6 +926,7 @@ if (isset($t_alumnos_g10)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g10");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g10");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g10");
+
 	
 }
 
@@ -978,6 +949,7 @@ if (isset($t_alumnos_g11)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g11");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g11");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g11");
+
 	
 }
 
@@ -1000,6 +972,7 @@ if (isset($t_alumnos_g12)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g12");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g12");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g12");
+
 	
 }
 
@@ -1022,6 +995,7 @@ if (isset($t_alumnos_g13)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g13");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g13");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g13");
+
 	
 }
 
@@ -1044,6 +1018,7 @@ if (isset($t_alumnos_g14)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g14");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g14");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g14");
+
 	
 }
 
@@ -1066,6 +1041,7 @@ if (isset($t_alumnos_g1)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g1");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g1");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g1");
+
 	
 }
 
@@ -1110,8 +1086,50 @@ if (isset($t_alumnos_g3)) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$t_precio_fact_g3");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada_g3");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real_g3");
+
 	
 }
+
+
+$objSpreadsheet->getActiveSheet()->getStyle("F13:F".$conta."")
+    ->getNumberFormat()
+    ->setFormatCode(
+    	'_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+);
+
+$objSpreadsheet->getActiveSheet()->getStyle("H13:H".$conta."")
+    ->getNumberFormat()
+    ->setFormatCode(
+    	'_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+);
+
+$objSpreadsheet->getActiveSheet()->getStyle("I13:I".$conta."")
+    ->getNumberFormat()
+    ->setFormatCode(
+    	'_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+);
+
+$objSpreadsheet->getActiveSheet()->getStyle("J13:J".$conta."")
+    ->getNumberFormat()
+    ->setFormatCode(
+    	'_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+);
+
+$objSpreadsheet->getActiveSheet()->getStyle("K13:K".$conta."")
+    ->getNumberFormat()
+    ->setFormatCode(
+    	'_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+);
+
+
+$objSpreadsheet->getActiveSheet()->getStyle("L13:L".$conta."")
+    ->getNumberFormat()
+    ->setFormatCode(
+    	'_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+);
+
+
+
 
 // Obtener la hoja activa
 $sheet = $objSpreadsheet->getActiveSheet();
