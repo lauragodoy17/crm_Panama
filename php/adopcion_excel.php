@@ -168,7 +168,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("K4", "                 ");
 $objSpreadsheet->getActiveSheet()->SetCellValue("L4", "                 ");
 
 
-$sql_periodo="SELECT id, periodo FROM periodos ORDER BY id DESC";
+$sql_periodo="SELECT id, periodo FROM periodos WHERE id='".$_GET['periodo']."' ";
 
 $req_periodo = $bdd->prepare($sql_periodo);
 $req_periodo->execute();
