@@ -91,7 +91,7 @@
                       <option value="todos">Todos</option>
                       
                        <?php 
-                        $sql ="SELECT id, CONCAT(nombres, ' ', apellidos) as promotor FROM usuarios WHERE (tipo=3 || tipo=4) AND act=1";
+                        $sql ="SELECT id, CONCAT(nombres, ' ', apellidos) as promotor FROM usuarios WHERE (tipo=3 || tipo=4 || tipo=1) AND act=1";
               
                         $req = $bdd->prepare($sql);
                         $req->execute();
