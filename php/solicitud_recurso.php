@@ -16,7 +16,7 @@
 	require '../lib/PHPMailer/src/SMTP.php';
 
 
-	$sql = "SELECT MAX(conse) as conse FROM solicitudes_recursos";
+	$sql = "SELECT MAX(conse) as conse FROM solicitudes_recursos WHERE id_periodo='".$_POST["periodo"]."'";
     $req = $bdd->prepare($sql);
     $req->execute();
 	$conse = $req->fetch();
