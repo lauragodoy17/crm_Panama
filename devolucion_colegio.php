@@ -98,7 +98,7 @@
             <div class="row">
               <div class="col-md-6 col-sm-12">
                 <div class="title">
-                  <h4>Devolucione de venta</h4>
+                  <h4>Devoluciones de venta</h4>
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
                   <ol class="breadcrumb">
