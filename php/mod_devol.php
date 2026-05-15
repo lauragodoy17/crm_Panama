@@ -28,7 +28,7 @@
 
 		list($id_libro,$cantidad) = explode("/", $libro);
 			
-		if ($libro !=0) {
+		if ($id_libro !='') {
 			
 			$sql_p = "INSERT INTO libros_devol(cod_pedido,id_libro,cantidad) VALUES('".$_POST['codigo']."','".$id_libro."','".$cantidad."')";
 				
