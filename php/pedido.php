@@ -60,7 +60,8 @@
 		
 
 	}
-
+	$_POST["observaciones"]=str_replace("'", " ", $_POST["observaciones"]);
+	
 	$sql_p2 = "INSERT INTO pedidos(codigo,id_periodo,id_colegio,id_usuario,fecha_r,dir_ent,observaciones,cliente,fac_rem,tipo,estado) VALUES('".$cod_pedido."','".$_POST["periodo"]."','".$_POST["id_colegio"]."','".$_SESSION["id"]."','".$_POST["fecha_r"]."','".$_POST["dir_ent"]."','".$_POST["observaciones"]."','".$_POST["cliente"]."','".$_POST["fac_rem"]."','".$_POST["tipo"]."','1')";
 				
 				
