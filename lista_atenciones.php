@@ -123,7 +123,8 @@
             <div class="table-responsive">
               <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                 <thead>
-                  <th>#</th>
+                  <th>Id</th>
+                  <th>Consecutivo</th>
                   <th>Fecha</th>
                   <th>Usuario</th>
                   <th>Colegio</th>
@@ -147,12 +148,9 @@
                     $total = $req->fetch();
 
                     echo "<tr>";
-                      if ($solicitud["id"] < 221) {
-                        echo "<td><a href='vista_solicitud.php?id=".$solicitud["id"]."' class='vista_soli'>".$solicitud["id"]."</a></td>";
-                      }else{
-                        echo "<td><a href='vista_solicitud.php?id=".$solicitud["id"]."' class='vista_soli'>".$solicitud["conse"]."</a></td>";
-                      }
-                                              
+                      echo "<td>".$solicitud["id"]."</td>";
+                      echo "<td><a href='vista_solicitud.php?id=".$solicitud["id"]."' class='vista_soli'>".$solicitud["conse"]."</a></td>";
+                           
                       echo "<td>".$solicitud["fecha"]."</td>";
                       echo "<td>".$solicitud["promotor"]."</td>";
                       echo "<td>".$solicitud["colegio"]."</td>";
