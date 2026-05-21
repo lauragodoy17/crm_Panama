@@ -17,6 +17,10 @@ ini_set('memory_limit', '200000M');
 
 		foreach ($_POST["libs_aod"] as $libros => $libro) {
 
+			if (empty($libro)) {
+        		continue;
+   			}
+   			
 			list($materia,$grado,$lib,$grado_otro) = explode("/", $libro);
 
 

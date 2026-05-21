@@ -15,6 +15,10 @@
 
 		foreach ($_POST["libs_ao"] as $libros => $libro) {
 
+			if (empty($libro)) {
+        		continue;
+   			}
+   			
 			list($materia,$grado,$lib,$grado_otro) = explode("/", $libro);
 
 			if ($lib !=0) {
