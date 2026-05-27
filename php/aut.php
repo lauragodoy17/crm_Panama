@@ -20,7 +20,7 @@ session_start();
         header("location:./login.php?opd=".$_GET['opd']."");
       }
       else{
-        header("location:../login.php");
+        header("location:login.php");
       }
       
     }
