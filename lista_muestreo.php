@@ -166,7 +166,9 @@
                       echo'<td class="center">'.$pedido["id"].'</td>';
                       echo'<td class="center">'.$pedido["fecha"].'</td>';
                       if ($pedido['tipo']==3 || $pedido['tipo']==1) {
-                        list($empresa,$n_zona) = explode("/", $pedido["zona"]);
+                        $partes = explode("/", $pedido["zona"]);
+                        $empresa = $partes[0] ?? '';
+                        $n_zona = $partes[1] ?? '';
                         echo'<td class="center">'.$empresa.'</td>';
                         echo'<td class="center">'.$n_zona.'</td>';
                         echo'<td class="center">'.$promotor.'</td>';
