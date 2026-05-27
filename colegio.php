@@ -704,7 +704,7 @@
           if (target !="#presupuesto" && target !="#adopciones") {
             var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&id_calendario='+ <?php echo $colegio['id_calendario'] ?>;
           }else{
-            var responsable = <?php echo json_encode($responsable["codigo"]); ?>;
+            var responsable = <?php echo json_encode($colegio["responsable"]); ?>;
             var f_cierre = <?php echo json_encode($gp_periodo["f_cierre"]); ?>;
             var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&cod_zona='+ <?php echo $colegio['cod_zona'] ?>+ '&sub_zona='+ <?php echo $colegio['sub_zona'] ?>+ '&responsable='+encodeURIComponent(responsable)+ '&promotor='+ <?php echo $promotor['id'] ?>+ '&f_cierre='+encodeURIComponent(f_cierre);
 
