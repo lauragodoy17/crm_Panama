@@ -38,10 +38,11 @@
 	}
 
 	
+	$tp = $_POST['tp'] ?? '';
 	if ($_POST['salida']=="aprobado") {
-		header('Location: ../pedido_colegio.php?id_pedido='.$_POST["pedido"].'');
+		header('Location: ../pedido_colegio.php?id_pedido='.$_POST["pedido"].'&tp='.$tp);
 	}else{
-		header('Location: ../pedido_colegio.php?id_pedido='.$_POST["pedido"].'');
+		header('Location: ../pedido_colegio.php?id_pedido='.$_POST["pedido"].'&tp='.$tp);
 	}
 
 	

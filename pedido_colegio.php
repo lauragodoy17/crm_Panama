@@ -1,14 +1,14 @@
-<?php require_once("php/aut.php"); ?>
+<?php require_once("php/aut.php"); $tp = $_GET['tp'] ?? ''; ?>
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <!-- Basic Page Info -->
     <meta charset="utf-8" />
-    <?php if ($_GET['tp']==2) { ?>
+    <?php if ($tp==2) { ?>
       <title>Inkpulse - Pedido pendiente</title>
-    <?php }elseif ($_GET['tp']==3) { ?>
+    <?php }elseif ($tp==3) { ?>
       <title>Inkpulse - Pedido aprobado</title>
-    <?php }elseif ($_GET['tp']==4) { ?>
+    <?php }elseif ($tp==4) { ?>
       <title>Inkpulse - Pedido entregado</title>
     <?php }else { ?>
       <title>Inkpulse - Pedido anulado</title>
@@ -106,11 +106,11 @@
             <div class="row">
               <div class="col-md-6 col-sm-12">
                 <div class="title">
-                  <?php if ($_GET['tp']==2) { ?>
+                  <?php if ($tp==2) { ?>
                     <h4>Pedido pendiente</h4>
-                  <?php }elseif ($_GET['tp']==3) { ?>
+                  <?php }elseif ($tp==3) { ?>
                     <h4>Pedido aprobado</h4>
-                  <?php }elseif ($_GET['tp']==4) { ?>
+                  <?php }elseif ($tp==4) { ?>
                     <h4>Pedido entregado</h4>
                   <?php }else { ?>
                     <h4>Pedido anulado</h4>
@@ -123,11 +123,11 @@
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                     
-                      <?php if ($_GET['tp']==2) { ?>
+                      <?php if ($tp==2) { ?>
                         Pendiente
-                      <?php }elseif ($_GET['tp']==3) { ?>
+                      <?php }elseif ($tp==3) { ?>
                         Aprobado
-                      <?php }elseif ($_GET['tp']==4) { ?>
+                      <?php }elseif ($tp==4) { ?>
                         Entregado
                       <?php }else { ?>
                         Anulado
@@ -399,6 +399,7 @@
               </div>
               <input type="hidden" name="id_colegio" value="<?php echo $_GET["id_colegio"]; ?>">
               <input type="hidden" name="periodo" value="<?php echo $_GET["periodo"]; ?>">
+              <input type="hidden" name="tp" value="<?php echo $tp; ?>">
 
               <br><center>
                   <label for="observaciones">Observaciones:</label><br>

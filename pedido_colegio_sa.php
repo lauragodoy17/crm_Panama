@@ -1,14 +1,14 @@
-<?php require_once("php/aut.php"); ?>
+<?php require_once("php/aut.php"); $tp = $_GET['tp'] ?? ''; ?>
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <!-- Basic Page Info -->
     <meta charset="utf-8" />
-    <?php if ($_GET['tp']==2) { ?>
+    <?php if ($tp==2) { ?>
       <title>Inkpulse - Pedido sin adopción pendiente</title>
-    <?php }elseif ($_GET['tp']==3) { ?>
+    <?php }elseif ($tp==3) { ?>
       <title>Inkpulse - Pedido sin adopción aprobado</title>
-    <?php }elseif ($_GET['tp']==4) { ?>
+    <?php }elseif ($tp==4) { ?>
       <title>Inkpulse - Pedido sin adopción entregado</title>
     <?php }else { ?>
       <title>Inkpulse - Pedido sin adopción anulado</title>
@@ -106,11 +106,11 @@
             <div class="row">
               <div class="col-md-6 col-sm-12">
                 <div class="title">
-                  <?php if ($_GET['tp']==2) { ?>
+                  <?php if ($tp==2) { ?>
                     <h4>Pedido sin adopción pendiente</h4>
-                  <?php }elseif ($_GET['tp']==3) { ?>
+                  <?php }elseif ($tp==3) { ?>
                     <h4>Pedido sin adopción aprobado</h4>
-                  <?php }elseif ($_GET['tp']==4) { ?>
+                  <?php }elseif ($tp==4) { ?>
                     <h4>Pedido sin adopción entregado</h4>
                   <?php }else { ?>
                     <h4>Pedido sin adopción anulado</h4>
@@ -122,11 +122,11 @@
                       Pedido
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                    <?php if ($_GET['tp']==2) { ?>
+                    <?php if ($tp==2) { ?>
                       Pendiente
-                    <?php }elseif ($_GET['tp']==3) { ?>
+                    <?php }elseif ($tp==3) { ?>
                       Aprobado
-                    <?php }elseif ($_GET['tp']==4) { ?>
+                    <?php }elseif ($tp==4) { ?>
                       Entregado
                     <?php }else { ?>
                       Anulado
@@ -341,6 +341,7 @@
                     <input type="hidden" name="pedido" value="<?php echo $_GET["id_pedido"] ?>">
                     <input type="hidden" name="codigo" value="<?php echo $pedido["codigo"] ?>">
                     <input type="hidden" name="salida" value="pendiente">
+                    <input type="hidden" name="tp" value="<?php echo $tp; ?>">
                                        
                   </tbody>
                 </table>

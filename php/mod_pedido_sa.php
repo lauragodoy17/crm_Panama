@@ -177,13 +177,14 @@
       die ('Erreur execute');
     }
 
+    $tp = $_POST['tp'] ?? '';
     if ($_POST['salida']=="pendiente") {
 
-      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'');
+      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'&tp='.$tp);
     }elseif ($_POST['salida']=="aprobado") {
-      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'');
+      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'&tp='.$tp);
     }else{
-      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'');
+      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'&tp='.$tp);
     }
 
   }
