@@ -264,15 +264,15 @@
                           echo'<td class="">'.$libro["isbn"].'</td>';
                           echo'<td class="">'.$libro["libro"].'</td>';
                           echo'<td class="center">'.$libro["materia"].'</td>';
-                          if ($libro["cod_area"] == "") {
+                          if (empty($libro["cod_area"])) {
 
                             $sql_g = "SELECT grado FROM grados WHERE id='".$libro["id_grado"]."'";
                             $req_g = $bdd->prepare($sql_g);
                             $req_g->execute();
                             $grado= $req_g->fetch();
-                                                  
+
                           }else{
-                                                  
+
                             $sql = "SELECT id_grado_otro FROM areas_objetivas WHERE codigo='".$libro["cod_area"]."'";
                             $req = $bdd->prepare($sql);
                             $req->execute();
