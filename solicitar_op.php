@@ -214,7 +214,7 @@
                 <h4>OP para Devoluciones de cliente:</h4>
                 <table class="table table-bordered table-hover">
                   <tr>
-                    <td># Devolucion de cliente: <?php echo $_GET["id_devol_c"] ?></td>
+                    <td># Devolución de cliente: <?php echo $_GET["id_devol_c"] ?></td>
                     <td>Cliente: <?php echo $pedido["cliente"] ?></td>
                     <td>Fecha: <?php echo $pedido["fecha"] ?></td>
                   </tr>
@@ -227,7 +227,7 @@
                 <h4>OP para devoluciones de proveedor:</h4>
                 <table class="table table-bordered table-hover">
                   <tr>
-                    <td># Devolucion de proveedor: <?php echo $_GET["id_devol_p"] ?></td>
+                    <td># Devolución de proveedor: <?php echo $_GET["id_devol_p"] ?></td>
                     <td>Cliente: <?php echo $pedido["cliente"] ?></td>
                     <td>Fecha: <?php echo $pedido["fecha"] ?></td>
                   </tr>
@@ -240,7 +240,7 @@
                 <h4>OP para devoluciones de ventas:</h4>
                 <table class="table table-bordered table-hover">
                   <tr>
-                    <td># Devolucion de venta: <?php echo $_GET["id_devol_v"] ?></td>
+                    <td># Devolución de venta: <?php echo $_GET["id_devol_v"] ?></td>
                     <td>Cliente: <?php echo $pedido["cliente"] ?></td>
                     <td>Fecha: <?php echo $pedido["fecha"] ?></td>
                   </tr>

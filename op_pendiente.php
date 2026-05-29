@@ -228,9 +228,9 @@
                     $pedido= $req->fetch();
                     if ($pedido["estado"] ==2) {
                       
-                      echo'<td><b>Pedido de mustras:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
+                      echo'<td><b>Pedido de muestras:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
                     }else{
-                      echo'<td><b>Pedido de mustras:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
+                      echo'<td><b>Pedido de muestras:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
 
                       
                     }
@@ -318,8 +318,8 @@
 
               ?>
                 <tr>
-                  <td><b>Fecha de atendida:</b> <?php echo $op["fecha_at"]; ?></td>
-                  <td><b>Usuario atendida:</b> <?php echo $aten["usr_aten"]; ?></td>
+                  <td><b>Fecha de atención:</b> <?php echo $op["fecha_at"]; ?></td>
+                  <td><b>Usuario que atendió:</b> <?php echo $aten["usr_aten"]; ?></td>
                 </tr>
               <?php } ?>
             </table>

@@ -96,7 +96,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Departamento");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Ciudad");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Barrio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H4", "Dirección");
-$objSpreadsheet->getActiveSheet()->SetCellValue("I4", "Telefono");
+$objSpreadsheet->getActiveSheet()->SetCellValue("I4", "Teléfono");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J4", "Status");
 $objSpreadsheet->getActiveSheet()->SetCellValue("K4", "Propuesta comercial");
 $objSpreadsheet->getActiveSheet()->getStyle("A1:K1")->getFont()->getColor()->applyFromArray(

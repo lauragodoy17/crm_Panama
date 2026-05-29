@@ -272,7 +272,7 @@
                             <div class="col-sm-6">
                               <div class="form-group">
                                 <label>Nombre de la institución <small style="color:red;"> *</small></label>
-                                <input type="text" class="form-control" placeholder="Nombre de la instricución" name="colegio"  value="<?php echo $colegio['colegio']; ?>" required />
+                                <input type="text" class="form-control" placeholder="Nombre de la institución" name="colegio"  value="<?php echo $colegio['colegio']; ?>" required />
                               </div>
                             </div>
                             <div class="col-sm-3">
@@ -371,8 +371,8 @@
                             
                             <div class="col-sm-4">
                               <div class="form-group">
-                                <label>Pagina Web</label>
-                                <input type="text" class="form-control" placeholder="Pagina Web" name="web"  value="<?php echo $colegio['web']; ?>"/>
+                                <label>Página Web</label>
+                                <input type="text" class="form-control" placeholder="Página Web" name="web"  value="<?php echo $colegio['web']; ?>"/>
                               </div>
                             </div>
                             <div class="col-sm-4">

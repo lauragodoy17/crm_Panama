@@ -149,8 +149,8 @@
                       <th>Grado</th>
                       <th>PVP</th>
                       <th>Desc.</th>
-                      <th>Precio Fact.</th>
-                      <th>Cant.</th>
+                      <th>Precio Facturación</th>
+                      <th>Cantidad</th>
                       <th>Valor Venta</th>
                       <?php if ($pedido["tipo"]==3 || $pedido["codzona"]=='5656') { ?>
                         <th>Plataforma</th>

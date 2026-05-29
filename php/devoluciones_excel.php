@@ -69,9 +69,9 @@ $estilo_negrita = array(
 	$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Isbn");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Libro");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("H4", "PVP");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("I4", "Desc.");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("J4", "Precio Fact.");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("K4", "Cant.");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("I4", "Descuento");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("J4", "Precio Facturación");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("K4", "Cantidad");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("L4", "Valor");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("M4", "Observaciones");
 

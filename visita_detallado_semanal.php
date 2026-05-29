@@ -137,7 +137,7 @@
                             
                 <tr>
                   <td>Colegio: <?php echo $colegio['colegio']; ?></td>
-                  <td>Telefonos: <?php echo $colegio['telefono']; ?></td>
+                  <td>Teléfonos: <?php echo $colegio['telefono']; ?></td>
                 </tr>
                 <tr>
                   <td>Barrio: <?php echo $colegio['barrio']; ?></td>
@@ -232,7 +232,7 @@
                 </div>
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <label for="telefono_p" class="control-label no-padding-right">Telefono<small style="color:red;"> *</small></label>
+                    <label for="telefono_p" class="control-label no-padding-right">Teléfono<small style="color:red;"> *</small></label>
                     <input type="tel" name="telefono_p" id="telefono_p" class="form-control" placeholder="" required>
                   </div>
 

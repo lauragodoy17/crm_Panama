@@ -140,7 +140,7 @@
                 <!-- PAGE CONTENT BEGINS -->
                   
                   <div class="form-group">
-                    <label class="control-label no-padding-right" for="barrio"> Dese:<small style="color:red;"> *</small> </label>
+                    <label class="control-label no-padding-right" for="barrio"> Desde:<small style="color:red;"> *</small> </label>
 
                     <input type="number" name="desde" class="form-control" style="width: auto" required>
                   </div>

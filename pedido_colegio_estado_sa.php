@@ -166,11 +166,11 @@
                       <th>Materia</th>
                       <th>Grado</th>
                       <th>PVP</th>
-                      <th>Desc.</th>
-                      <th>Precio Fact.</th>
-                      <th>Cant.</th>
-                      <th>Desc. Aprobado</th>
-                      <th>Cant. Aprobada</th>
+                      <th>Descuento</th>
+                      <th>Precio Facturación</th>
+                      <th>Cantidad</th>
+                      <th>Descuento Aprobado</th>
+                      <th>Cantidad Aprobada</th>
                       <th>Valor Venta</th>
                     </tr>
                   </thead>

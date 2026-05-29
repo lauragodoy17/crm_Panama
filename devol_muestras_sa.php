@@ -9,7 +9,7 @@
     <?php }elseif ($_GET['tp']==2) { ?>
       <title>Inkpulse - Devolución de Proveedores</title>
     <?php }else{ ?>
-      <title>Inkpulse - Devolución deventa sin adopción</title>
+      <title>Inkpulse - Devolución de venta sin adopción</title>
     <?php } ?>
     
 

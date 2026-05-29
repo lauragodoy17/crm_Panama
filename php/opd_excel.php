@@ -103,7 +103,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("E6", "Solicitante");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Cliente");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Fecha para entrega");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H6", "Observaciones");
-$objSpreadsheet->getActiveSheet()->SetCellValue("I6", "Titulo");
+$objSpreadsheet->getActiveSheet()->SetCellValue("I6", "Título");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J6", "Cantidad");
 $objSpreadsheet->getActiveSheet()->SetCellValue("K6", "Entrega 1");
 $objSpreadsheet->getActiveSheet()->SetCellValue("L6", "Fecha entrega 1");

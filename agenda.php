@@ -279,9 +279,9 @@
 							  <div class="modal-body">
 								
 								  <div class="form-group">
-									<label for="title" class="col-sm-4 control-label">Titulo</label>
+									<label for="title" class="col-sm-4 control-label">Título</label>
 									<div class="col-sm-8">
-									  <input type="text" name="title" class="form-control" id="title" placeholder="Titulo">
+									  <input type="text" name="title" class="form-control" id="title" placeholder="Título">
 									</div>
 								  </div>
 								  <div class="form-group">

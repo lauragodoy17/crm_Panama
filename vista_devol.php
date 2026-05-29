@@ -244,7 +244,7 @@
                   </tr>
                 </table>
 
-                <center><h5>Soporte Adjunto:</b> <a href="adjuntos/<?php echo $pedido["archivo"] ?>" style="cursor: pointer;" target="_blank"><?php echo $pedido["archivo"] ?></a></h5></center><br>
+                <center><h5>Soporte Adjunto: <a href="adjuntos/<?php echo $pedido["archivo"] ?>" style="cursor: pointer;" target="_blank"><?php echo $pedido["archivo"] ?></a></h5></center><br>
 
                 <center id="impre"></center>
                 <input type="hidden" id="fecha_impre">
@@ -258,7 +258,7 @@
                         <th>Título</th>
                         <th>Materia</th>
                         <th>Grado</th>
-                        <th>Cant.</th>
+                        <th>Cantidad</th>
                       </tr>
                     </thead>
                     <tbody>

@@ -244,7 +244,7 @@
                             <div class="col-sm-6">
                               <div class="form-group">
                                 <label>Nombre de la institución <small style="color:red;"> *</small></label>
-                                <input type="text" class="form-control" placeholder="Nombre de la instricución" name="colegio"  value="<?php echo $colegio['colegio']; ?>" required />
+                                <input type="text" class="form-control" placeholder="Nombre de la institución" name="colegio"  value="<?php echo $colegio['colegio']; ?>" required />
                               </div>
                             </div>
                             <div class="col-sm-3">
@@ -349,8 +349,8 @@
                             
                             <div class="col-sm-4">
                               <div class="form-group">
-                                <label>Pagina Web</label>
-                                <input type="text" class="form-control" placeholder="Pagina Web" name="web"  value="<?php echo $colegio['web']; ?>"/>
+                                <label>Página Web</label>
+                                <input type="text" class="form-control" placeholder="Página Web" name="web"  value="<?php echo $colegio['web']; ?>"/>
                               </div>
                             </div>
                             <div class="col-sm-4">
@@ -1301,7 +1301,7 @@
                                       <input type="number" class="form-control" name="preescolar" id="preescolar_at" autocomplete="off">
                                     </div>
                                     <div class="form-group col-sm-3">
-                                      <label id="l_primaria_at" for="primaria_at" class="control-label">Pimaria</label>
+                                      <label id="l_primaria_at" for="primaria_at" class="control-label">Primaria</label>
                                       <input type="number" class="form-control" name="primaria" id="primaria_at" autocomplete="off">
                                     </div>
                                     <div class="form-group col-sm-3">
@@ -1341,7 +1341,7 @@
                                           <input type="number" class="form-control" name="preescolar" id="preescolar_at<?php echo $i;?>" autocomplete="off">
                                         </div>
                                         <div class="form-group col-sm-3">
-                                          <label id="l_primaria_at<?php echo $i;?>" for="primaria_at<?php echo $i;?>" class="control-label">Pimaria</label>
+                                          <label id="l_primaria_at<?php echo $i;?>" for="primaria_at<?php echo $i;?>" class="control-label">Primaria</label>
                                           <input type="number" class="form-control" name="primaria_at" id="primaria_at<?php echo $i;?>" autocomplete="off">
                                         </div>
                                         <div class="form-group col-sm-3">

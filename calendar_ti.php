@@ -3,7 +3,7 @@
 	<head>
 		<!-- Basic Page Info -->
 		<meta charset="utf-8" />
-		<title>Inkpulse - Calendario Consultorias</title>
+		<title>Inkpulse - Calendario Consultorías</title>
 
 		<!-- Site favicon -->
 		<link
@@ -61,7 +61,7 @@
 						<div class="row">
 							<div class="col-md-12 col-sm-12">
 								<div class="title">
-									<h4>Calendario consultorioas</h4>
+									<h4>Calendario consultorías</h4>
 								</div>
 								<nav aria-label="breadcrumb" role="navigation">
 									<ol class="breadcrumb">
@@ -69,7 +69,7 @@
 											<a href="index.html">Inicio</a>
 										</li>
 										<li class="breadcrumb-item active" aria-current="page">
-											Calendario consultorioas
+											Calendario consultorías
 										</li>
 									</ol>
 								</nav>

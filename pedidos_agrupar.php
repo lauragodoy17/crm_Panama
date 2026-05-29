@@ -110,7 +110,7 @@
                         <th>Estado</th>
                         <th>Promotor</th>
                         <th>Colegio</th>
-                        <th>Selec.</th>    
+                        <th>Seleccionar</th>    
                       </tr>
                     </thead>
                     <tbody>

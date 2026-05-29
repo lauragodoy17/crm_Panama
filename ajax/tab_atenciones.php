@@ -94,7 +94,7 @@
                                       <input type="number" class="form-control" name="preescolar" id="preescolar_at" autocomplete="off">
                                     </div>
                                     <div class="form-group col-sm-3">
-                                      <label id="l_primaria_at" for="primaria_at" class="control-label">Pimaria</label>
+                                      <label id="l_primaria_at" for="primaria_at" class="control-label">Primaria</label>
                                       <input type="number" class="form-control" name="primaria" id="primaria_at" autocomplete="off">
                                     </div>
                                     <div class="form-group col-sm-3">
@@ -134,7 +134,7 @@
                                           <input type="number" class="form-control" name="preescolar" id="preescolar_at<?php echo $i;?>" autocomplete="off">
                                         </div>
                                         <div class="form-group col-sm-3">
-                                          <label id="l_primaria_at<?php echo $i;?>" for="primaria_at<?php echo $i;?>" class="control-label">Pimaria</label>
+                                          <label id="l_primaria_at<?php echo $i;?>" for="primaria_at<?php echo $i;?>" class="control-label">Primaria</label>
                                           <input type="number" class="form-control" name="primaria_at" id="primaria_at<?php echo $i;?>" autocomplete="off">
                                         </div>
                                         <div class="form-group col-sm-3">

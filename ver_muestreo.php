@@ -4,7 +4,7 @@
   <head>
     <!-- Basic Page Info -->
     <meta charset="utf-8" />
-    <title>Inkpulse -Ver muestreo</title>
+    <title>Inkpulse - Ver muestreo</title>
 
     <!-- Site favicon -->
     <link

@@ -90,7 +90,7 @@
                       <?php }elseif($_GET['tp']==2){ ?>
                         OP pendientes
                       <?php }elseif($_GET['tp']==3){ ?>
-                        OP atendias
+                        OP atendidas
                       <?php }else{ ?>
                          OP anuladas
                       <?php } ?>

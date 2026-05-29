@@ -218,7 +218,7 @@
                 </table>
                 <center id="impre"></center>
                 <input type="hidden" id="fecha_impre">
-                <center>Archivo Adjunto:</b> <a href="adjuntos_dist/<?php echo $pedido["archivo"] ?>" style="cursor: pointer;" target="_blank"><?php echo $pedido["archivo"] ?></a></center><br>
+                <center>Archivo Adjunto: <a href="adjuntos_dist/<?php echo $pedido["archivo"] ?>" style="cursor: pointer;" target="_blank"><?php echo $pedido["archivo"] ?></a></center><br>
                 <div class="table-responsive">
                 <table class="table table-striped table-bordered table-hover">
                   <thead>
@@ -230,12 +230,12 @@
                       <th>Grado</th>
                       <th>PVP</th>
                       <th>Desc.</th>
-                      <th>Precio Fact.</th>
-                      <th>Cant.</th>
+                      <th>Precio Facturación</th>
+                      <th>Cantidad</th>
                       <th>Valor Venta</th>
                       <?php if ($_SESSION["tipo"] ==1 || $_SESSION["id"]==21) { ?>
-                        <th class="d-print-none">Desc. Aprobado</th>
-                        <th class="">Cant. Aprobada</th>
+                        <th class="d-print-none">Descuento Aprobado</th>
+                        <th class="">Cantidad Aprobada</th>
                       <?php } ?>
                     </tr>
                   </thead>

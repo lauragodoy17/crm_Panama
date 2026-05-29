@@ -216,7 +216,7 @@
 
 
 					<b>Fecha atendida:</b> <?php echo $at["fecha_at"] ?> <br>
-					<b>Usuario atendida:</b> <?php echo $aten["usr_aten"]; ?> <br>
+					<b>Usuario atendido:</b> <?php echo $aten["usr_aten"]; ?> <br>
 					<b>Entregado a:</b> <?php echo $at["transportista"] ?> <br>
 					<b>Guía:</b> <?php echo $at["guia"] ?> <br>
 					<b>Valor:</b> <?php echo $at["valor"] ?><br>

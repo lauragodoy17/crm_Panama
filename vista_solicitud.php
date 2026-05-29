@@ -115,7 +115,7 @@
                       <th colspan='3'><center>Compradores activos</center></th>
                     </thead>
                     <thead>
-                      <th>Areas comprometidas</th>
+                      <th>Áreas comprometidas</th>
                         <th>Preescolar</th>
                         <th>Primaria</th>
                         <th>Bachillerato</th>

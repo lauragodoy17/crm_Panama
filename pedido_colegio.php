@@ -254,15 +254,15 @@
                         <th class="d-print-none">Materia</th>
                         <th>Grado</th>
                         <th>PVP</th>
-                        <th>Desc.</th>
-                        <th>Precio Fact.</th>
-                        <th>Cant.</th>
+                        <th>Descuento</th>
+                        <th>Precio Facturación</th>
+                        <th>Cantidad</th>
                         <th>Valor Venta</th>
                         <?php if ($pedido["tipo"]==3 || $pedido["codzona"]=='5656') { ?>
                           <th>Plataforma</th>
                         <?php } ?>
-                          <th class="d-print-none">Desc. Aprobado</th>
-                          <th class="d-print-none">Cant. Aprobada</th>
+                          <th class="d-print-none">Descuento Aprobado</th>
+                          <th class="d-print-none">Cantidad Aprobada</th>
                       </tr>
                       </thead>
                         <tbody>
@@ -404,7 +404,7 @@
               <br><center>
                   <label for="observaciones">Observaciones:</label><br>
                  <textarea name="observaciones" id="observaciones" cols="100" rows="9" class="form-control"><?php echo $pedido["observaciones"] ?></textarea><br><br>
-                 <h5><label for="">Direción de entrega:</label>
+                 <h5><label for="">Dirección de entrega:</label>
                 <?php echo $pedido["dir_ent"]; ?><br><br></h5>
                  <h3><?php echo $pedido["estado"]; ?></h3><br>
                  <input type="hidden" name="pedido" value="<?php echo $_GET["id_pedido"] ?>">

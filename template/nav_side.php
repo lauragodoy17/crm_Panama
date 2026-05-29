@@ -425,16 +425,16 @@
 									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2 || $_SESSION["id"] ==2) { ?>
 
 										<li>
-											<a href="devol_muestras_sa.php?tp=3">Devol. de ventas sin adopciones</a>
+											<a href="devol_muestras_sa.php?tp=3">Devoluciones de ventas sin adopción</a>
 										</li>
 									<?php } ?>
 
 									<li>
-										<a href="ver_devol_muestras.php">Ver Devol. de muestras</a>
+										<a href="ver_devol_muestras.php">Ver devoluciones de muestras</a>
 									</li>
 
 									<li>
-										<a href="ver_devol_ventas.php">Ver Devol. de ventas</a>
+										<a href="ver_devol_ventas.php">Ver devoluciones de ventas</a>
 									</li>
 
 									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2) { ?>
@@ -444,7 +444,7 @@
 										</li>
 
 										<li>
-											<a href="ver_devol_proveedores.php">Ver devol. proveedores</a>
+											<a href="ver_devol_proveedores.php">Ver devoluciones de proveedores</a>
 										</li>
 
 									<?php } ?>
@@ -459,7 +459,7 @@
 							<li class="dropdown" id="pedidos">
 								<a href="javascript:;" class="dropdown-toggle" >
 									<span class="micon bi bi-truck-flatbed"></span
-									><span class="mtext">Pedidos sin adop.</span>
+									><span class="mtext">Pedidos sin adopción</span>
 								</a>
 								<ul class="submenu">
 									<?php if ($_SESSION["tipo"] ==6 || $_SESSION["tipo"] ==4 || $_SESSION["tipo"] ==3) { ?>
@@ -584,7 +584,7 @@
 									<?php } ?>
 
 									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==3 || $_SESSION["tipo"]==4 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==5) {?>
-										<li><a href="calendar_ti.php">Calendario consultorias</a></li>
+										<li><a href="calendar_ti.php">Calendario consultorías</a></li>
 									<?php } ?>
 
 									<?php if ($_SESSION["tipo"]!=4) {?>

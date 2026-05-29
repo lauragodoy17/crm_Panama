@@ -4,7 +4,7 @@
   <head>
     <!-- Basic Page Info -->
     <meta charset="utf-8" />
-    <title>Inkpulse - Solicitar Orde de producción</title>
+    <title>Inkpulse - Solicitar Orden de producción</title>
     <!-- Site favicon -->
     <link
       rel="apple-touch-icon"
@@ -177,7 +177,7 @@
                 
                 
                 <div class="form-group col-sm-6">
-                  <label id="l_titulo" for="titulo" class="control-label">Titulo<small style="color:red;"> *</small></label>
+                  <label id="l_titulo" for="titulo" class="control-label">Título<small style="color:red;"> *</small></label>
                   <input type="text" class="form-control" name="titulo" id="titulo">
                 </div>
 
@@ -195,7 +195,7 @@
                   <h4>Material #<?php echo $i+1;?>:</h4>
                   <div class="row">
                     <div class="form-group col-sm-6">
-                      <label id="l_titulo<?php echo $i;?>" for="titulo<?php echo $i;?>" class="control-label">Titulo<small style="color:red;"> *</small></label>
+                      <label id="l_titulo<?php echo $i;?>" for="titulo<?php echo $i;?>" class="control-label">Título<small style="color:red;"> *</small></label>
                       <input type="text" class="form-control" name="titulo" id="titulo<?php echo $i;?>">
                     </div>
 

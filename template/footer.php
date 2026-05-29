@@ -20,7 +20,7 @@
 	                <div class="modal-body">
 	                	<center>
 	                    <div class="form-group">
-							<label class="control-label no-padding-right" for="periodo"> Seleccone el periodo:<small style="color:red;"> *</small> </label><br>
+							<label class="control-label no-padding-right" for="periodo"> Seleccione el periodo:<small style="color:red;"> *</small> </label><br>
 							<select name="periodo" id="periodo">
 								<?php  
 
@@ -68,7 +68,7 @@
 	                <div class="modal-body">
 	                	<center>
 	                    <div class="form-group">
-							<label class="control-label no-padding-right" for="periodo"> Seleccone el periodo:<small style="color:red;"> *</small> </label><br>
+							<label class="control-label no-padding-right" for="periodo"> Seleccione el periodo:<small style="color:red;"> *</small> </label><br>
 							<select name="periodo" id="periodo">
 								<?php  
 

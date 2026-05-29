@@ -181,7 +181,7 @@
                 ?>
                 <table class="table table-bordered table-hover">
                   <tr>
-                    <td>Devolución venta #: <?php echo $_GET["id_pedido"] ?></td>
+                    <td>Devolución de venta #: <?php echo $_GET["id_pedido"] ?></td>
                     <td>Colegio: <?php echo $pedido["colegio"] ?></td>
                     <td>Fecha: <?php echo $pedido["fecha"] ?></td>
                   </tr>
@@ -233,8 +233,8 @@
                                 <th>Grado</th>
                                 <th>PVP</th>
                                 <th>Desc.</th>
-                                <th>Precio Fact.</th>
-                                <th>Cant.</th>
+                                <th>Precio Facturación</th>
+                                <th>Cantidad</th>
                                 <th>Valor</th>  
                               </tr>
                             </thead>

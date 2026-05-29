@@ -123,7 +123,7 @@
                           <th>Colegio</th>
                           <th>Dirección</th>
                           <th>Barrio</th>
-                          <th>Telefono</th>
+                          <th>Teléfono</th>
                         </tr>
                     </thead>
                     <tbody>

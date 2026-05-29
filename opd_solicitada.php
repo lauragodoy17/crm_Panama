@@ -197,7 +197,7 @@
                    
                 </table>
 
-                  Archivo Adjunto:</b> <a href="adjuntos_opd/<?php echo $pedido["adjunto"] ?>" style="cursor: pointer;" target="_blank"><?php echo  $pedido["adjunto"] ?></a><br><br>
+                  Archivo Adjunto: <a href="adjuntos_opd/<?php echo $pedido["adjunto"] ?>" style="cursor: pointer;" target="_blank"><?php echo  $pedido["adjunto"] ?></a><br><br>
 
                   <?php if ($_SESSION['tipo']!=8) { ?>
                     <div class="form-group " for="persona">
@@ -476,7 +476,7 @@
                       <h4>Material #<?php echo $i;?>:</h4>
                       <div class="row">
                         <div class="form-group col-sm-3">
-                          <label id="l_titulo<?php echo $i;?>" for="titulo<?php echo $i;?>" class="control-label">Titulo<small style="color:red;"> *</small></label>
+                          <label id="l_titulo<?php echo $i;?>" for="titulo<?php echo $i;?>" class="control-label">Título<small style="color:red;"> *</small></label>
                           <input type="text" class="form-control" name="titulo" id="titulo<?php echo $i;?>">
                         </div>
 
