@@ -29,26 +29,50 @@ if (isset($_GET['order'][0]['column'])) {
 
 if ($_SESSION['zona']=='5656' || ($_SESSION["tipo"]!=3 && $_SESSION["tipo"]!=6 && $_SESSION["tipo"]!=10) ) {
 
-    
+
         $searchSQL = " WHERE (colegio LIKE :search OR dane LIKE :search) AND cod_zona !=0 AND id > 2";
         $params[':search'] = "%" . $searchValue . "%";
-    
+
 
 }else {
 
     if ($_SESSION["tipo"]==10){
-       
+
             $searchSQL = " WHERE (colegio LIKE :search OR dane LIKE :search) AND (cod_zona='".$_SESSION['zona']."' OR zona_madre='".$_SESSION['zona']."')";
             $params[':search'] = "%" . $searchValue . "%";
-        
+
     }else{
-       
+
         $searchSQL = " WHERE (colegio LIKE :search OR dane LIKE :search) AND cod_zona='".$_SESSION['zona']."'";
         $params[':search'] = "%" . $searchValue . "%";
-    
+
 
     }
 
+}
+
+// Filtros adicionales del panel de búsqueda
+$zona_filter   = isset($_GET['zona_filter'])   ? intval($_GET['zona_filter'])           : 0;
+$depto_filter  = isset($_GET['depto_filter'])  ? intval($_GET['depto_filter'])           : 0;
+$ciudad_filter = isset($_GET['ciudad_filter']) ? trim(strip_tags($_GET['ciudad_filter'])): '';
+$resp_filter   = isset($_GET['resp_filter'])   ? trim(strip_tags($_GET['resp_filter']))  : '';
+
+if ($zona_filter > 0) {
+    $searchSQL .= " AND cod_zona = :zona_filter";
+    $params[':zona_filter'] = $zona_filter;
+}
+if ($depto_filter > 0) {
+    $searchSQL .= " AND departamento = :depto_filter";
+    $params[':depto_filter'] = $depto_filter;
+}
+if (!empty($ciudad_filter)) {
+    $searchSQL .= " AND ciudad LIKE :ciudad_filter";
+    $params[':ciudad_filter'] = "%" . $ciudad_filter . "%";
+}
+// Solo perfiles 1 y 2 pueden filtrar por responsable
+if (!empty($resp_filter) && ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 2)) {
+    $searchSQL .= " AND cod_zona IN (SELECT z.codigo FROM zonas z JOIN usuarios u ON z.codigo = u.cod_zona WHERE CONCAT(u.nombres,' ',u.apellidos) = :resp_filter)";
+    $params[':resp_filter'] = $resp_filter;
 }
 
 
@@ -62,17 +86,14 @@ $stmt->execute($params);
 $filtered = $stmt->fetchColumn();
 
 // Datos paginados con filtro
-$dataSQL = "SELECT id, codigo, dane, colegio, direccion, barrio,departamento,ciudad,telefono, cod_zona, responsable, sub_zona, id_calendario FROM colegios $searchSQL $orderSQL LIMIT :start, :length";
+$dataSQL = "SELECT id, codigo, dane, colegio, direccion, barrio, departamento, ciudad, telefono, cod_zona, responsable, sub_zona, id_calendario FROM colegios $searchSQL $orderSQL LIMIT :start, :length";
 $stmt = $bdd->prepare($dataSQL);
 
-// Agregar parámetros de límite y desplazamiento
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_STR);
+}
 $stmt->bindValue(':start', $start, PDO::PARAM_INT);
 $stmt->bindValue(':length', $length, PDO::PARAM_INT);
-
-// Agregar el parámetro de búsqueda si corresponde
-if (!empty($searchSQL)) {
-    $stmt->bindValue(':search', "%" . $searchValue . "%", PDO::PARAM_STR);
-}
 
 $stmt->execute();
 $data = [];
@@ -143,14 +164,12 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $colegio) {
     // Lo agregas como una nueva columna
     $colegio['periodo'] = $selectPeriodo;
     $colegio['departamento'] = $dep['departamento'];
-    $colegio['acciones'] ="";
-    /*$colegio['acciones'] = '
-        <button class="btn btn-sm btn-info" data-id='.$colegio['id'].' data-codigo='.$colegio['codigo'].'>
-            <i class="fa fa-pencil bigger-120"></i>
-        </button>';*/
+    $colegio['acciones'] = '<button class="btn btn-sm btn-ver-detalle" data-codigo="'.$colegio['codigo'].'" data-id="'.$colegio['id'].'" title="Ver detalle">
+        <i class="bi bi-eye"></i>
+    </button>';
 
     if ($_SESSION['tipo'] == 1) {
-         $colegio['acciones'].='<a class="btn btn-sm btn-danger eliminar" href="#" data-codigo='.$colegio['codigo'].'>
+        $colegio['acciones'].=' <a class="btn btn-sm btn-danger eliminar" href="#" data-codigo='.$colegio['codigo'].'>
             <i class="fa fa-trash-o bigger-120"></i>
         </a>';
     }

@@ -1,4 +1,21 @@
-<?php require_once('conexion/bdd.php'); ?>
+<?php
+require_once('conexion/bdd.php');
+
+// Detección de página activa para el menú
+$current_page = basename($_SERVER['PHP_SELF']);
+
+$zonificacion_active = in_array($current_page, ['ver_colegios.php','agregar_colegio.php','colegio.php','colegio2.php']);
+$agenda_active       = $current_page === 'agenda.php';
+$muestreo_active     = in_array($current_page, ['solicitar_muestreo.php','lista_muestreo.php','ver_muestreo.php','muestras_entregadas.php']);
+$pedidos_active      = in_array($current_page, ['ver_pedidos.php','lista_pedidos.php','agrupar_pedidos.php','pedido_colegio.php']);
+$devoluciones_active = in_array($current_page, ['devol_muestras_sa.php','ver_devol_muestras.php','ver_devol_ventas.php','ver_devol_proveedores.php','proveedores.php']);
+$pedidos_sa_active   = in_array($current_page, ['solicitar_pedido_sa.php','ver_pedidos_sa.php','lista_pedidos_sa.php','pedido_colegio_sa.php']);
+$presupuesto_active  = $current_page === 'colegios_presup.php';
+$atenciones_active   = $current_page === 'lista_atenciones.php';
+$ops_active          = in_array($current_page, ['solicitar_op.php','lista_op.php','clientes_op.php']);
+$opds_active         = in_array($current_page, ['solicitar_orden_pd.php','ver_opds.php','reporte_opd.php']);
+$reportes_active     = in_array($current_page, ['reporte_zonificacion.php','reporte_cubrimiento.php','reporte_visitas.php','reporte_atenciones.php','calendar_ti.php','reporte_valoriza.php','reporte_valoriza_global.php','reporte_trabajadores.php','reporte_cant_adop.php','reporte_muestreo_f.php','reporte_pedidos.php','reporte_devoluciones.php']);
+?>
 <!--<div class="pre-loader">
 			<div class="pre-loader-box">
 				<div class="loader-logo">
@@ -269,7 +286,7 @@
 			</div>
 		</div>
 
-		<div class="left-side-bar">
+		<div class="left-side-bar sidebar-modern">
 			<div class="brand-logo">
 				<a href="index.php">
 					<img src="vendors/images/logo_ink-pulse.png" alt="" class="dark-logo" />
@@ -287,33 +304,32 @@
 
 				<div class="sidebar-menu">
 					<ul id="accordion-menu">
+						<li><div class="sidebar-small-cap nav-sec">Navegación</div></li>
 						<li>
-							<a href="index.php" class="dropdown-toggle no-arrow">
+							<a href="index.php" class="dropdown-toggle no-arrow <?= $current_page==='index.php' ? 'active' : '' ?>">
 								<span class="micon bi bi-house"></span
 								><span class="mtext">Inicio</span>
 							</a>
 						</li>
 						<?php if ($_SESSION["tipo"] !=8) {?>
-							<li class="dropdown" id="zonificacion">
-								<a href="javascript:;" class="dropdown-toggle" >
+							<li class="dropdown <?= $zonificacion_active ? 'show' : '' ?>" id="zonificacion">
+								<a href="javascript:;" class="dropdown-toggle <?= $zonificacion_active ? 'active' : '' ?>">
 									<span class="micon bi bi-building"></span
 									><span class="mtext">Zonificación</span>
 								</a>
-								<ul class="submenu">
+								<ul class="submenu" <?= $zonificacion_active ? 'style="display:block"' : '' ?>>
 									<?php if ($_SESSION["tipo"] ==1) {?>
-
 										<li>
-											<a href="agregar_colegio.php">Crear colegio</a>
+											<a href="agregar_colegio.php" class="<?= $current_page==='agregar_colegio.php' ? 'active' : '' ?>">Crear colegio</a>
 										</li>
 									<?php } ?>
 									<li>
-										<a href="ver_colegios.php" id="ver_zonificacion">Ver</a>
+										<a href="ver_colegios.php" class="<?= $current_page==='ver_colegios.php' ? 'active' : '' ?>" id="ver_zonificacion">Ver colegios</a>
 									</li>
-									
 								</ul>
 							</li>
 							<li>
-								<a href="agenda.php" class="dropdown-toggle no-arrow" id="plan_trabajo">
+								<a href="agenda.php" class="dropdown-toggle no-arrow <?= $agenda_active ? 'active' : '' ?>" id="plan_trabajo">
 									<span class="micon bi bi-calendar4-week"></span
 									><span class="mtext">Plan de trabajo</span>
 								</a>
@@ -321,13 +337,13 @@
 						<?php }?>
 						
 						<?php if ($_SESSION["tipo"] !=5  && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=8) {?>
-
-							<li class="dropdown" id="zonificacion">
-								<a href="javascript:;" class="dropdown-toggle" >
+							<li><div class="sidebar-small-cap proc-sec">Procesos</div></li>
+							<li class="dropdown <?= $muestreo_active ? 'show' : '' ?>">
+								<a href="javascript:;" class="dropdown-toggle <?= $muestreo_active ? 'active' : '' ?>">
 									<span class="micon bi bi-book"></span
 									><span class="mtext">Muestreo</span>
 								</a>
-								<ul class="submenu">
+								<ul class="submenu" <?= $muestreo_active ? 'style="display:block"' : '' ?>>
 									<?php if ($_SESSION["tipo"]!=3 && $_SESSION["tipo"]!=6 ) {?>
 										<li>
 											<a href="solicitar_muestreo.php?tp=1" id="">Solicitar muestreo</a>
@@ -372,8 +388,8 @@
 
 						<?php if ($_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=5) {?>
 
-							<li class="dropdown" id="pedidos">
-								<a href="javascript:;" class="dropdown-toggle" >
+							<li class="dropdown <?= $pedidos_active ? 'show' : '' ?>" id="pedidos">
+								<a href="javascript:;" class="dropdown-toggle <?= $pedidos_active ? 'active' : '' ?>">
 									<span class="micon bi bi-truck"></span
 									><span class="mtext">Pedidos</span>
 								</a>
@@ -403,8 +419,8 @@
 								</ul>
 							</li>
 
-							<li class="dropdown">
-								<a href="javascript:;" class="dropdown-toggle" >
+							<li class="dropdown <?= $devoluciones_active ? 'show' : '' ?>">
+								<a href="javascript:;" class="dropdown-toggle <?= $devoluciones_active ? 'active' : '' ?>">
 									<span class="micon bi bi-arrow-bar-left"></span
 									><span class="mtext">Devoluciones</span>
 								</a>
@@ -456,8 +472,8 @@
 
 						<?php if ($_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
 
-							<li class="dropdown" id="pedidos">
-								<a href="javascript:;" class="dropdown-toggle" >
+							<li class="dropdown <?= $pedidos_sa_active ? 'show' : '' ?>">
+								<a href="javascript:;" class="dropdown-toggle <?= $pedidos_sa_active ? 'active' : '' ?>">
 									<span class="micon bi bi-truck-flatbed"></span
 									><span class="mtext">Pedidos sin adopción</span>
 								</a>
@@ -489,8 +505,9 @@
 						<?php } ?>
 
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==3 || $_SESSION["tipo"] ==10) {?>
+						<li><div class="sidebar-small-cap gest-sec">Gestión</div></li>
 						<li>
-							<a href="colegios_presup.php" class="dropdown-toggle no-arrow" id="plan_trabajo">
+							<a href="colegios_presup.php" class="dropdown-toggle no-arrow <?= $presupuesto_active ? 'active' : '' ?>">
 								<span class="micon bi bi-currency-dollar"></span
 								><span class="mtext">Presupuesto</span>
 							</a>
@@ -498,8 +515,8 @@
 						<?php }?>
 
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==7 || $_SESSION["tipo"] ==9 ) {?>
-							<li class="dropdown">
-								<a href="javascript:;" class="dropdown-toggle">
+							<li class="dropdown <?= $atenciones_active ? 'show' : '' ?>">
+								<a href="javascript:;" class="dropdown-toggle <?= $atenciones_active ? 'active' : '' ?>">
 									<span class="micon bi bi-gift"></span
 									><span class="mtext">Atenciones</span>
 								</a>
@@ -514,8 +531,8 @@
 						<?php } ?>
 
 						<?php if ($_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=6 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
-							<li class="dropdown">
-								<a href="javascript:;" class="dropdown-toggle">
+							<li class="dropdown <?= $ops_active ? 'show' : '' ?>">
+								<a href="javascript:;" class="dropdown-toggle <?= $ops_active ? 'active' : '' ?>">
 									<span class="micon bi bi-receipt"></span
 									><span class="mtext">OP'S</span>
 								</a>
@@ -533,8 +550,8 @@
 						<?php } ?>
 
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==8) {?>
-							<li class="dropdown">
-								<a href="javascript:;" class="dropdown-toggle">
+							<li class="dropdown <?= $opds_active ? 'show' : '' ?>">
+								<a href="javascript:;" class="dropdown-toggle <?= $opds_active ? 'active' : '' ?>">
 									<span class="micon bi bi-printer"></span
 									><span class="mtext">OPD'S</span>
 								</a>
@@ -553,8 +570,9 @@
 						<?php } ?>
 
 						<?php if ($_SESSION["tipo"] !=8) {?>
-							<li class="dropdown">
-								<a href="javascript:;" class="dropdown-toggle">
+							<li><div class="sidebar-small-cap anal-sec">Análisis</div></li>
+							<li class="dropdown <?= $reportes_active ? 'show' : '' ?>">
+								<a href="javascript:;" class="dropdown-toggle <?= $reportes_active ? 'active' : '' ?>">
 									<span class="micon bi bi-clipboard2-data"></span
 									><span class="mtext">Reportes</span>
 								</a>

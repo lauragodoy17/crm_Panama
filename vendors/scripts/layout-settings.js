@@ -4,7 +4,7 @@
 		// Store object for local storage data
 		var currentOptions = {
 			headerBackground: "header-white",
-			navigationBackground: "sidebar-light",
+			navigationBackground: "sidebar-dark",
 			menuDropdownIcon: "icon-style-1",
 			menuListIcon: "icon-list-style-1",
 			welcomemodal: "show",

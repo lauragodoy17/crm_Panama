@@ -1025,7 +1025,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 .header{
 	position: fixed;
 	height: 70px;
-	width: calc(100% - 280px);
+	width: calc(100% - 260px);
 	background: #ffffff;
 	right: 0;
 	top: 0;
@@ -1314,7 +1314,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 	font-size: 20px;
 }
 .brand-logo{
-	width: 280px;
+	width: 260px;
 	height: 70px;
 	border-bottom: 1px solid rgba(0,0,0,0.1);
 }
@@ -1358,7 +1358,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 	position: fixed;
 	left: 0;
 	top: 0;
-	width: 280px;
+	width: 260px;
 	height: 100%;
 	z-index: 1000;
 	background: #142127;
@@ -1368,7 +1368,10 @@ table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td:first-child:before, tabl
 	transition: all 0.3s ease-in-out;
 }
 .left-side-bar .mCS-dark-2.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{
-	background: #ecf0f4;
+	background: #94a3b8;
+}
+.left-side-bar .mCS-dark-2.mCSB_scrollTools .mCSB_draggerRail{
+	background-color: #e2e8f0 !important;
 }
 .left-side-bar:before{
 	content: "";
@@ -1922,7 +1925,7 @@ body.IE .register-page-wrap .container{
 	Register Page End
 ==============================================================*/
 .main-container{
-	padding: 80px 20px 2px 300px;
+	padding: 80px 20px 2px 280px;
 	-webkit-transition: all 0.3s ease-in-out;
 	-moz-transition: all 0.3s ease-in-out;
 	-o-transition: all 0.3s ease-in-out;
@@ -4118,3 +4121,246 @@ body.IE .register-page-wrap .container{
 .welcome-modal-btn i{
 	margin-top: 6px;
 }
+
+/* ===================================================
+   Módulo Zonificación - Diseño Moderno
+   =================================================== */
+
+/* Tarjetas de estadísticas */
+.stat-card-modern {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: box-shadow 0.2s;
+    margin-bottom: 24px;
+}
+.stat-card-modern:hover { box-shadow: 0 6px 24px rgba(0,0,0,.1); }
+.stat-icon-modern {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+.stat-icon-modern.sblue   { background: #eef0ff; color: #4361ee; }
+.stat-icon-modern.sorange { background: #fff4ec; color: #f77f00; }
+.stat-icon-modern.sgreen  { background: #e9f9f0; color: #2ecc71; }
+.stat-icon-modern.spurple { background: #f4ecff; color: #9b59b6; }
+.stat-info-modern h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a202c;
+    line-height: 1;
+    margin: 0 0 5px;
+}
+.stat-info-modern .stat-label {
+    font-size: 13px;
+    color: #718096;
+    font-weight: 500;
+    margin: 0;
+}
+.stat-info-modern .stat-sub {
+    font-size: 11px;
+    color: #a0aec0;
+    margin-top: 3px;
+    display: block;
+}
+
+/* Barra de filtros */
+.filter-toolbar {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.filter-toolbar .ft-search {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+.filter-toolbar .ft-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0aec0;
+    font-size: 15px;
+    pointer-events: none;
+}
+.filter-toolbar .ft-search input {
+    height: 38px;
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0 12px 0 36px;
+    font-size: 13px;
+    color: #4a5568;
+    background: #f8fafc;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+.filter-toolbar .ft-search input:focus {
+    border-color: #4361ee;
+    box-shadow: 0 0 0 3px rgba(67,97,238,.12);
+    background: #fff;
+    outline: none;
+}
+.filter-toolbar .ft-select {
+    height: 38px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 13px;
+    color: #4a5568;
+    background: #f8fafc;
+    min-width: 150px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+.filter-toolbar .ft-select:focus { border-color: #4361ee; outline: none; }
+.filter-toolbar .ft-btn {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, transform 0.1s;
+    font-family: 'Inter', sans-serif;
+}
+.filter-toolbar .ft-btn:active { transform: scale(0.97); }
+.filter-toolbar .ft-btn.ft-apply { background: #4361ee; color: #fff; }
+.filter-toolbar .ft-btn.ft-apply:hover { background: #3a51d4; }
+.filter-toolbar .ft-btn.ft-clear { background: #edf2f7; color: #4a5568; }
+.filter-toolbar .ft-btn.ft-clear:hover { background: #e2e8f0; }
+
+/* Tarjeta contenedor de tabla */
+.modern-card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+.modern-card .card-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f4f8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.modern-card .card-head h5 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+/* Avatar de colegio */
+.school-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #eef0ff;
+    color: #4361ee;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 7px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+.school-name-link { vertical-align: middle; color: #2d3748; font-weight: 500; }
+.school-name-link:hover { color: #4361ee; }
+
+/* Ocultar búsqueda nativa de DataTables (usamos la personalizada) */
+#dataTables-example_filter { display: none !important; }
+
+/* ===================================================
+   Sidebar Moderno
+   =================================================== */
+.left-side-bar.sidebar-modern {
+    background: #ffffff;
+    border-right: 1px solid #edf2f7;
+    box-shadow: 2px 0 8px rgba(0,0,0,.04);
+}
+.sidebar-modern .brand-logo { border-bottom: 1px solid #edf2f7; }
+.sidebar-modern .brand-logo a .dark-logo { display: none; }
+.sidebar-modern .brand-logo a .light-logo { display: block; }
+.sidebar-modern .sidebar-menu .dropdown-toggle {
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 14px;
+}
+.sidebar-modern .sidebar-menu .dropdown-toggle .micon { color: #a0aec0; font-size: 20px; }
+.sidebar-modern .sidebar-menu .dropdown-toggle:hover {
+    background: #f0f4ff;
+    color: #4361ee;
+}
+.sidebar-modern .sidebar-menu .dropdown-toggle:hover .micon { color: #4361ee; }
+.sidebar-modern .sidebar-menu .show > .dropdown-toggle {
+    background: #f0f4ff;
+    color: #4361ee;
+    border-radius: 8px 8px 0 0;
+}
+.sidebar-modern .sidebar-menu .show > .dropdown-toggle .micon { color: #4361ee; }
+.sidebar-modern .sidebar-menu .dropdown-toggle.active {
+    background: #4361ee;
+    color: #ffffff !important;
+    border-radius: 8px;
+}
+.sidebar-modern .sidebar-menu .dropdown-toggle.active .micon { color: #ffffff !important; }
+.sidebar-modern .sidebar-menu .show > .dropdown-toggle.active { border-radius: 8px 8px 0 0; }
+.sidebar-modern .sidebar-menu .dropdown-toggle::after { color: #cbd5e0; }
+.sidebar-modern .sidebar-menu .show > .dropdown-toggle::after { color: #4361ee; }
+.sidebar-modern .sidebar-menu .dropdown-toggle.active::after { color: rgba(255,255,255,.7); }
+.sidebar-modern .sidebar-menu .submenu {
+    background: #f8fafc;
+    border-radius: 0 0 8px 8px;
+}
+.sidebar-modern .sidebar-menu .submenu li a { color: #718096; font-size: 13px; }
+.sidebar-modern .sidebar-menu .submenu li a:hover,
+.sidebar-modern .sidebar-menu .submenu li a.active {
+    color: #4361ee;
+    background: #eef0ff;
+    border-radius: 6px;
+}
+.sidebar-modern .sidebar-menu .sidebar-small-cap {
+    color: #cbd5e0;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 14px 20px 5px;
+}
+.sidebar-modern .sidebar-menu .dropdown-divider {
+    border-color: #edf2f7;
+    border-width: 1px;
+    margin: 4px 0;
+}
+.sidebar-modern .sidebar-menu > ul > li > .dropdown-toggle.active {
+    background: #4361ee;
+    color: #ffffff;
+}
+.sidebar-modern .mCS-dark-2.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar { background: #cbd5e0; }
+.sidebar-modern .close-sidebar { color: #a0aec0; }
