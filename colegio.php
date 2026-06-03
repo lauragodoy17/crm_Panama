@@ -57,10 +57,44 @@
 
     <style>
       input[type=number] { -moz-appearance:textfield; }
-      input[type=number]::-webkit-inner-spin-button, 
-      input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
+      input[type=number]::-webkit-inner-spin-button,
+      input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+
+      /* ── Encabezado del colegio ── */
+      .fc-header { background:#fff; border:1px solid #e9ecef; border-radius:10px; padding:18px 22px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+      .fc-avatar  { width:44px; height:44px; background:#eef0ff; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; color:#4361ee; flex-shrink:0; }
+      .fc-nombre  { font-size:17px; font-weight:700; color:#111827; margin:0; }
+      .fc-badge   { background:#d1fae5; color:#059669; font-size:11px; font-weight:600; padding:2px 9px; border-radius:20px; margin-left:8px; }
+
+      /* ── Chips de info ── */
+      .fc-chips { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+      .fc-chip  { background:#fff; border:1px solid #e9ecef; border-radius:8px; padding:9px 14px; display:flex; align-items:center; gap:8px; flex:1; min-width:140px; }
+      .fc-chip-ico { width:30px; height:30px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+      .fc-chip-ico.blue   { background:#eef0ff; color:#4361ee; }
+      .fc-chip-ico.green  { background:#d1fae5; color:#059669; }
+      .fc-chip-ico.orange { background:#fff7ed; color:#ea580c; }
+      .fc-chip-ico.purple { background:#f5f3ff; color:#7c3aed; }
+      .fc-chip-lbl { font-size:11px; color:#9ca3af; font-weight:500; line-height:1; }
+      .fc-chip-val { font-size:13px; color:#111827; font-weight:600; line-height:1.4; }
+
+      /* ── Chips más grandes ── */
+      .fc-chip     { padding:14px 20px; }
+      .fc-chip-ico { width:38px; height:38px; font-size:17px; }
+      .fc-chip-lbl { font-size:12px; }
+      .fc-chip-val { font-size:15px; font-weight:700; }
+
+      /* ── Modo vista / edición ──
+         pointer-events:none en el contenedor de campos bloquea todo (incluido Select2).
+         El bloque de acciones vive fuera del contenedor, siempre clicable. */
+      #fc-campos.fc-readonly { pointer-events:none; user-select:none; }
+      #fc-campos.fc-readonly .form-control  { background:#f8f9fa; border-color:#f0f0f0; color:#374151; }
+      #fc-campos.fc-readonly .custom-select { background:#f8f9fa; border-color:#f0f0f0; color:#374151; }
+      /* Select2: gris visual en modo readonly */
+      #fc-campos.fc-readonly .select2-container--default .select2-selection--single {
+        background-color:#f8f9fa; border-color:#f0f0f0;
+      }
+      #fc-campos.fc-readonly .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color:#374151;
       }
     </style>
 
@@ -72,59 +106,118 @@
     <div class="main-container">
       <div class="pd-ltr-20 xs-pd-20-10">
         <div class="min-height-200px">
-          <div class="page-header">
-            <div class="row">
-              <div class="col-sm-6 col-sm-12">
-                <div class="title">
-                  <h4>Ficha de colegio</h4>
+          <nav aria-label="breadcrumb" role="navigation" class="mb-3">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="ver_colegios.php">Zonificación</a></li>
+              <li class="breadcrumb-item active">Ficha de colegio</li>
+            </ol>
+          </nav>
+
+          <?php
+            if (isset($_GET["codigo"])) { $codigo_col = $_GET["codigo"]; }
+            else { $codigo_col = $_POST["codigo"]; }
+
+            $sql = "SELECT * FROM colegios WHERE codigo='".$codigo_col."'";
+            $req = $bdd->prepare($sql);
+            $req->execute();
+            $colegio = $req->fetch();
+
+            $sql_promo = "SELECT u.id, CONCAT(u.nombres,' ',u.apellidos) as promotor, u.tipo, z.zona FROM usuarios u JOIN zonas z ON u.cod_zona=z.codigo WHERE cod_zona='".$colegio["cod_zona"]."'";
+            $req_promo = $bdd->prepare($sql_promo);
+            $req_promo->execute();
+            $promotor = $req_promo->fetch();
+
+            if (isset($_POST["periodo"])) { $periodo = $_POST["periodo"]; }
+            else { $periodo = $_GET["periodo"]; }
+
+            // Empresa / zona
+            if ($promotor['tipo']==3 || $promotor['tipo']==1) {
+              list($emp_nombre, $zona_nombre) = array_map('trim', explode("/", $promotor["zona"]));
+            } else {
+              $req_sz = $bdd->prepare("SELECT sub_zona FROM sub_zonas WHERE id='".$colegio["sub_zona"]."'");
+              $req_sz->execute();
+              $sub_zona    = $req_sz->fetch();
+              $emp_nombre  = $promotor['promotor'];
+              $zona_nombre = $sub_zona['sub_zona'] ?? '—';
+            }
+            $resp_txt = ($promotor['tipo']==3 || $promotor['tipo']==1) ? $promotor['promotor'] : ($colegio['responsable'] ?: '—');
+
+            // Calendario
+            $req_cal = $bdd->prepare("SELECT calendario FROM calendarios WHERE id='".$colegio["id_calendario"]."'");
+            $req_cal->execute();
+            $cal_row = $req_cal->fetch();
+
+            // Iniciales avatar
+            $words_av = array_filter(explode(' ', $colegio['colegio']), fn($w) => strlen($w) > 2);
+            $ini_av   = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice($words_av, 0, 2))));
+            if (!$ini_av) $ini_av = strtoupper(substr($colegio['colegio'], 0, 2));
+
+            $puede_editar = ($_SESSION["tipo"] != 2 && $_SESSION["tipo"] != 4)
+              && ($_SESSION["zona"] == $colegio["cod_zona"] || $_SESSION["tipo"] == 1);
+
+            // Status del colegio para el período actual
+            $req_st = $bdd->prepare("
+                SELECT sc.status
+                FROM colegios_status cs
+                JOIN status_cubrimiento sc ON cs.id_status = sc.id
+                WHERE cs.id_colegio = ? AND cs.id_periodo = ?
+                LIMIT 1
+            ");
+            $req_st->execute([$colegio['id'], $periodo]);
+            $status_actual = strtolower(trim($req_st->fetchColumn() ?: ''));
+
+            if (strpos($status_actual, 'descart') !== false) {
+                $badge_txt   = 'Descartado';
+                $badge_style = 'background:#fee2e2;color:#dc2626;';
+            } elseif (strpos($status_actual, 'inactiv') !== false) {
+                $badge_txt   = 'Inactivo';
+                $badge_style = 'background:#f3f4f6;color:#6b7280;';
+            } else {
+                $badge_txt   = 'Activo';
+                $badge_style = 'background:#d1fae5;color:#059669;';
+            }
+          ?>
+
+          <!-- Encabezado del colegio -->
+          <div class="fc-header">
+            <div class="d-flex align-items-center gap-2" style="gap:12px">
+              <div class="fc-avatar"><?= $ini_av ?></div>
+              <div>
+                <div class="d-flex align-items-center flex-wrap">
+                  <span class="fc-nombre"><?= htmlspecialchars($colegio['colegio']) ?></span>
+                  <span class="fc-badge" style="<?= $badge_style ?>"><?= $badge_txt ?></span>
                 </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                      Colegios
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                      Colegio
-                    </li>
-                  </ol>
-                </nav>
+                <small class="text-muted" style="font-size:12px">DANE: <?= htmlspecialchars($colegio['dane']) ?></small>
               </div>
-              
+            </div>
+            <?php if ($_SESSION['tipo']==1): ?>
+            <a href="" class="btn btn-outline-warning btn-sm" data-toggle="modal" data-target="#modal_reasig">
+              <i class="bi bi-arrow-left-right"></i> Reasignar
+            </a>
+            <?php endif; ?>
+          </div>
+
+          <!-- Chips de información -->
+          <div class="fc-chips">
+            <div class="fc-chip">
+              <div class="fc-chip-ico blue"><i class="bi bi-building"></i></div>
+              <div><div class="fc-chip-lbl">Empresa</div><div class="fc-chip-val"><?= htmlspecialchars($emp_nombre) ?></div></div>
+            </div>
+            <div class="fc-chip">
+              <div class="fc-chip-ico green"><i class="bi bi-geo-alt"></i></div>
+              <div><div class="fc-chip-lbl">Zona</div><div class="fc-chip-val"><?= htmlspecialchars($zona_nombre) ?></div></div>
+            </div>
+            <div class="fc-chip">
+              <div class="fc-chip-ico orange"><i class="bi bi-person"></i></div>
+              <div><div class="fc-chip-lbl">Responsable</div><div class="fc-chip-val"><?= htmlspecialchars($resp_txt) ?></div></div>
+            </div>
+            <div class="fc-chip">
+              <div class="fc-chip-ico purple"><i class="bi bi-calendar3"></i></div>
+              <div><div class="fc-chip-lbl">Calendario</div><div class="fc-chip-val"><?= htmlspecialchars($cal_row['calendario'] ?? '—') ?></div></div>
             </div>
           </div>
+
           <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-            <?php
-
-              if (isset($_GET["codigo"])) {
-                $codigo_col= $_GET["codigo"];
-              }
-              else {
-                $codigo_col= $_POST["codigo"];
-              }
-                                
-              $sql = "SELECT * FROM colegios WHERE codigo='".$codigo_col."'";
-
-              $req = $bdd->prepare($sql);
-              $req->execute();
-
-              $colegio = $req->fetch();
-
-              $sql_promo = "SELECT u.id, CONCAT(u.nombres,' ',u.apellidos) as promotor, u.tipo, z.zona FROM usuarios u JOIN zonas z ON u.cod_zona=z.codigo WHERE cod_zona='".$colegio["cod_zona"]."'";
-
-              $req_promo = $bdd->prepare($sql_promo);
-              $req_promo->execute();
-
-              $promotor = $req_promo->fetch();
-
-              if (isset($_POST["periodo"])) {
-                $periodo=$_POST["periodo"];
-              }
-              else {
-                $periodo=$_GET["periodo"];
-              }
-
-            ?>
-            <center><h5 class="h4 text-blue mb-20"><?php echo $colegio["colegio"]; ?></h5></center>
                 <div class="tab">
                   <ul class="nav nav-tabs customtab" role="tablist">
                     <li class="nav-item info_b">
@@ -206,63 +299,30 @@
                     >
                       <div class="pd-20">
                         <form action="php/actualizar_colegio.php" method="POST" enctype="multipart/form-data">
-                          <?php if ($_SESSION['tipo']==1) { ?>
-                            <a href="" class="btn btn-warning" data-toggle="modal" data-target="#modal_reasig">Reasignar</a><br><br>
-                          <?php } ?>
-                          <div class="row">
-                            <?php if ($promotor['tipo']==3 || $promotor['tipo']==1) {
 
-                              list($empresa,$n_zona) = explode("/", $promotor["zona"]);
-
-                            ?>
-                              <div class="col-sm-4">
-                                <h5>Empresa: <?php echo $empresa; ?></h5>
+                          <!-- Barra de acciones: vive FUERA de #fc-campos para ser siempre clicable -->
+                          <div class="d-flex justify-content-between align-items-center mb-3">
+                            <strong style="font-size:14px;color:#374151"><i class="bi bi-info-circle text-primary"></i> Información básica del colegio</strong>
+                            <div>
+                              <?php if ($puede_editar): ?>
+                              <div id="fc-acciones-ver">
+                                <button type="button" id="btn-editar" class="btn btn-primary btn-sm">
+                                  <i class="bi bi-pencil"></i> Editar
+                                </button>
                               </div>
-                              <div class="col-sm-4">
-                                <h5>Zona: <?php echo $n_zona; ?></h5>
+                              <div id="fc-acciones-edit" style="display:none">
+                                <button type="button" id="btn-cancelar" class="btn btn-light btn-sm mr-1">Cancelar</button>
+                                <button type="submit" class="btn btn-success btn-sm">
+                                  <i class="bi bi-check-lg"></i> Guardar cambios
+                                </button>
                               </div>
-
-                            <?php }else{
-
-                              $sql_sz="SELECT sub_zona FROM sub_zonas WHERE id='".$colegio["sub_zona"]."'";
-                              $req_sz = $bdd->prepare($sql_sz);
-                              $req_sz->execute();
-                              $sub_zona = $req_sz->fetch();
-
-                            ?>
-                              <div class="col-sm-4">
-                                <h5>Empresa: <?php echo $promotor['promotor']; ?></h5>
-                              </div>
-                              <div class="col-sm-4">
-                                <h5>Zona: <?php echo $sub_zona['sub_zona']; ?></h5>
-                              </div>
-                              <?php } ?>
-                              <div class="col-sm-4">
-                                <?php if ($_SESSION['tipo']==6) { ?>
-                                  
-                                  <div class="form-group">
-                                    <label>Responsable <small style="color:red;"> *</small></label>
-                                    <input type="text" class="form-control" placeholder="Responsable" name="colegio"  value="<?php echo $colegio['responsable']; ?>" required />
-                                  </div>
-                                  
-                                <?php }else{
-
-                                  if ($promotor['tipo']==3 || $promotor['tipo']==1) {
-
-                                    echo "<h5>Responsable: ".$promotor['promotor']."</h5>"; 
-
-                                  }else{ ?>
-                                    <div class="form-group">
-                                      <label>Responsable <small style="color:red;"> *</small></label>
-                                      <input type="text" class="form-control" placeholder="Responsable" name="colegio"  value="<?php echo $colegio['responsable']; ?>" required />
-                                    </div>
-                                  <?php }
-                                  }
-                                  ?>
-                              </div> 
+                              <?php endif; ?>
+                            </div>
                           </div>
-                          <br>
-                          <div class="row">   
+
+                          <!-- Contenedor de campos — bloqueado en modo vista -->
+                          <div id="fc-campos" class="fc-readonly">
+                          <div class="row">
                             <div class="col-sm-3">
                               <div class="form-group">
                                 <label>DANE <small style="color:red;"> *</small></label>
@@ -341,7 +401,19 @@
                             <div class="col-sm-6">
                               <div class="form-group">
                                 <label>Ciudad <small style="color:red;"> *</small></label>
-                                <input type="text" class="form-control" placeholder="Ciudad" name="ciudad" value="<?php echo $colegio['ciudad']; ?>" required/>
+                                <!-- Vista: muestra la ciudad como texto -->
+                                <input type="text" id="ciudad-texto-edit" class="form-control"
+                                       value="<?php echo htmlspecialchars($colegio['ciudad']); ?>" readonly />
+                                <!-- Edición: mismo desplegable que crear colegio (oculto hasta editar) -->
+                                <div id="ciudad-dropdown-edit" style="display:none">
+                                  <select id="ciudad_select_edit" class="form-control">
+                                    <option value="">Cargando ciudades...</option>
+                                  </select>
+                                  <input type="text" id="ciudad_nueva_edit" class="form-control mt-2 d-none"
+                                         placeholder="Escriba el nombre de la ciudad" />
+                                </div>
+                                <input type="hidden" name="ciudad" id="ciudad_hidden_edit"
+                                       value="<?php echo htmlspecialchars($colegio['ciudad']); ?>" />
                               </div>
                             </div>
                           </div>
@@ -552,14 +624,14 @@
                             <?php } ?>
 
                           </div>
-                          <input type="hidden" name="id_colegio" value='<?php echo $colegio["id"] ?>'>
-                          <input type="hidden" name="periodo" value="<?php echo $_GET['periodo'] ?>">
+                          </div><!-- /#fc-campos -->
+
+                          <input type="hidden" name="id_colegio"  value='<?php echo $colegio["id"] ?>'>
+                          <input type="hidden" name="periodo"     value="<?php echo $periodo ?>">
                           <input type="hidden" name="cod_colegio" value="<?php echo $colegio['codigo'] ?>">
-                           <?php if($_SESSION["tipo"] !=2 && $_SESSION["tipo"] != 4) {
-                              if($_SESSION["zona"] ==$colegio["cod_zona"] || $_SESSION["tipo"] == 1) { ?>
-                                <center><button class="btn btn-primary btn-lg"><i class="icon-copy bi bi-sd-card-fill"></i> Guardar</button></center>
-                              <?php } ?>
-                            <?php } ?> 
+                          <?php /* Preserva el responsable actual para que el UPDATE no lo borre.
+                                   Para tipo 6 se puede editar desde el campo visible en fc-campos. */ ?>
+                          <input type="hidden" name="responsable"  value="<?php echo htmlspecialchars($colegio['responsable']) ?>">
                         </form>
                       </div>
                     </div>
@@ -690,6 +762,79 @@
        $("#zonificacion").addClass("show");
        $("#zonificacion .submenu").css("display","block");
        $("#ver_zonificacion").addClass("active");
+
+      // ── Toggle editar / cancelar ──────────────────────────────────────────
+      $('#btn-editar').on('click', function () {
+        $('#fc-campos').removeClass('fc-readonly');
+        $('#fc-acciones-ver').hide();
+        $('#fc-acciones-edit').show();
+
+        // Ciudad: mostrar desplegable y cargar ciudades del departamento actual
+        var depto = $('select[name="departamento"]').val();
+        $('#ciudad-texto-edit').hide();
+        $('#ciudad-dropdown-edit').show();
+        if (depto) {
+          cargarCiudadesEdit(depto);
+        } else {
+          $('#ciudad_select_edit').html('<option value="">Primero seleccione un departamento</option>');
+        }
+      });
+
+      $('#btn-cancelar').on('click', function () {
+        location.reload();
+      });
+
+      // Cargar ciudades en el select de edición
+      function cargarCiudadesEdit(deptoId) {
+        var ciudadActual = <?php echo json_encode($colegio['ciudad']); ?>;
+        $.ajax({
+          url: 'ajax/buscar_ciudades.php',
+          type: 'POST',
+          data: { departamento: deptoId },
+          success: function (resp) {
+            $('#ciudad_select_edit').html(resp);
+            // Pre-seleccionar la ciudad actual si existe en la lista
+            var encontrado = false;
+            $('#ciudad_select_edit option').each(function () {
+              if ($(this).val() === ciudadActual) {
+                $(this).prop('selected', true);
+                $('#ciudad_hidden_edit').val(ciudadActual);
+                encontrado = true;
+              }
+            });
+            if (!encontrado && ciudadActual) {
+              // La ciudad no está en la lista, mostrar campo libre
+              $('#ciudad_select_edit').val('__otra__');
+              $('#ciudad_nueva_edit').removeClass('d-none').val(ciudadActual).attr('required','required');
+              $('#ciudad_hidden_edit').val(ciudadActual);
+            }
+          }
+        });
+      }
+
+      // Al cambiar departamento en modo edición → recargar ciudades
+      $('select[name="departamento"]').on('change', function () {
+        if (!$('#ciudad-dropdown-edit').is(':visible')) return;
+        $('#ciudad_nueva_edit').addClass('d-none').val('').removeAttr('required');
+        $('#ciudad_hidden_edit').val('');
+        cargarCiudadesEdit($(this).val());
+      });
+
+      // Al seleccionar ciudad en el desplegable de edición
+      $('#ciudad_select_edit').on('change', function () {
+        if ($(this).val() === '__otra__') {
+          $('#ciudad_nueva_edit').removeClass('d-none').attr('required','required').focus();
+          $('#ciudad_hidden_edit').val('');
+        } else {
+          $('#ciudad_nueva_edit').addClass('d-none').val('').removeAttr('required');
+          $('#ciudad_hidden_edit').val($(this).val());
+        }
+      });
+
+      // Al escribir ciudad nueva
+      $('#ciudad_nueva_edit').on('input', function () {
+        $('#ciudad_hidden_edit').val($(this).val());
+      });
 
       $(document).ready(function () {
         $("#modal_reasig .custom-select2").select2({

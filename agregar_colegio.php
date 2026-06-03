@@ -282,8 +282,6 @@
                 <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> El DANE debe tener 12 dígitos numéricos.</div>
                 <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> Selecciona la empresa y zona correspondiente para una mejor asignación.</div>
                 <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> Los campos marcados con <span style="color:red">*</span> son obligatorios.</div>
-                <hr style="margin:12px 0">
-                <div class="cc-info-box"><i class="bi bi-info-circle"></i> Puedes guardar un borrador o continuar más adelante.</div>
               </div>
 
             </div>
