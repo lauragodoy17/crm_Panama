@@ -103,4 +103,57 @@ if ($ultimo_periodo > 0) {
 
 $data['valor_potencial'] = (int) $valor_potencial;
 
+// Cálculo de venta potencial de adopciones — replica exacta de la lógica de tab_adopciones.php:
+// pre_definido=1 (libro marcado para adopción), aprobado<2, probabilidad!=3, definido=1 (adopción confirmada).
+// Se usa p.precio del presupuesto siempre en el cálculo, sin fallback a l.precio,
+// porque tab_adopciones.php usa $presup["precio"] directamente (si es 0, precio_neto queda en 0).
+// La comparación de tasa usa != (laxa) igual que el original, donde "0.00" != "" es false en PHP.
+$valor_potencial_adopciones = 0;
+
+if ($ultimo_periodo > 0) {
+    $stmt_adop = $bdd->prepare("
+        SELECT p.precio, p.tasa_compra, p.tasa_compra_d, p.descuento, p.descuento_d,
+               p.cod_area, l.id_grado
+        FROM presupuestos p
+        JOIN libros l ON l.id = p.id_libro
+        WHERE p.id_colegio = ? AND p.id_periodo = ?
+          AND p.pre_definido = 1 AND p.aprobado < 2
+          AND p.probabilidad != 3 AND p.definido = 1
+    ");
+    $stmt_adop->execute([$data['id'], $ultimo_periodo]);
+    $adops = $stmt_adop->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($adops as $adop) {
+        if ($adop['cod_area'] == '') {
+            $id_grado = $adop['id_grado'];
+        } else {
+            $stmt_go->execute([$adop['cod_area']]);
+            $id_grado = $stmt_go->fetchColumn() ?: $adop['id_grado'];
+        }
+
+        $stmt_alumnos->execute([$data['id'], $id_grado, $ultimo_periodo]);
+        $alumnos = (int) $stmt_alumnos->fetchColumn();
+
+        // p.precio usado directamente: si es 0, precio_neto = 0 (igual que tab_adopciones.php)
+        $precio = (float)$adop['precio'];
+
+        // Condiciones laxas (!=) para replicar el comportamiento de PHP en tab_adopciones.php,
+        // donde "0.00" != "" evalúa como false (ambos convierten a 0.0).
+        if ($adop['tasa_compra'] != '' && $adop['tasa_compra_d'] == 0) {
+            $tasa = (float)$adop['tasa_compra'];
+            $desc = (float)$adop['descuento'];
+        } elseif ($adop['tasa_compra_d'] != '') {
+            $tasa = (float)$adop['tasa_compra_d'];
+            $desc = (float)$adop['descuento_d'];
+        } else {
+            continue;
+        }
+
+        $precio_neto = $precio - ($precio * $desc);
+        $valor_potencial_adopciones += $precio_neto * floor($alumnos * $tasa);
+    }
+}
+
+$data['valor_potencial_adopciones'] = (int) $valor_potencial_adopciones;
+
 echo json_encode($data);

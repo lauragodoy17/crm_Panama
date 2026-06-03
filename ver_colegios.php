@@ -33,22 +33,46 @@ if ($_SESSION['tipo'] == 3) {
     $stmt_dep->execute([':zona_id' => $zona_id_dep]);
     $depto_list = $stmt_dep->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $depto_list = $bdd->query("SELECT id, departamento FROM departamentos ORDER BY departamento")->fetchAll(PDO::FETCH_ASSOC);
+    $filtro_prueba_depto = $_SESSION['tipo'] != 1 ? "WHERE LOWER(departamento) NOT LIKE '%prueba%'" : "";
+    $depto_list = $bdd->query("SELECT id, departamento FROM departamentos $filtro_prueba_depto ORDER BY departamento")->fetchAll(PDO::FETCH_ASSOC);
 }
 if ($_SESSION['tipo'] != 3) {
-    $ciudades_list = $bdd->query("SELECT DISTINCT ciudad FROM colegios WHERE $where_stats AND ciudad != '' AND ciudad IS NOT NULL ORDER BY ciudad LIMIT 300")->fetchAll(PDO::FETCH_ASSOC);
+    // Usar municipios si ya fue importada para mostrar nombres oficiales sin duplicados
+    $usa_municipios = false;
+    try { $bdd->query("SELECT 1 FROM municipios LIMIT 1"); $usa_municipios = true; } catch (Exception $e) {}
+
+    if ($usa_municipios) {
+        $ciudades_list = $bdd->query("
+            SELECT DISTINCT m.nombre AS ciudad
+            FROM municipios m
+            WHERE EXISTS (
+                SELECT 1 FROM colegios
+                WHERE departamento = m.id_departamento
+                  AND ciudad = m.nombre
+                  AND $where_stats
+            )
+            ORDER BY m.nombre
+            LIMIT 300
+        ")->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $filtro_prueba_ciudad = $_SESSION['tipo'] != 1 ? "AND LOWER(ciudad) NOT LIKE '%prueba%'" : "";
+        $ciudades_list = $bdd->query("SELECT DISTINCT ciudad FROM colegios WHERE $where_stats AND ciudad != '' AND ciudad IS NOT NULL $filtro_prueba_ciudad ORDER BY ciudad LIMIT 300")->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
 $show_zona_filter = ($_SESSION['tipo'] != 3 && ($_SESSION['tipo']==1 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5 || $_SESSION['zona']=='5656'));
 if ($show_zona_filter) {
-    $zonas_filter_list = $bdd->query("SELECT codigo, zona FROM zonas ORDER BY zona")->fetchAll(PDO::FETCH_ASSOC);
+    $filtro_prueba_zona = $_SESSION['tipo'] != 1 ? "WHERE LOWER(zona) NOT LIKE '%prueba%'" : "";
+    $zonas_filter_list = $bdd->query("SELECT codigo, zona FROM zonas $filtro_prueba_zona ORDER BY zona")->fetchAll(PDO::FETCH_ASSOC);
 }
 
 $show_resp_filter = ($_SESSION['tipo']==1 || $_SESSION['tipo']==2);
 if ($show_resp_filter) {
+    $filtro_prueba_resp = $_SESSION['tipo'] != 1 ? "AND LOWER(u.nombres) NOT LIKE '%prueba%' AND LOWER(u.apellidos) NOT LIKE '%prueba%'" : "";
     $resp_list = $bdd->query(
         "SELECT DISTINCT CONCAT(u.nombres,' ',u.apellidos) AS responsable
          FROM zonas z JOIN usuarios u ON z.codigo = u.cod_zona
+         WHERE 1=1 $filtro_prueba_resp
          ORDER BY responsable"
     )->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -111,7 +135,7 @@ if ($show_resp_filter) {
                 </div>
               </div>
             </div>
-            <?php if ($_SESSION['tipo'] != 3): ?>
+            <?php if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 6): ?>
             <div class="col-xl-3 col-lg-6 col-md-6">
               <div class="stat-card-modern">
                 <div class="stat-icon-modern sorange"><i class="bi bi-map"></i></div>
@@ -133,7 +157,7 @@ if ($show_resp_filter) {
                 </div>
               </div>
             </div>
-            <?php if ($_SESSION['tipo'] != 3): ?>
+            <?php if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 6): ?>
             <div class="col-xl-3 col-lg-6 col-md-6">
               <div class="stat-card-modern">
                 <div class="stat-icon-modern spurple"><i class="bi bi-person-check"></i></div>
@@ -286,8 +310,15 @@ if ($show_resp_filter) {
         <div class="dp-row">
           <span class="dp-icon" style="background:#dcfce7;color:#16a34a"><i class="bi bi-currency-dollar"></i></span>
           <div class="dp-field">
-            <span class="dp-label">Valor venta potencial</span>
+            <span class="dp-label">Venta potencial (presupuesto)</span>
             <span class="dp-val dp-money" id="dp-valor">—</span>
+          </div>
+        </div>
+        <div class="dp-row">
+          <span class="dp-icon" style="background:#dbeafe;color:#2563eb"><i class="bi bi-book"></i></span>
+          <div class="dp-field">
+            <span class="dp-label">Venta potencial (adopciones)</span>
+            <span class="dp-val dp-money" id="dp-valor-adopciones">—</span>
           </div>
         </div>
       </div>
@@ -407,9 +438,26 @@ if ($show_resp_filter) {
 
         // Limpiar filtros
         $('#ft-btn-clear').on('click', function () {
-            $('#ft-depto, #ft-ciudad, #ft-zona, #ft-resp').val('');
+            $('#ft-depto, #ft-zona, #ft-resp').val('');
             $('#ft-input-search').val('');
+            $('#ft-ciudad').html('<option value="">Todas las ciudades</option>');
             table.api().search('').draw();
+        });
+
+        // Cargar ciudades al seleccionar departamento
+        $('#ft-depto').on('change', function () {
+            var depto = $(this).val();
+            $('#ft-ciudad').html('<option value="">Todas las ciudades</option>');
+            if (!depto) return;
+
+            $.ajax({
+                url: 'ajax/ciudades_por_depto.php',
+                type: 'POST',
+                data: { departamento: depto },
+                success: function (resp) {
+                    $('#ft-ciudad').append(resp);
+                }
+            });
         });
 
         // Navegación al detalle del colegio
@@ -456,6 +504,9 @@ if ($show_resp_filter) {
 
                 var val = parseFloat(d.valor_potencial) || 0;
                 $('#dp-valor').text(val > 0 ? '$ ' + val.toLocaleString('es-CO') : '—');
+
+                var valAdop = parseFloat(d.valor_potencial_adopciones) || 0;
+                $('#dp-valor-adopciones').text(valAdop > 0 ? '$ ' + valAdop.toLocaleString('es-CO') : '—');
 
                 $('#panel-detalle, #panel-overlay').addClass('dp-open');
                 $('body').addClass('dp-body-lock');
