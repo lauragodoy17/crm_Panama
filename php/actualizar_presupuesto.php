@@ -78,7 +78,7 @@
 
 			list($libro,$tasa_c,$descuento,$precio, $probab) = explode("/", $presup);
 
-				
+
 
 			if ($libro !="" && $tasa_c !="") {
 
@@ -142,7 +142,7 @@
 	}else{
 		
 		foreach ($_POST["presupuesto_p"] as $presups => $presup) {
-			
+
 			list($libro,$tasa_c,$descuento,$precio, $probab) = explode("/", $presup);
 
 
