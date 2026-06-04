@@ -18,7 +18,7 @@
 	$req = $bdd->prepare($sql);
 	$req->execute();
 
-	echo "<script>alert('Colegio reasignado');window.location='../colegio.php?codigo=".$_POST["cod_colegio"]."'</script>";
+	header("Location: ../colegio.php?codigo=".$_POST["cod_colegio"]."&periodo=".$_POST["periodo"]."&msg=reasignado");
 
 
 

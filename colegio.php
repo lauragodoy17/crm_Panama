@@ -650,86 +650,87 @@
                 </div>
                       
 
-                <div class="modal fade bs-example-modal-lg" id="modal_reasig" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <style>
+                  .rs-modal .modal-content  { border:none; border-radius:12px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,.15); }
+                  .rs-modal .modal-header   { background:#fff; padding:18px 24px 14px; border-bottom:1px solid #e9ecef; }
+                  .rs-modal .modal-title    { font-size:16px; font-weight:700; color:#111827; margin:0 0 3px; }
+                  .rs-modal .modal-subtitle { font-size:12.5px; color:#6b7280; margin:0; }
+                  .rs-modal .close          { color:#9ca3af; opacity:1; text-shadow:none; font-size:1.3rem; margin-top:-4px; }
+                  .rs-modal .close:hover    { color:#374151; }
+                  .rs-modal .modal-body     { padding:22px 24px; background:#f9fafb; }
+                  .rs-modal .modal-footer   { border-top:1px solid #e9ecef; padding:14px 24px; background:#fff; display:flex; justify-content:flex-end; gap:8px; }
+                  .rs-section               { background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:18px 20px; }
+                  .rs-modal .form-group     { margin-bottom:0; }
+                  .rs-modal .form-group label { font-size:12px; font-weight:600; color:#374151; margin-bottom:5px; display:block; }
+                  .rs-modal .form-control   { border-radius:7px; font-size:13px; border:1px solid #d1d5db; padding:7px 10px; background:#fff; color:#111827; transition:border-color .15s, box-shadow .15s; }
+                  .rs-modal .form-control:focus { border-color:#4f46e5; background:#fff; box-shadow:0 0 0 3px rgba(79,70,229,.1); outline:none; }
+                  .rs-req                   { color:#ef4444; }
+                  .rs-modal .btn-primary    { background:#4f46e5; border-color:#4f46e5; border-radius:8px; padding:8px 22px; font-weight:600; font-size:13.5px; }
+                  .rs-modal .btn-primary:hover { background:#4338ca; border-color:#4338ca; }
+                  .rs-modal .btn-light      { border-radius:8px; font-size:13.5px; }
+                </style>
+
+                <div class="modal fade rs-modal" id="modal_reasig" tabindex="-1" role="dialog" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
+
                       <div class="modal-header">
-                        <h4 class="modal-title" id="myLargeModalLabel">
-                          Reasignar colegio
-                        </h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                          ×
-                        </button>
-                      </div>
-                      <form action="php/reasignar_colegio.php" method="POST">
-                        <div class="modal-body">
-                          <div class="row">
-
-                            <div class="col-sm-6">
-                
-                              <div class="form-group">
-                                <label class="control-label no-padding-right" for="empresa"> Empresa:<small style="color:red;"> *</small> </label>
-
-                                <select name="empresa" id="empresa" class="form-control custom-select2" required>
-                                  <option value="">Seleccione</option>
-                                  <option value="1">EUREKA</option>
-                                    <?php
-
-                                      $sql = "SELECT * FROM zonas WHERE zona NOT LIKE '%Eureka%' AND zona NOT LIKE '%ALEJANDRO%'";
-
-                                      $req = $bdd->prepare($sql);
-                                      $req->execute();
-
-                                      $zonas = $req->fetchAll();
-
-                                      foreach ($zonas as $zona) {
-                                                          
-                                        echo '<option value="'.$zona["codigo"].'">'.$zona["zona"].'</option>';
-                                                       
-                                      }
-
-                                    ?>
-                                  </select>
-                                  
-                              </div>
-
-                            </div>
-
-                            <div class="col-sm-6">
-                              
-                              <div class="form-group">
-                                <label class="control-label no-padding-right" for="zona"> Zona:<small style="color:red;"> *</small> </label>
-
-                                <select name="zona" id="zona" class="form-control custom-select2" required>
-                                  <option value="">Seleccione</option>
-                                </select>
-                                  
-                              </div>
-
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div class="col-sm-6 col-responsable d-none">
-
-                              <div class="form-group">
-                                <label class="control-label no-padding-right" for="responsable"> Responsable:<small style="color:red;"> *</small> </label>              
-                                <input type="text" name="responsable" id="responsable" placeholder="" class="form-control" />
-                                  
-                              </div>  
-                            </div>
-                          </div>   
+                        <div>
+                          <h5 class="modal-title">Reasignar colegio</h5>
+                          <p class="modal-subtitle">Asigna este colegio a otra empresa, zona o responsable</p>
                         </div>
-                        <div class="modal-footer">
-                          <button  class="btn btn-primary">
-                            Guardar
-                            </button>
-                          </div>
-                          <input type="hidden" name="id_colegio" value='<?php echo $colegio["id"] ?>'>
-                          <input type="hidden" name="cod_colegio" value="<?php echo $colegio['codigo'] ?>">
-                      </form>
-                    </div>
-                    </div>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      </div>
 
+                      <form action="php/reasignar_colegio.php" method="POST">
+                      <div class="modal-body">
+                        <div class="rs-section">
+                          <div class="row g-3">
+                            <div class="col-sm-6 col-12">
+                              <div class="form-group">
+                                <label for="empresa">Empresa <span class="rs-req">*</span></label>
+                                <select name="empresa" id="empresa" class="form-control custom-select2" required>
+                                  <option value="">Seleccionar empresa...</option>
+                                  <option value="1">EUREKA</option>
+                                  <?php
+                                    $sql = "SELECT * FROM zonas WHERE zona NOT LIKE '%Eureka%' AND zona NOT LIKE '%ALEJANDRO%'";
+                                    $req = $bdd->prepare($sql); $req->execute();
+                                    foreach ($req->fetchAll() as $zona)
+                                      echo '<option value="'.$zona["codigo"].'">'.$zona["zona"].'</option>';
+                                  ?>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-sm-6 col-12">
+                              <div class="form-group">
+                                <label for="zona">Zona <span class="rs-req">*</span></label>
+                                <select name="zona" id="zona" class="form-control custom-select2" required>
+                                  <option value="">Seleccionar zona...</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-sm-6 col-12 col-responsable d-none">
+                              <div class="form-group">
+                                <label for="responsable">Responsable <span class="rs-req">*</span></label>
+                                <input type="text" name="responsable" id="responsable" class="form-control" placeholder="Nombre del responsable">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-left-right"></i> Reasignar</button>
+                      </div>
+
+                      <input type="hidden" name="id_colegio"  value="<?= $colegio['id'] ?>">
+                      <input type="hidden" name="cod_colegio" value="<?= $colegio['codigo'] ?>">
+                      <input type="hidden" name="periodo"     value="<?= $periodo ?>">
+                      </form>
+
+                    </div>
+                  </div>
                 </div>
         </div>
         <?php
@@ -956,6 +957,24 @@
       });
 
     </script>
-    
+
+  <!-- Toast notificación global -->
+  <style>
+    .cole-toast { position:fixed; top:24px; right:24px; min-width:260px; padding:14px 20px; border-radius:10px; font-size:.87rem; font-weight:600; color:#fff; z-index:99999; box-shadow:0 6px 20px rgba(0,0,0,.18); display:flex; align-items:center; gap:10px; opacity:0; transform:translateY(-16px); transition:opacity .3s, transform .3s; pointer-events:none; }
+    .cole-toast.show { opacity:1; transform:translateY(0); }
+    .cole-toast.ok   { background:#16a34a; }
+  </style>
+  <div class="cole-toast" id="cole-toast"><i class="bi bi-check-circle-fill"></i><span id="cole-toast-msg"></span></div>
+  <script>
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'reasignado'): ?>
+    (function(){
+      var $t = document.getElementById('cole-toast');
+      document.getElementById('cole-toast-msg').textContent = 'Colegio reasignado correctamente';
+      $t.classList.add('ok', 'show');
+      setTimeout(function(){ $t.classList.remove('show'); }, 3500);
+    })();
+    <?php endif; ?>
+  </script>
+
   </body>
 </html>
