@@ -49,9 +49,9 @@ $objSpreadsheet->getActiveSheet()->getPageSetup()->setFitToHeight(0);
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D1", "Nombre");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E1", "Cargo");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("F1", "Materia");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("G1", "telefono");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("H1", "email");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("I1", "cumpleaños");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("G1", "Teléfono");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("H1", "Correo electrónico");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("I1", "Cumpleaños");
 
 
 $sql_periodo="SELECT id FROM periodos ORDER BY id DESC";

@@ -231,9 +231,9 @@ foreach (excelColumnRange('AA', 'ZZ') as $columnID) {
 $objWriter = new Xlsx($objSpreadsheet); //Escribir archivo
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 if ($_POST['promo']!=0) {
-	header('Content-Disposition: attachment; filename="Zonifición_'.$nombre_completo.'.xlsx"');
+	header('Content-Disposition: attachment; filename="Zonificación_'.$nombre_completo.'.xlsx"');
 }else{
-	header('Content-Disposition: attachment; filename="Zonifición_general.xlsx"');
+	header('Content-Disposition: attachment; filename="Zonificación_general.xlsx"');
 }
 
 header('Cache-Control: max-age=0');

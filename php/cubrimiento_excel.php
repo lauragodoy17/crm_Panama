@@ -104,10 +104,10 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("M4", "Alumnos primaria");
 $objSpreadsheet->getActiveSheet()->SetCellValue("N4", "Alumnos bachillerato");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O4", "Alumnos global");
 $objSpreadsheet->getActiveSheet()->SetCellValue("P4", "Status");
-$objSpreadsheet->getActiveSheet()->SetCellValue("Q4", "Prpuesta comercial");
+$objSpreadsheet->getActiveSheet()->SetCellValue("Q4", "Propuesta comercial");
 $objSpreadsheet->getActiveSheet()->SetCellValue("R4", "Segmento");
 $objSpreadsheet->getActiveSheet()->SetCellValue("S4", "Estado del cliente");
-$objSpreadsheet->getActiveSheet()->SetCellValue("T4", "Fecha de ultimo contacto");
+$objSpreadsheet->getActiveSheet()->SetCellValue("T4", "Fecha de último contacto");
 $objSpreadsheet->getActiveSheet()->getStyle("A1:T1")->getFont()->getColor()->applyFromArray(
   array(
   'rgb' => '#251919'

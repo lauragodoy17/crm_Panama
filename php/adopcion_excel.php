@@ -266,9 +266,9 @@ $objSpreadsheet->getActiveSheet()->getStyle('J11')->applyFromArray($estilo_borde
 $objSpreadsheet->getActiveSheet()->SetCellValue("A10", "TITULO");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B10", "GRADO");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C10", "ALUMNOS");
-$objSpreadsheet->getActiveSheet()->SetCellValue("D10", "% COMP");
+$objSpreadsheet->getActiveSheet()->SetCellValue("D10", "% COMPRADORES");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F10", "VENTA");
-$objSpreadsheet->getActiveSheet()->SetCellValue("E10", "COM ACT.");
+$objSpreadsheet->getActiveSheet()->SetCellValue("E10", "COMPRADORES ACTIVOS");
 
 $objSpreadsheet->getActiveSheet()->SetCellValue("K10", "PRECIO VENTA PADRE");
 $objSpreadsheet->getActiveSheet()->SetCellValue("L10", "VENTA REAL");
@@ -714,9 +714,9 @@ if (isset($p_sec)) {
 
   
 $objSpreadsheet->getActiveSheet()->SetCellValue("F11", "PVP");
-$objSpreadsheet->getActiveSheet()->SetCellValue("G11", "DESC.%");
-$objSpreadsheet->getActiveSheet()->SetCellValue("H11", "V. BRUTA");
-$objSpreadsheet->getActiveSheet()->SetCellValue("I11", "P. FACT");
+$objSpreadsheet->getActiveSheet()->SetCellValue("G11", "DESCUENTO %");
+$objSpreadsheet->getActiveSheet()->SetCellValue("H11", "VENTA BRUTA");
+$objSpreadsheet->getActiveSheet()->SetCellValue("I11", "PRECIO FACTURACIÓN");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J11", "VENTA ESTIMADA");
 
 $sql_conse =  "SELECT conse, year FROM presupuestos p WHERE p.id_colegio='".$_GET["cole"]."' AND p.id_periodo='".$_GET["periodo"]."' AND p.definido='1' ";

@@ -61,7 +61,7 @@ $estilo_negrita = array(
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B2", "$usuario[nombre_c]");*/
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D1", "Fecha");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D2", "$fecha");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("A4", "# Devol");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("A4", "# Devolución");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B4", "Usuario");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Fecha");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Estado");

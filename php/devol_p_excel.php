@@ -70,7 +70,7 @@ $estilo_negrita = array(
 		$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Fecha");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Estado");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Proveedor");
-		$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Cant. Libros");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Cantidad de Libros");
 		$objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Observaciones");
 
 
