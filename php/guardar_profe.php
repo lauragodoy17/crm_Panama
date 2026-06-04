@@ -4,8 +4,13 @@
 
 	foreach ($_POST["profe"] as $profes => $profe) {
 
-		list($nombre,$apellido,$correo, $telefono, $area) = explode("/", $profe);
-			
+		if ($profe == "") continue;
+
+		$parts = explode("/", $profe);
+		if (count($parts) < 5) continue;
+
+		list($nombre,$apellido,$correo, $telefono, $area) = $parts;
+
 		if ($profe !="") {
 			
 			$sql_p = "INSERT INTO trabajadores_colegios(id_colegio, nombre, apellido, email, telefono, area, cargo) VALUES('{$_POST['id_colegio']}', '{$nombre}','{$apellido}','{$correo}','{$telefono}','{$area}', '6')";

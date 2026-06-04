@@ -44,7 +44,9 @@
 
 	foreach ($_POST["areas_r"] as $libros => $libro) {
 
-		list($materia,$preescolar,$primaria,$bachillerato) = explode("/", $libro);
+		if (empty($libro) || substr_count($libro, '/') < 3) continue;
+
+		list($materia,$preescolar,$primaria,$bachillerato) = explode("/", $libro, 4);
 
 		if ($materia !=0) {
 			

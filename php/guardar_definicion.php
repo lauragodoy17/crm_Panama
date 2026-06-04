@@ -15,7 +15,12 @@
 	$year=$row_y["ultimos"];
 	foreach ($_POST["presupuesto_d"] as $presups => $presup) {
 
-		list($libro,$tasa_c,$descuento, $precio,$precio_padre) = explode("/", $presup);
+		if ($presup == "") continue;
+
+		$parts = explode("/", $presup);
+		if (count($parts) < 5) continue;
+
+		list($libro,$tasa_c,$descuento, $precio,$precio_padre) = $parts;
 
 		
 
@@ -214,7 +219,10 @@
 		
 		foreach ($_POST["definir"] as $definiciones => $definir) {
 
-			list($libro,$id_presupuesto) = explode("/", $definir);
+			if ($definir == "") continue;
+			$parts_def = explode("/", $definir);
+			if (count($parts_def) < 2) continue;
+			list($libro,$id_presupuesto) = $parts_def;
 			
 			//almaceno en un array los que se marcaron como definidos
 			$defs2[]=$id_presupuesto;
@@ -434,7 +442,10 @@
 
 	foreach ($_POST["v_uni_vr"] as $v_uni_vrs => $v_uni_vr) {
 
-		list($libro,$uni_vr) = explode("/", $v_uni_vr);
+		if ($v_uni_vr == "") continue;
+		$parts_vr = explode("/", $v_uni_vr);
+		if (count($parts_vr) < 2) continue;
+		list($libro,$uni_vr) = $parts_vr;
 
 		
 		if ($libro!="") {
