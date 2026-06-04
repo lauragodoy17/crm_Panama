@@ -345,12 +345,19 @@
       if (currentStep > 1) goTo(currentStep - 1);
     });
 
+    // ── Estado de verificación DANE ──────────────────────────────────────────
+    var daneDisponible  = null;  // null=sin verificar, true=libre, false=duplicado
+    var daneVerificando = false;
+
     // ── Validación por paso ──────────────────────────────────────────────────
     function validarPaso(paso) {
       if (paso === 1) {
         var dane = $('#dane').val().trim();
         if (!dane)                        { alert('El DANE es obligatorio.'); $('#dane').focus(); return false; }
         if (!/^\d{12}$/.test(dane))       { alert('El DANE debe tener exactamente 12 dígitos numéricos.'); $('#dane').focus(); return false; }
+        if (daneVerificando)              { alert('Espera mientras se verifica el DANE...'); $('#dane').focus(); return false; }
+        if (daneDisponible === false)     { alert('El DANE ingresado ya está registrado en el sistema.'); $('#dane').focus(); return false; }
+        if (daneDisponible === null)      { alert('Ingresa un DANE válido de 12 dígitos para verificar disponibilidad.'); $('#dane').focus(); return false; }
         if (!$('#colegio').val().trim())   { alert('El nombre del colegio es obligatorio.'); $('#colegio').focus(); return false; }
         if (!$('#calendario').val())       { alert('Selecciona un calendario.'); return false; }
         if (!$('#departamento').val())     { alert('Selecciona un departamento.'); return false; }
@@ -403,18 +410,49 @@
 
     // Feedback en tiempo real del DANE
     $('#dane').on('input', function () {
-      var val = $(this).val().replace(/\D/g, ''); // solo dígitos
-      $(this).val(val); // elimina letras al escribir
-      var $fb = $('#dane-feedback');
+      var val = $(this).val().replace(/\D/g, '');
+      $(this).val(val);
+      var $input = $(this);
+      var $fb    = $('#dane-feedback');
+
+      daneDisponible  = null;
+      daneVerificando = false;
+
       if (val.length === 0) {
-        $(this).removeClass('is-valid is-invalid');
+        $input.removeClass('is-valid is-invalid');
         $fb.hide();
       } else if (val.length < 12) {
-        $(this).removeClass('is-valid').addClass('is-invalid');
+        $input.removeClass('is-valid').addClass('is-invalid');
         $fb.show().css('color', '#dc3545').text('Faltan ' + (12 - val.length) + ' dígito(s)');
       } else {
-        $(this).removeClass('is-invalid').addClass('is-valid');
-        $fb.show().css('color', '#198754').text('DANE válido ✓');
+        $input.removeClass('is-valid is-invalid');
+        $fb.show().css('color', '#6c757d').html('<i class="bi bi-hourglass-split"></i> Verificando...');
+        daneVerificando = true;
+
+        $.ajax({
+          url: 'ajax/verificar_dane.php',
+          type: 'POST',
+          data: { dane: val },
+          dataType: 'json',
+          success: function (resp) {
+            daneVerificando = false;
+            if (resp.disponible) {
+              daneDisponible = true;
+              $input.removeClass('is-invalid').addClass('is-valid');
+              $fb.show().css('color', '#198754').html('<i class="bi bi-check-circle-fill"></i> DANE disponible ✓');
+            } else {
+              daneDisponible = false;
+              $input.removeClass('is-valid').addClass('is-invalid');
+              $fb.show().css('color', '#dc3545').html('<i class="bi bi-x-circle-fill"></i> Este DANE ya está registrado en el sistema');
+            }
+          },
+          error: function () {
+            daneVerificando = false;
+            daneDisponible  = null;
+            $input.removeClass('is-valid is-invalid');
+            $fb.show().css('color', '#dc3545').text('No se pudo verificar el DANE. Inténtalo de nuevo.');
+          }
+        });
       }
     });
 
