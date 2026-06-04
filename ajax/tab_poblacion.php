@@ -361,6 +361,11 @@
     }
   });
 
+  // ── Seleccionar todo al entrar al campo ──────────────────────────────
+  $('#tabla-pob').on('focus', 'input.pob-input', function () {
+    $(this).select();
+  });
+
   // ── Recalcular al escribir ────────────────────────────────────────────
   $('#tabla-pob').on('input', 'input.pob-input', function () {
     var v = $(this).val().replace(/[^0-9]/g, '');

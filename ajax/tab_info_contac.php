@@ -570,6 +570,12 @@ function syncAdm(i) {
 $('#nombre_adm, #apellido_adm, #correo_adm, #telefono_adm').on('keyup', function(){ syncAdm(0); });
 $('#cargo_adm').on('change', function(){ syncAdm(0); });
 
+// Garantiza que todos los campos ocultos estén sincronizados antes de enviar
+$('form[action="php/guardar_adm.php"]').on('submit', function() {
+  syncAdm(0);
+  for (var i = 1; i < mAdm; i++) { syncAdm(i); }
+});
+
 var mAdm = 1;
 $('#agregar_adm').on('click', function () {
   if (mAdm > 13) { $(this).hide(); return; }
@@ -593,6 +599,12 @@ function syncProfe(i) {
 }
 $('#nombre_profe, #apellido_profe, #correo_profe, #telefono_profe').on('keyup', function(){ syncProfe(0); });
 $('#area_profe').on('change', function(){ syncProfe(0); });
+
+// Garantiza que todos los campos ocultos estén sincronizados antes de enviar
+$('form[action="php/guardar_profe.php"]').on('submit', function() {
+  syncProfe(0);
+  for (var i = 1; i < mProfe; i++) { syncProfe(i); }
+});
 
 var mProfe = 1;
 $('#agregar_profe').on('click', function () {
