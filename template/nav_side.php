@@ -425,46 +425,25 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 									><span class="mtext">Devoluciones</span>
 								</a>
 								<ul class="submenu">
+
 									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2) { ?>
-										<li>
-										<a href="proveedores.php">Cargar Proveedores</a>
-									</li>
+										<li class="menu-subgroup-label">Proveedores</li>
+										<li><a href="proveedores.php">Cargar Proveedores</a></li>
+										<li><a href="devol_muestras_sa.php?tp=2">Devoluciones de proveedores</a></li>
+										<li><a href="ver_devol_proveedores.php">Ver devoluciones de proveedores</a></li>
 									<?php } ?>
-									<li>
-										<a href="devol_muestras_sa.php?tp=1">Devolución de muestras</a>
-									</li>
 
-									<li>
-										<a href="#"  data-toggle="modal" data-target="#modal_devols">Devolución de ventas</a>
-									</li>
+									<li class="menu-subgroup-label">Muestras</li>
+									<li><a href="devol_muestras_sa.php?tp=1">Devolución de muestras</a></li>
+									<li><a href="ver_devol_muestras.php">Ver devoluciones de muestras</a></li>
 
+									<li class="menu-subgroup-label">Ventas</li>
+									<li><a href="#" data-toggle="modal" data-target="#modal_devols">Devolución de ventas</a></li>
 									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2 || $_SESSION["id"] ==2) { ?>
-
-										<li>
-											<a href="devol_muestras_sa.php?tp=3">Devoluciones de ventas sin adopción</a>
-										</li>
+										<li><a href="devol_muestras_sa.php?tp=3">Devoluciones de ventas sin adopción</a></li>
 									<?php } ?>
+									<li><a href="ver_devol_ventas.php">Ver devoluciones de ventas</a></li>
 
-									<li>
-										<a href="ver_devol_muestras.php">Ver devoluciones de muestras</a>
-									</li>
-
-									<li>
-										<a href="ver_devol_ventas.php">Ver devoluciones de ventas</a>
-									</li>
-
-									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2) { ?>
-
-										<li>
-											<a href="devol_muestras_sa.php?tp=2">Devoluciones de proveedores</a>
-										</li>
-
-										<li>
-											<a href="ver_devol_proveedores.php">Ver devoluciones de proveedores</a>
-										</li>
-
-									<?php } ?>
-									
 								</ul>
 							</li>
 
@@ -534,7 +513,7 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 							<li class="dropdown <?= $ops_active ? 'show' : '' ?>">
 								<a href="javascript:;" class="dropdown-toggle <?= $ops_active ? 'active' : '' ?>">
 									<span class="micon bi bi-receipt"></span
-									><span class="mtext">OP'S</span>
+									><span class="mtext">Órdenes de Pedido</span>
 								</a>
 								<ul class="submenu">
 									<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2) {?>
@@ -553,7 +532,7 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 							<li class="dropdown <?= $opds_active ? 'show' : '' ?>">
 								<a href="javascript:;" class="dropdown-toggle <?= $opds_active ? 'active' : '' ?>">
 									<span class="micon bi bi-printer"></span
-									><span class="mtext">OPD'S</span>
+									><span class="mtext">Órdenes de Producción</span>
 								</a>
 								<ul class="submenu">
 
@@ -577,58 +556,51 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 									><span class="mtext">Reportes</span>
 								</a>
 								<ul class="submenu">
-									<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==5) {?>
-									
-										<li><a href="reporte_zonificacion.php">Zonificación</a></li>
-										<li><a href="reporte_cubrimiento.php">Cubrimiento</a></li>
+
+									<?php if ($_SESSION["tipo"] != 7 && $_SESSION["tipo"] != 9) { ?>
+										<li class="menu-subgroup-label">Territorial</li>
+										<?php if ($_SESSION["tipo"] != 4) { ?>
+											<li><a href="reporte_zonificacion.php">Zonificación</a></li>
+											<li><a href="reporte_cubrimiento.php">Cubrimiento</a></li>
+										<?php } ?>
 										<li><a href="reporte_visitas.php">Visitas</a></li>
-									
-									<?php } elseif($_SESSION["tipo"] ==3 || $_SESSION["tipo"] ==6 || $_SESSION["tipo"] ==10) {?>
-										
-										<li><a href="reporte_zonificacion.php">Zonificación</a></li>
-										<li><a href="reporte_cubrimiento.php">Cubrimiento</a></li>
-										<li><a href="reporte_visitas.php">Visitas</a></li>
-										
 									<?php } ?>
 
-									<?php if ($_SESSION["tipo"] ==4) {?>
-									
-										<li><a href="reporte_visitas.php">Visitas</a></li>
-									
-									<?php } ?>
-									
-									<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) {?>
-										<li><a href="reporte_atenciones.php">Atenciones a clientes</a></li>
-									<?php } ?>
-
-									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==3 || $_SESSION["tipo"]==4 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==5) {?>
-										<li><a href="calendar_ti.php">Calendario consultorías</a></li>
+									<?php if (in_array($_SESSION["tipo"], [1,2,3,4,5,7,9])) { ?>
+										<li class="menu-subgroup-label">Clientes</li>
+										<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) { ?>
+											<li><a href="reporte_atenciones.php">Atenciones a clientes</a></li>
+										<?php } ?>
+										<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==3 || $_SESSION["tipo"]==4 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==5) { ?>
+											<li><a href="calendar_ti.php">Calendario consultorías</a></li>
+										<?php } ?>
 									<?php } ?>
 
-									<?php if ($_SESSION["tipo"]!=4) {?>
-										<li><a href="reporte_valoriza.php">Valorización libro a libro</a></li>
-										<li><a href="reporte_valoriza_global.php">Valorización global</a></li>
-									<?php } ?>
-									<?php if ($_SESSION["tipo"]!=10) {?>
-										<li><a href="reporte_trabajadores.php">Contactos</a></li>
-									<?php } ?>
-
-									<?php if ($_SESSION["tipo"]!=10) {?>
-										<li><a href="reporte_cant_adop.php">Cantidad adopciones</a></li>
-									<?php } ?>
-
-									<?php if ($_SESSION["tipo"]!=10 && $_SESSION["tipo"]!=4) {?>
+									<?php if ($_SESSION["tipo"] != 10 && $_SESSION["tipo"] != 4) { ?>
+										<li class="menu-subgroup-label">Muestreo</li>
 										<li><a href="reporte_muestreo_f.php?tp=1">Muestreos solicitados</a></li>
 										<li><a href="reporte_muestreo_f.php?tp=2">Muestreos entregados</a></li>
 									<?php } ?>
 
-									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2) {?>
-										<li><a href="php/oppend_excel.php">OP'S pendientes</a></li>
-										<li><a href="php/opaten_excel.php">OP'S atendidas</a></li>
-										<li><a href="php/opanu_excel.php">OP'S anuladas</a></li>
-										<li><a href="reporte_pedidos.php">Pedidos</a></li>
-										<li><a href="reporte_devoluciones.php">Devoluciones</a></li>
+									<?php if ($_SESSION["tipo"] != 4) { ?>
+										<li class="menu-subgroup-label">Ventas</li>
+										<li><a href="reporte_valoriza.php">Valorización libro a libro</a></li>
+										<li><a href="reporte_valoriza_global.php">Valorización global</a></li>
+										<?php if ($_SESSION["tipo"] != 10) { ?>
+											<li><a href="reporte_cant_adop.php">Cantidad adopciones</a></li>
+											<li><a href="reporte_trabajadores.php">Contactos</a></li>
+										<?php } ?>
+										<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2) { ?>
+											<li><a href="reporte_pedidos.php">Pedidos</a></li>
+											<li><a href="reporte_devoluciones.php">Devoluciones</a></li>
+										<?php } ?>
+									<?php } ?>
 
+									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2) { ?>
+										<li class="menu-subgroup-label">Órdenes de Pedido</li>
+										<li><a href="php/oppend_excel.php">Pendientes</a></li>
+										<li><a href="php/opaten_excel.php">Atendidas</a></li>
+										<li><a href="php/opanu_excel.php">Anuladas</a></li>
 									<?php } ?>
 
 								</ul>
