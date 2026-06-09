@@ -1,348 +1,389 @@
 <?php require_once("php/aut.php"); ?>
 <!DOCTYPE html>
-<html>
-  <head>
-    <!-- Basic Page Info -->
-    <meta charset="utf-8" />
-    <?php if (isset($_GET["id_pedido"])) { ?>
-      <?php if($_GET["tp"]==3) {  ?>
-        <title>Inkpulse - Muestreo aprobado</title>
-      <?php  }elseif($_GET["tp"]==4) { ?>
-        <title>Inkpulse - Muestreo despachado</title>
-      <?php  }else{ ?>
-        <title>Inkpulse - Muestreo anulado</title>
-      <?php  } ?>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <?php
+    if (isset($_GET["id_pedido"])) {
+      if ($_GET["tp"] == 3)      echo '<title>Inkpulse - Muestreo aprobado</title>';
+      elseif ($_GET["tp"] == 4)  echo '<title>Inkpulse - Muestreo despachado</title>';
+      else                       echo '<title>Inkpulse - Muestreo anulado</title>';
+    } else {
+      echo '<title>Inkpulse - Muestras entregadas</title>';
+    }
+  ?>
+  <link rel="apple-touch-icon" sizes="180x180" href="vendors/images/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="vendors/images/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="vendors/images/favicon-16x16.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/icon-font.min.css" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <style>
+    input[type=number] { -moz-appearance:textfield; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+    @media print {
+      .mc-actions, .left-side-bar, .header { display:none !important; }
+      a[href]:after { content:none !important; }
+      body { font-size:9px; }
+      .mc-obs-wrap textarea { height:auto !important; overflow:visible !important; page-break-inside:avoid; }
+    }
 
-     
-    <?php }else{ ?>
-      <title>Inkpulse - Muestras entregadas</title>
-    <?php } ?>
-  
-    <!-- Site favicon -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="vendors/images/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="vendors/images/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="vendors/images/favicon-16x16.png"
-    />
+    /* ── Info cards ─────────────────────────────────── */
+    .mc-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .mc-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(15,23,42,.08);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .mc-card-icon {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .mc-card-icon.blue   { background:#dbeafe; color:#1d4ed8; }
+    .mc-card-icon.green  { background:#dcfce7; color:#15803d; }
+    .mc-card-icon.orange { background:#ffedd5; color:#c2410c; }
+    .mc-card-icon.purple { background:#ede9fe; color:#6d28d9; }
+    .mc-card-icon.teal   { background:#ccfbf1; color:#0d9488; }
+    .mc-card-label { font-size:.71rem; color:#64748b; margin:0 0 2px 0; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+    .mc-card-val   { font-size:.9rem; font-weight:700; color:#0f172a; margin:0; }
 
-    <!-- Mobile Specific Metas -->
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
+    /* ── OP badge ───────────────────────────────────── */
+    .mc-op-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fefce8; border: 1.5px solid #fde047;
+      border-radius: 8px; padding: 8px 16px;
+      font-size: .88rem; font-weight: 600; color: #92400e;
+      margin-bottom: 18px;
+    }
+    .mc-op-badge a { color: #b45309; font-weight: 700; text-decoration: underline; }
 
-    <!-- Google Font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <!-- CSS -->
-    <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="vendors/styles/icon-font.min.css"
-    />
-    <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
+    /* ── Tabla ──────────────────────────────────────── */
+    .mc-table-wrap { border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(15,23,42,.09); margin-bottom:24px; }
+    #mc-table { width:100%; font-size:.83rem; border-collapse:collapse; }
+    #mc-table thead th {
+      background:#f8fafc; color:#374151; font-weight:600;
+      padding:11px 12px; text-align:left; border:none;
+      border-bottom:2px solid #e2e8f0; white-space:nowrap; font-size:.79rem;
+    }
+    #mc-table tbody tr              { background:#fff; }
+    #mc-table tbody tr:nth-child(even) { background:#f8fafc; }
+    #mc-table tbody tr:hover        { background:#eff6ff; }
+    #mc-table tbody td {
+      padding:9px 12px; border-bottom:1px solid #e2e8f0;
+      color:#1e293b; vertical-align:middle;
+    }
+    #mc-table tfoot td {
+      padding:10px 12px; background:#f8fafc; color:#374151;
+      font-weight:700; font-size:.83rem; border:none;
+      border-top:2px solid #e2e8f0;
+    }
 
-    <style>
+    /* ── Observaciones ──────────────────────────────── */
+    .mc-obs-wrap {
+      background:#fff; border-radius:10px; padding:16px 20px;
+      box-shadow:0 1px 6px rgba(15,23,42,.08); margin-bottom:20px;
+    }
+    .mc-obs-label {
+      font-size:.78rem; font-weight:700; color:#374151;
+      text-transform:uppercase; letter-spacing:.04em;
+      display:flex; align-items:center; gap:6px; margin:0 0 10px 0;
+    }
+    .mc-obs-label i { color:#6366f1; }
+    .mc-obs-wrap textarea {
+      width:100%; border-radius:8px; border:1.5px solid #d1d5db;
+      padding:10px 14px; font-size:.85rem; background:#f9fafb;
+      color:#1e293b; resize:vertical; outline:none; transition:border-color .15s;
+      min-height:150px;
+    }
 
+    /* ── Acciones ───────────────────────────────────── */
+    .mc-actions { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:4px; }
+    .mc-btn {
+      display:inline-flex; align-items:center; gap:7px;
+      padding:9px 22px; border-radius:8px; font-size:14px; font-weight:600;
+      border:none; cursor:pointer; text-decoration:none;
+      transition:opacity .15s, transform .1s;
+    }
+    .mc-btn:hover { opacity:.88; transform:translateY(-1px); text-decoration:none; color:#fff; }
+    .mc-btn-teal   { background:#0d9488; color:#fff; }
+    .mc-btn-green  { background:#16a34a; color:#fff; }
+    .mc-btn-yellow { background:#d97706; color:#fff; }
+  </style>
+</head>
+<body>
+  <?php include("template/nav_side.php"); ?>
+  <div class="main-container">
+    <div class="pd-ltr-20 xs-pd-20-10">
+      <div class="min-height-200px">
 
-      input[type=number] { -moz-appearance:textfield; }
-      input[type=number]::-webkit-inner-spin-button, 
-      input[type=number]::-webkit-outer-spin-button { 
-          -webkit-appearance: none; 
-          margin: 0; 
-      }
-      @page{
-          margin: 0;
-      
-      }
-      @media print {
-        a {display: none;}
-        
-        a[href]:after {
-            content: none !important;
-        }
-        body{
-          font-size: 9px;
-        }
-      }
-    </style>
+        <?php
+          // ── Título y breadcrumb por tp ───────────────────────────
+          if (isset($_GET["id_pedido"])) {
+            if ($_GET["tp"] == 3)     { $titulo = 'Muestreo aprobado';   $bc = 'Aprobado';   $icon = 'bi-check-circle-fill'; $icon_color = '#15803d'; }
+            elseif ($_GET["tp"] == 4) { $titulo = 'Muestreo despachado'; $bc = 'Despachado'; $icon = 'bi-truck';             $icon_color = '#1d4ed8'; }
+            else                      { $titulo = 'Muestreo anulado';    $bc = 'Anulado';    $icon = 'bi-x-circle-fill';     $icon_color = '#dc2626'; }
+          } else {
+            $titulo = 'Muestras entregadas'; $bc = 'Entregadas'; $icon = 'bi-box-seam'; $icon_color = '#4361ee';
+          }
+        ?>
 
-  </head>
-  <body>
-    
-    <?php include("template/nav_side.php"); ?>
-    <div class="main-container">
-      <div class="pd-ltr-20 xs-pd-20-10">
-        <div class="min-height-200px">
-          <div class="page-header">
-            <div class="row">
-              <div class="col-md-6 col-sm-12">
-                <div class="title">
-                  <?php if (isset($_GET["id_pedido"])) { ?>
-                    <?php if($_GET["tp"]==3) {  ?>
-                      <h4>Muestreo aprobado</h4>
-                    <?php  }elseif($_GET["tp"]==4) { ?>
-                      <h4>Muestreo despachado</h4>
-                    <?php  }else{ ?>
-                      <h4>Muestreo anulado</h4>
-                    <?php  } ?>
-                  <?php }else{ ?>
-                    <h4>Muestras entregadas</h4>
-                  <?php } ?>
-                  
-                </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                      Muestreo
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                      <?php if (isset($_GET["id_pedido"])) { ?>
-                        <?php if($_GET["tp"]==3) {  ?>
-                          Aprobado
-                        <?php  }elseif($_GET["tp"]==4) { ?>
-                          Despachado
-                        <?php  }else{ ?>
-                          Anulado
-                        <?php  } ?>
-                      <?php }else{ ?>
-                        Entregadas
-                      <?php } ?>
-                    </li>
-                  </ol>
-                </nav>
+        <div class="page-header">
+          <div class="row align-items-center">
+            <div class="col-md-8 col-sm-12">
+              <div class="title">
+                <h4><i class="bi <?= $icon ?>" style="color:<?= $icon_color ?>;margin-right:6px"></i><?= $titulo ?></h4>
               </div>
-              
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item">Muestreo</li>
+                  <li class="breadcrumb-item active"><?= $bc ?></li>
+                </ol>
+              </nav>
             </div>
           </div>
-          <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-            
-            <div class="row">
-              <div class="col-sm-12">
-               
-              <?php 
-                if (isset($_GET["id_muestreo"])) {
-                    $_GET["id_pedido"]=$_GET["id_muestreo"];
-                }
+        </div>
 
-                if (isset($_GET["id_pedido"])) {
+        <?php
+          if (isset($_GET["id_muestreo"])) {
+            $_GET["id_pedido"] = $_GET["id_muestreo"];
+          }
 
-                  $sql_pedido="SELECT id FROM muestreos WHERE id='".$_GET["id_pedido"]."'";
+          if (isset($_GET["id_pedido"])) {
+            $sql_pedido = "SELECT id FROM muestreos WHERE id='".$_GET["id_pedido"]."'";
+            $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
+            $pedido = $req_pedido->fetch();
 
-                  $req_pedido = $bdd->prepare($sql_pedido);
-                  $req_pedido->execute();
-                  $pedido = $req_pedido->fetch();
+            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, z.zona, c.colegio, c.sub_zona, c.responsable, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado WHERE pe.id='".$pedido["id"]."'";
+            $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
+            $pedido = $req_pedido->fetch();
 
-                  $sql_pedido="SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha,pe.observaciones, z.zona, c.colegio, c.sub_zona, c.responsable, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado WHERE pe.id='".$pedido["id"]."'";
+            $sql_repetido = "SELECT id FROM muestreos WHERE id_periodo='".$pedido["id_periodo"]."' AND id_colegio='".$pedido["id_colegio"]."' AND estado='4'";
+            $req_repetido = $bdd->prepare($sql_repetido); $req_repetido->execute();
+            $num_repetido = $req_repetido->rowCount();
+            $n_repetido   = $req_repetido->fetchAll();
 
-                  $req_pedido = $bdd->prepare($sql_pedido);
-                  $req_pedido->execute();
-                  $pedido = $req_pedido->fetch();
+            $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.cantidad_aprob, lp.id as id_lm, l.isbn, m.materia, g.id as id_grado, g.grado FROM muestreos pe LEFT JOIN libros_muestreos lp ON lp.cod_muestreo=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON m.id=l.id_materia LEFT JOIN grados g ON g.id=l.id_grado WHERE pe.id='".$_GET["id_pedido"]."' GROUP BY l.id";
+            $req = $bdd->prepare($sql); $req->execute();
+            $libros = $req->fetchAll();
 
+            $sql_op = "SELECT id, año FROM ordenes_pedidos WHERE id_muestreo='".$_GET["id_pedido"]."' AND estado!=4";
+            $req_op = $bdd->prepare($sql_op); $req_op->execute();
+            $op   = $req_op->rowCount();
+            $n_op = $req_op->fetch();
+          } else {
+            $sql_pedido = "SELECT id FROM muestreos_e WHERE id='".$_GET["id_muestras_e"]."'";
+            $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
+            $pedido = $req_pedido->fetch();
 
-                  $sql_repetido="SELECT id FROM muestreos WHERE id_periodo='".$pedido["id_periodo"]."' AND id_colegio='".$pedido["id_colegio"]."' AND estado='4'";
+            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, z.zona, c.colegio, c.sub_zona, c.responsable, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos_e pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado WHERE pe.id='".$_GET["id_muestras_e"]."'";
+            $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
+            $pedido = $req_pedido->fetch();
 
-                  $req_repetido = $bdd->prepare($sql_repetido);
-                  $req_repetido->execute();
-                  $num_repetido = $req_repetido->rowCount();
-                  $n_repetido = $req_repetido->fetchAll();
-                    
-                  $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.cantidad_aprob, lp.id as id_lm, l.isbn, m.materia, g.id as id_grado, g.grado  FROM muestreos pe LEFT JOIN libros_muestreos lp ON lp.cod_muestreo=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON m.id=l.id_materia LEFT JOIN grados g ON g.id=l.id_grado WHERE pe.id='".$_GET["id_pedido"]."'  GROUP BY l.id";
-                  $req = $bdd->prepare($sql);
-                  $req->execute();
-                  $libros = $req->fetchAll();
+            $sql_repetido = "SELECT id FROM muestreos_e WHERE id_periodo='".$pedido["id_periodo"]."' AND id_colegio='".$_GET["id_muestras_e"]."'";
+            $req_repetido = $bdd->prepare($sql_repetido); $req_repetido->execute();
+            $num_repetido = $req_repetido->rowCount();
+            $n_repetido   = $req_repetido->fetchAll();
 
-                  $sql_op = "SELECT id, año FROM ordenes_pedidos WHERE id_muestreo='".$_GET["id_pedido"]."' AND estado!=4";
+            $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.cantidad_aprob, lp.id as id_lm, l.isbn, m.materia, g.id as id_grado, g.grado FROM muestreos_e pe LEFT JOIN libros_muestreos_e lp ON lp.cod_muestreo=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON m.id=l.id_materia LEFT JOIN grados g ON g.id=l.id_grado WHERE pe.id='".$_GET["id_muestras_e"]."' GROUP BY l.id";
+            $req = $bdd->prepare($sql); $req->execute();
+            $libros = $req->fetchAll();
+            $op = 0;
+          }
 
-                  $req_op = $bdd->prepare($sql_op);
-                  $req_op->execute();
-                  $op = $req_op->rowCount();
-                  $n_op = $req_op->fetch();
+          if ($pedido["tipo"] == 3) {
+            list($empresa, $n_zona) = explode("/", $pedido["zona"]);
+            $responsable = $pedido["nombres"]." ".$pedido["apellidos"];
+          } else {
+            $sql_sz = "SELECT sub_zona FROM sub_zonas WHERE id='".$pedido["sub_zona"]."'";
+            $req_sz = $bdd->prepare($sql_sz); $req_sz->execute();
+            $sub_zona    = $req_sz->fetch();
+            $empresa     = $pedido["nombres"]." ".$pedido["apellidos"];
+            $n_zona      = $sub_zona["sub_zona"] ?? '—';
+            $responsable = $pedido["responsable"];
+          }
 
-                  if ($op !=0) {
-                    echo "<h4>OP <a href='op_pendiente.php?op=".$n_op["id"]."' target='_blank'># ".$n_op["año"]." - ".$n_op["id"]."</a></h4>";
-                  }
+          $id_disp = isset($_GET["id_pedido"]) ? $_GET["id_pedido"] : ($_GET["id_muestras_e"] ?? '—');
+        ?>
 
-                }else {
+        <!-- OP badge (si existe) -->
+        <?php if (isset($op) && $op != 0): ?>
+        <div class="mc-op-badge">
+          <i class="bi bi-file-earmark-text"></i>
+          OP asociada:
+          <a href="op_pendiente.php?op=<?= $n_op["id"] ?>" target="_blank">
+            # <?= htmlspecialchars($n_op["año"]) ?> — <?= htmlspecialchars($n_op["id"]) ?>
+          </a>
+        </div>
+        <?php endif; ?>
 
-                  $sql_pedido="SELECT id FROM muestreos_e WHERE id='".$_GET["id_muestras_e"]."'";
-
-                  $req_pedido = $bdd->prepare($sql_pedido);
-                  $req_pedido->execute();
-                  $pedido = $req_pedido->fetch();
-
-                  $sql_pedido="SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha,pe.observaciones, z.zona, c.colegio, c.sub_zona, c.responsable, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos_e pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado WHERE pe.id='".$_GET["id_muestras_e"]."'";
-
-                  $req_pedido = $bdd->prepare($sql_pedido);
-                  $req_pedido->execute();
-                  $pedido = $req_pedido->fetch();
-
-                  $sql_repetido="SELECT id FROM muestreos_e WHERE id_periodo='".$pedido["id_periodo"]."' AND id_colegio='".$_GET["id_muestras_e"]."'";
-
-                  $req_repetido = $bdd->prepare($sql_repetido);
-                  $req_repetido->execute();
-                  $num_repetido = $req_repetido->rowCount();
-                  $n_repetido = $req_repetido->fetchAll();
-                                
-                  $sql = "SELECT pe.id, l.id, l.libro, lp.cantidad, lp.cantidad_aprob, lp.id as id_lm, l.isbn, m.materia, g.id as id_grado, g.grado  FROM muestreos_e pe LEFT JOIN libros_muestreos_e lp ON lp.cod_muestreo=pe.codigo LEFT JOIN libros l ON l.id=lp.id_libro LEFT JOIN materias m ON m.id=l.id_materia LEFT JOIN grados g ON g.id=l.id_grado WHERE pe.id='".$_GET["id_muestras_e"]."'  GROUP BY l.id";
-                  $req = $bdd->prepare($sql);
-                  $req->execute();
-                  $libros = $req->fetchAll();
-
-                }
-                                
-                                
-              ?>
-              <table class="table table-bordered table-hover">
-                  <tr>
-                    <?php if (isset($_GET["id_pedido"])) { ?>
-                      <td># Muestreo: <?php echo $_GET["id_pedido"] ?></td>
-                    <?php }else { ?>
-                      <td>#: <?php echo $_GET["id_muestras_e"] ?></td>
-                    <?php } ?>
-                    <td>Colegio: <?php echo $pedido["colegio"] ?></td>
-                    <td>Fecha: <?php echo $pedido["fecha"] ?></td>
-                    </tr>
-                  <tr>
-                  <?php if ($pedido["tipo"]==3) {
-                    list($empresa,$n_zona) = explode("/", $pedido["zona"]);
-                  ?>
-                    <td>Empresa: <?php echo $empresa ?></td>
-                    <td>Zona: <?php echo $n_zona ?></td>
-                    <td>Responsable: <?php echo $pedido["nombres"]." ".$pedido["apellidos"] ?></td>
-
-                  <?php }else{
-
-                    $sql_sz="SELECT sub_zona FROM sub_zonas WHERE id='".$pedido["sub_zona"]."'";
-                    $req_sz = $bdd->prepare($sql_sz);
-                    $req_sz->execute();
-                    $sub_zona = $req_sz->fetch();
-
-                  ?>
-                    <td>Empresa: <?php echo $pedido["nombres"]." ".$pedido["apellidos"] ?></td>
-                    <td>Zona: <?php echo $sub_zona["sub_zona"] ?></td>
-                    <td>Responsable: <?php echo $pedido["responsable"] ?></td>
-                  <?php } ?>
-                                
-                  </tr>
-                              
-              </table>
-                          
-                <div class="table-responsive">
-                  <table class="table table-striped table-bordered table-hover">
-                    <thead>
-                      <tr>
-                        <th>Isbn</th>
-                        <th>Título</th>
-                        <th>Materia</th>
-                        <th>Grado</th>
-                        <?php if (isset($_GET["id_pedido"])) { ?>
-                          <th>Cantidad Solicitada</th>
-                        <?php }else { ?>
-                          <th>Cantidad Entregada</th>
-                        <?php } ?>
-                        <?php if (isset($_GET["id_pedido"])) { ?>
-                          <th>Cantidad aprobada</th>
-                        <?php } ?>
-                      </tr>
-                    </thead>
-                    <tbody>
-                     
-                      <?php 
-                        foreach($libros as $libro) {
-                                           
-                          $total_cantidad[]=$libro["cantidad"];
-                          $total_cantidad_aprob[]=$libro["cantidad_aprob"];
-
-                          echo'<tr class="odd gradeX">';
-                          echo'<td class="">'.$libro["isbn"].'</td>';
-                          echo'<td class="">'.$libro["libro"].'</td>';
-                          echo'<td class="">'.$libro["materia"].'</td>';
-                          echo'<td class="">'.$libro["grado"].'</td>';                   
-                          echo'<td class="center">'.$libro["cantidad"].'</td>';
-                          if (isset($_GET["id_pedido"])) {
-                            echo'<td class="center">'.$libro["cantidad_aprob"].'</td>';
-                          }
-                                          
-                        }
-
-                        echo'<input type="hidden" name="id_muestreo" value="'.$pedido["id"].'">';
-                                            
-                        $total_c=array_sum($total_cantidad);
-                        $total_c_aprob=array_sum($total_cantidad_aprob);
-                      ?>
-                        </tr>               
-                        <td></td><td></td><td></td></td><td class="center"><b>Total:</b></td>
-                        <td class="center"><b><?php echo $total_c; ?></b></td>
-                        <?php if (isset($_GET["id_pedido"])) { ?>
-                          <td class="center"><b><?php echo $total_c_aprob; ?></b></td>
-                        <?php } ?>
-                                       
-                      </tbody>
-                    </table>
-                  </div>
-                  <input type="hidden" name="id_colegio" value="<?php echo $_GET["id_colegio"]; ?>">
-                  <input type="hidden" name="periodo" value="<?php echo $_GET["periodo"]; ?>">
-
-                  <center>
-                    <?php if (isset($_GET["id_pedido"])) { ?>
-                      <label for="observaciones">Observaciones:</label><br>
-                      <textarea class="form-control" name="observaciones" id="observaciones"><?php echo $pedido["observaciones"] ?></textarea><br><br>
-                    <?php } ?>
-                    <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button> <br><br>
-                    <?php if (isset($_GET["id_pedido"])) { ?>
-                      <?php if ($_GET["tp"]==3) { ?>
-                        <?php if ($op ==0) { ?>
-                          <a href="solicitar_op.php?id_muestreo=<?php echo $_GET["id_pedido"] ?>" target="_blank" class="btn btn-warning hidden-print">Solicitar OP</a>
-                        <?php } ?>
-                        <button class="btn btn-success hidden-print" id="entregar">Despachar</button><center>
-                      <?php } ?>
-                      
-                    <?php } ?>  
-               
-                <!-- PAGE CONTENT ENDS -->
-              </div><!-- /.col -->
-            </div><!-- /.row -->
-
+        <!-- Tarjetas fila 1 -->
+        <div class="mc-cards">
+          <div class="mc-card">
+            <div class="mc-card-icon blue"><i class="bi bi-box-seam"></i></div>
+            <div>
+              <p class="mc-card-label"># Muestreo</p>
+              <p class="mc-card-val"><?= htmlspecialchars($id_disp) ?></p>
+            </div>
+          </div>
+          <div class="mc-card">
+            <div class="mc-card-icon green"><i class="bi bi-building"></i></div>
+            <div>
+              <p class="mc-card-label">Colegio</p>
+              <p class="mc-card-val"><?= htmlspecialchars($pedido["colegio"]) ?></p>
+            </div>
+          </div>
+          <div class="mc-card">
+            <div class="mc-card-icon orange"><i class="bi bi-calendar3"></i></div>
+            <div>
+              <p class="mc-card-label">Fecha</p>
+              <p class="mc-card-val"><?= htmlspecialchars($pedido["fecha"]) ?></p>
+            </div>
+          </div>
+          <div class="mc-card">
+            <div class="mc-card-icon purple"><i class="bi bi-flag-fill"></i></div>
+            <div>
+              <p class="mc-card-label">Estado</p>
+              <p class="mc-card-val"><?= htmlspecialchars($pedido["estado"]) ?></p>
+            </div>
           </div>
         </div>
-        <?php include("template/footer.php"); ?>
+
+        <!-- Tarjetas fila 2 -->
+        <div class="mc-cards" style="margin-bottom:24px">
+          <div class="mc-card">
+            <div class="mc-card-icon purple"><i class="bi bi-person-fill"></i></div>
+            <div>
+              <p class="mc-card-label">Promotor / Empresa</p>
+              <p class="mc-card-val"><?= htmlspecialchars($empresa) ?></p>
+            </div>
+          </div>
+          <div class="mc-card">
+            <div class="mc-card-icon blue"><i class="bi bi-geo-alt-fill"></i></div>
+            <div>
+              <p class="mc-card-label">Zona</p>
+              <p class="mc-card-val"><?= htmlspecialchars($n_zona) ?></p>
+            </div>
+          </div>
+          <div class="mc-card">
+            <div class="mc-card-icon teal"><i class="bi bi-person-badge"></i></div>
+            <div>
+              <p class="mc-card-label">Responsable</p>
+              <p class="mc-card-val"><?= htmlspecialchars($responsable) ?></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de libros -->
+        <div class="mc-table-wrap">
+          <table id="mc-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ISBN</th>
+                <th>Título</th>
+                <th>Materia</th>
+                <th>Grado</th>
+                <?php if (isset($_GET["id_pedido"])): ?>
+                  <th>Cant. solicitada</th>
+                  <th>Cant. aprobada</th>
+                <?php else: ?>
+                  <th>Cant. entregada</th>
+                <?php endif; ?>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+                $i = 1;
+                foreach ($libros as $libro) {
+                  $total_cantidad[]       = $libro["cantidad"];
+                  $total_cantidad_aprob[] = $libro["cantidad_aprob"];
+                  echo '<tr>';
+                  echo '<td>'.($i++).'</td>';
+                  echo '<td>'.htmlspecialchars($libro["isbn"]).'</td>';
+                  echo '<td>'.htmlspecialchars($libro["libro"]).'</td>';
+                  echo '<td>'.htmlspecialchars($libro["materia"]).'</td>';
+                  echo '<td>'.htmlspecialchars($libro["grado"]).'</td>';
+                  echo '<td style="text-align:center">'.$libro["cantidad"].'</td>';
+                  if (isset($_GET["id_pedido"])) {
+                    echo '<td style="text-align:center">'.$libro["cantidad_aprob"].'</td>';
+                  }
+                  echo '</tr>';
+                }
+                echo '<input type="hidden" name="id_muestreo" value="'.$pedido["id"].'">';
+                $total_c       = array_sum($total_cantidad);
+                $total_c_aprob = array_sum($total_cantidad_aprob);
+              ?>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="5" style="text-align:right">Total</td>
+                <td style="text-align:center"><?= $total_c ?></td>
+                <?php if (isset($_GET["id_pedido"])): ?>
+                  <td style="text-align:center"><?= $total_c_aprob ?></td>
+                <?php endif; ?>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <?php if (isset($_GET["id_pedido"]) && !empty($pedido["observaciones"])): ?>
+        <div class="mc-obs-wrap">
+          <p class="mc-obs-label"><i class="bi bi-chat-text"></i> Observaciones</p>
+          <textarea rows="6" disabled><?= htmlspecialchars($pedido["observaciones"]) ?></textarea>
+        </div>
+        <?php endif; ?>
+
+        <input type="hidden" name="id_colegio" value="<?= htmlspecialchars($_GET["id_colegio"] ?? '') ?>">
+        <input type="hidden" name="periodo"    value="<?= htmlspecialchars($_GET["periodo"] ?? '') ?>">
+
+        <div class="mc-actions d-print-none">
+          <button type="button" id="imprimir" class="mc-btn mc-btn-teal">
+            <i class="bi bi-printer"></i> Imprimir
+          </button>
+          <?php if (isset($_GET["id_pedido"]) && $_GET["tp"] == 3): ?>
+            <?php if ($op == 0): ?>
+              <a href="solicitar_op.php?id_muestreo=<?= $_GET["id_pedido"] ?>" target="_blank" class="mc-btn mc-btn-yellow">
+                <i class="bi bi-file-earmark-plus"></i> Solicitar OP
+              </a>
+            <?php endif; ?>
+            <button type="button" id="entregar" class="mc-btn mc-btn-green">
+              <i class="bi bi-truck"></i> Despachar
+            </button>
+          <?php endif; ?>
+        </div>
+
       </div>
+      <?php include("template/footer.php"); ?>
     </div>
-    
-    <!-- js -->
-    <script src="vendors/scripts/core.js"></script>
-    <script src="vendors/scripts/script.min.js"></script>
-    <script src="vendors/scripts/process.js"></script>
-    <script src="vendors/scripts/layout-settings.js"></script>
+  </div>
 
-    <script>
-
-      $("#entregar").click(function(){
-        var factura=$("#factura").val()
-        window.location="php/accion_muestreo.php?entregado=<?php echo $_GET["id_pedido"] ?>&factura="+factura;
-      });
-
-      $("#imprimir").click(function(){
-        window.print();
-      })
-
-    </script>
-    
-  </body>
+  <script src="vendors/scripts/core.js"></script>
+  <script src="vendors/scripts/script.min.js"></script>
+  <script src="vendors/scripts/process.js"></script>
+  <script src="vendors/scripts/layout-settings.js"></script>
+  <script>
+    $("#entregar").click(function(){
+      var factura = $("#factura").val();
+      window.location = "php/accion_muestreo.php?entregado=<?= $_GET['id_pedido'] ?? '' ?>&factura=" + factura;
+    });
+    $("#imprimir").click(function(){
+      window.print();
+    });
+  </script>
+</body>
 </html>
