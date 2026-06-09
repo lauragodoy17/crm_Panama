@@ -469,6 +469,11 @@
     $req_hp->execute();
     $num_hp = $req_hp->rowCount();
 
+    $sql_exist_p = "SELECT DISTINCT id_libro_eureka FROM areas_objetivas WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$_GET["periodo"]."'";
+    $req_exist_p = $bdd->prepare($sql_exist_p);
+    $req_exist_p->execute();
+    $ids_exist_presup = array_map('intval', array_column($req_exist_p->fetchAll(PDO::FETCH_ASSOC), 'id_libro_eureka'));
+
     echo "<form action='php/actualizar_presupuesto.php' method='POST' id='pp' class='miFormulario'>";
 
     echo "<div class='pr-table-wrap mt-2'>
@@ -484,11 +489,14 @@
                     <th>Descuento</th>
                     <th>Precio neto</th>
                     <th>Venta potencial</th>
+                    <th>Venta ajustada</th>
                     <th>Probabilidad</th>
                     <th>Borrar</th>
                 </tr>
             </thead>
             <tbody>";
+
+    if (empty($libros_p)) echo '<tr><td colspan="12" class="tbl-empty"><i class="bi bi-inbox"></i>No hay información para mostrar</td></tr>';
 
     foreach ($libros_p as $libro_p) {
 
@@ -602,12 +610,25 @@
         $req_prob->execute();
         $probs = $req_prob->fetchAll();
 
+        // Venta ajustada = venta potencial × (probabilidad %)
+        $prob_valor_actual = 0;
+        foreach ($probs as $prob) {
+            if ($prob['id'] == $presup['probabilidad']) {
+                $prob_valor_actual = floatval($prob['valor']);
+                break;
+            }
+        }
+        $venta_ajustada = isset($venta_p) ? $venta_p * ($prob_valor_actual / 100) : 0;
+        $venta_ajustada_fmt = $venta_ajustada > 0 ? number_format($venta_ajustada, 0, ",", ".") : 0;
+        echo "<td id='venta_aj_p".$libro_p["id"]."' class='venta-aj'>".$venta_ajustada_fmt."</td>
+              <input type='hidden' id='venta_ajs_p".$libro_p["id"]."' class='venta1_aj_p' value='".$venta_ajustada."'>";
+
         if ($presup["probabilidad"] == 0) {
             echo '<td>
                 <select class="pr-prob" name="proba[]" id="proba_p'.$libro_p["id"].'">
                     <option value="">Seleccione</option>';
             foreach ($probs as $prob) {
-                echo '<option value="'.$prob["id"].'">'.$prob["probabilidad"].' ( '.$prob["valor"].' % )</option>';
+                echo '<option value="'.$prob["id"].'" data-valor="'.$prob["valor"].'">'.$prob["probabilidad"].' ( '.$prob["valor"].' % )</option>';
             }
             echo '</select></td>';
         } else {
@@ -616,9 +637,9 @@
                     <option value="">Seleccione</option>';
             foreach ($probs as $prob) {
                 if ($presup["probabilidad"] == $prob["id"]) {
-                    echo '<option value="'.$prob["id"].'" SELECTED>'.$prob["probabilidad"].' ( '.$prob["valor"].' % )</option>';
+                    echo '<option value="'.$prob["id"].'" data-valor="'.$prob["valor"].'" SELECTED>'.$prob["probabilidad"].' ( '.$prob["valor"].' % )</option>';
                 } else {
-                    echo '<option value="'.$prob["id"].'">'.$prob["probabilidad"].' ( '.$prob["valor"].' % )</option>';
+                    echo '<option value="'.$prob["id"].'" data-valor="'.$prob["valor"].'">'.$prob["probabilidad"].' ( '.$prob["valor"].' % )</option>';
                 }
             }
             echo '</select></td>';
@@ -684,6 +705,17 @@
                 if(isNaN(vp)){ vp=0; }
                 $('#venta_p_p".$libro_p["id"]."').text(formatNumber.new(vp));
                 $('#venta_ps_p".$libro_p["id"]."').val(vp);
+                var prob_valor=parseFloat($('#proba_p".$libro_p["id"]."').find('option:selected').data('valor')) || 0;
+                var venta_aj=vp*(prob_valor/100);
+                if(isNaN(venta_aj)){venta_aj=0;}
+                $('#venta_aj_p".$libro_p["id"]."').text(formatNumber.new(venta_aj));
+                $('#venta_ajs_p".$libro_p["id"]."').val(venta_aj);
+                var total_vp_aj_p=0;
+                $('.venta1_aj_p').each(function(){
+                    total_vp_aj_p+=parseFloat($(this).val()) || 0;
+                    total_vp_aj_p=Math.round(total_vp_aj_p * 100) / 100;
+                });
+                $('#total_vp_aj_p').text(formatNumber.new(total_vp_aj_p));
                 var probab=$('#proba_p".$libro_p["id"]."').val();
                 $('#presupuesto_p".$libro_p["id"]."').val(".$libro_p["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+probab);
                 var total_vp_p=0;
@@ -708,6 +740,17 @@
                 if(isNaN(vp)){ vp=0; }
                 $('#venta_p_p".$libro_p["id"]."').text(formatNumber.new(vp));
                 $('#venta_ps_p".$libro_p["id"]."').val(vp);
+                var prob_valor=parseFloat($('#proba_p".$libro_p["id"]."').find('option:selected').data('valor')) || 0;
+                var venta_aj=vp*(prob_valor/100);
+                if(isNaN(venta_aj)){venta_aj=0;}
+                $('#venta_aj_p".$libro_p["id"]."').text(formatNumber.new(venta_aj));
+                $('#venta_ajs_p".$libro_p["id"]."').val(venta_aj);
+                var total_vp_aj_p=0;
+                $('.venta1_aj_p').each(function(){
+                    total_vp_aj_p+=parseFloat($(this).val()) || 0;
+                    total_vp_aj_p=Math.round(total_vp_aj_p * 100) / 100;
+                });
+                $('#total_vp_aj_p').text(formatNumber.new(total_vp_aj_p));
                 var probab=$('#proba_p".$libro_p["id"]."').val();
                 $('#presupuesto_p".$libro_p["id"]."').val(".$libro_p["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+probab);
                 var total_vp_p=0;
@@ -732,6 +775,17 @@
                 if(isNaN(vp)){ vp=0; }
                 $('#venta_p_p".$libro_p["id"]."').text(formatNumber.new(vp));
                 $('#venta_ps_p".$libro_p["id"]."').val(vp);
+                var prob_valor=parseFloat($('#proba_p".$libro_p["id"]."').find('option:selected').data('valor')) || 0;
+                var venta_aj=vp*(prob_valor/100);
+                if(isNaN(venta_aj)){venta_aj=0;}
+                $('#venta_aj_p".$libro_p["id"]."').text(formatNumber.new(venta_aj));
+                $('#venta_ajs_p".$libro_p["id"]."').val(venta_aj);
+                var total_vp_aj_p=0;
+                $('.venta1_aj_p').each(function(){
+                    total_vp_aj_p+=parseFloat($(this).val()) || 0;
+                    total_vp_aj_p=Math.round(total_vp_aj_p * 100) / 100;
+                });
+                $('#total_vp_aj_p').text(formatNumber.new(total_vp_aj_p));
                 var probab=$('#proba_p".$libro_p["id"]."').val();
                 $('#presupuesto_p".$libro_p["id"]."').val(".$libro_p["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+probab);
                 var total_vp_p=0;
@@ -752,6 +806,7 @@
               <td>Total</td>
               <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
               <td id="total_vp_p"></td>
+              <td id="total_vp_aj_p"></td>
               <td></td><td></td>
             </tr>
           </tfoot>
@@ -797,6 +852,7 @@
   </div>
 </div>
 
+<script>var librosYaEnPresup = <?= json_encode($ids_exist_presup) ?>;</script>
 <script src="../vendors/scripts/core.js"></script>
 <script src="../src/plugins/datatables/js/jquery.dataTables.min.js"></script>
 <script src="../src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
@@ -989,14 +1045,49 @@
     });
     $('#total_vp_p').text(formatNumber.new(total_vp_p));
 
+    var total_vp_aj_p=0;
+    $('.venta1_aj_p').each(function(){
+        total_vp_aj_p+=parseFloat($(this).val()) || 0;
+        total_vp_aj_p=Math.round(total_vp_aj_p * 100) / 100;
+    });
+    $('#total_vp_aj_p').text(formatNumber.new(total_vp_aj_p));
+
     // ── Toast ───────────────────────────────────────────────────
     function prToast(msg, tipo) {
         var $t = $('#pr-toast');
-        $t.removeClass('ok error').addClass(tipo)
-          .find('.pr-toast-msg').text(msg);
+        var icon = tipo === 'error' ? 'bi bi-x-circle-fill' : 'bi bi-check-circle-fill';
+        $t.removeClass('ok error').addClass(tipo);
+        $t.find('i').attr('class', icon);
+        $t.find('.pr-toast-msg').text(msg);
         $t.addClass('show');
         setTimeout(function(){ $t.removeClass('show'); }, 3500);
     }
+
+    // ── Validar duplicados al guardar libros en presupuesto ──────
+    $('#modal_presupuesto form.miFormulario').on('submit', function(e) {
+        var ids = [];
+        var errMsg = '';
+        $('input[name="libs_ao[]"]').each(function() {
+            var val = $(this).val();
+            if (!val) return;
+            var libroId = val.split('/')[2];
+            if (!libroId || libroId === '0') return;
+            if (ids.indexOf(libroId) !== -1) {
+                errMsg = 'Hay libros repetidos en el formulario';
+                return false;
+            }
+            if (librosYaEnPresup.indexOf(parseInt(libroId)) !== -1) {
+                errMsg = 'Uno de los libros ya existe en el presupuesto';
+                return false;
+            }
+            ids.push(libroId);
+        });
+        if (errMsg) {
+            e.preventDefault();
+            prToast(errMsg, 'error');
+            return false;
+        }
+    });
 
     // ── Modal de confirmación ────────────────────────────────────
     var _prConfirmCb = null;

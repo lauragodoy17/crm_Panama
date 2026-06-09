@@ -183,8 +183,8 @@ $objSpreadsheet->getActiveSheet()->getStyle('I10')->applyFromArray($estilo_borde
 $objSpreadsheet->getActiveSheet()->getStyle('J10')->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('K10')->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('L10')->applyFromArray($estilo_borde);
-/*$objSpreadsheet->getActiveSheet()->getStyle('M10')->applyFromArray($estilo_borde);
-$objSpreadsheet->getActiveSheet()->getStyle('N10')->applyFromArray($estilo_borde);*/
+$objSpreadsheet->getActiveSheet()->getStyle('M10')->applyFromArray($estilo_borde);
+/*$objSpreadsheet->getActiveSheet()->getStyle('N10')->applyFromArray($estilo_borde);*/
 $objSpreadsheet->getActiveSheet()->getStyle('F11')->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('G11')->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('H11')->applyFromArray($estilo_borde);
@@ -204,8 +204,8 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("I11", "VENTA BRUTA");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J11", "PRECIO FACTURACIÓN");
 $objSpreadsheet->getActiveSheet()->SetCellValue("K10", "VENTA ESTIMADA");
 $objSpreadsheet->getActiveSheet()->SetCellValue("L10", "PROBABILIDAD");
-/*$objSpreadsheet->getActiveSheet()->SetCellValue("M10", "PRECIO \n VENTA F");
-$objSpreadsheet->getActiveSheet()->SetCellValue("N10", "VENTA \n REAL");
+$objSpreadsheet->getActiveSheet()->SetCellValue("M10", "VENTA AJUSTADA");
+/*$objSpreadsheet->getActiveSheet()->SetCellValue("N10", "VENTA \n REAL");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O10", "DIFEREN \n CIA");*/
 
 
@@ -262,7 +262,7 @@ foreach($adopciones as $adopcion) {
     $req_gp->execute();
     $gp = $req_gp->fetch();
 
-   	$sql_pro = "SELECT probabilidad FROM probabilidades WHERE id='".$adopcion["probabilidad"]."'";
+   	$sql_pro = "SELECT probabilidad, valor FROM probabilidades WHERE id='".$adopcion["probabilidad"]."'";
 	$req_pro = $bdd->prepare($sql_pro);
 	$req_pro->execute();
 	$probab = $req_pro->fetch();
@@ -277,6 +277,9 @@ foreach($adopciones as $adopcion) {
     $venta_estimada=$precio_fact * $comp_activos;
     $venta_real= $adopcion["precio_venta_final"] * $comp_activos;
     $diferencia=$venta_real - $venta_estimada;
+    $prob_valor = ($probab && isset($probab["valor"])) ? floatval($probab["valor"]) : 0;
+    $venta_ajustada = $venta_estimada * ($prob_valor / 100);
+    $venta_ajustada1 = number_format($venta_ajustada, 0, ",", ".");
 
     $objSpreadsheet->getActiveSheet()->getStyle('A'.$conta)->applyFromArray($estilo_borde);
 	$objSpreadsheet->getActiveSheet()->getStyle('B'.$conta)->applyFromArray($estilo_borde);
@@ -290,8 +293,8 @@ foreach($adopciones as $adopcion) {
 	$objSpreadsheet->getActiveSheet()->getStyle('J'.$conta)->applyFromArray($estilo_borde);
 	$objSpreadsheet->getActiveSheet()->getStyle('K'.$conta)->applyFromArray($estilo_borde);
 	$objSpreadsheet->getActiveSheet()->getStyle('L'.$conta)->applyFromArray($estilo_borde);
-	/*$objSpreadsheet->getActiveSheet()->getStyle('M'.$conta)->applyFromArray($estilo_borde);
-	$objSpreadsheet->getActiveSheet()->getStyle('N'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('M'.$conta)->applyFromArray($estilo_borde);
+	/*$objSpreadsheet->getActiveSheet()->getStyle('N'.$conta)->applyFromArray($estilo_borde);
 	$objSpreadsheet->getActiveSheet()->getStyle('O'.$conta)->applyFromArray($estilo_borde);*/
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$adopcion[libro]");
@@ -350,8 +353,9 @@ foreach($adopciones as $adopcion) {
 	}else{
 		$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$probab[probabilidad]");
 	}
-	
-	/*$objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$$p_final");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$$venta_ajustada1");
+
+	/*$objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$$p_final");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$$venta_real1");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$$diferencia1");*/
 
@@ -368,6 +372,7 @@ foreach($adopciones as $adopcion) {
 		$t_compradores[]=$comp_activos;
 		$t_venta_bruta[]=$venta_bruta;
 		$t_venta_estimada[]=$venta_estimada;
+		$t_venta_ajustada[]=$venta_ajustada;
 		$t_venta_real[]=$venta_real;
 		$t_diferencia[]=$diferencia;
 	}
@@ -426,12 +431,14 @@ $objSpreadsheet->getActiveSheet()->getStyle('I'.$conta)->applyFromArray($estilo_
 $objSpreadsheet->getActiveSheet()->getStyle('J'.$conta)->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('K'.$conta)->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('L'.$conta)->applyFromArray($estilo_borde);
-/*$objSpreadsheet->getActiveSheet()->getStyle('M'.$conta)->applyFromArray($estilo_borde);
-$objSpreadsheet->getActiveSheet()->getStyle('N'.$conta)->applyFromArray($estilo_borde);
+$objSpreadsheet->getActiveSheet()->getStyle('M'.$conta)->applyFromArray($estilo_borde);
+/*$objSpreadsheet->getActiveSheet()->getStyle('N'.$conta)->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('O'.$conta)->applyFromArray($estilo_borde);*/
 
 $t_venta_bruta=number_format($t_venta_bruta,0,",", ".");
 $t_venta_estimada=number_format($t_venta_estimada,0,",", ".");
+$t_venta_ajustada=array_sum($t_venta_ajustada ?? []);
+$t_venta_ajustada=number_format($t_venta_ajustada,0,",", ".");
 $t_venta_real=number_format($t_venta_real,0,",", ".");
 $t_diferencia=number_format($t_diferencia,0,",", ".");
 
@@ -441,7 +448,8 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$t_alumnos");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$t_compradores");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$$t_venta_bruta");
 $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$$t_venta_estimada");
-/*$objSpreadsheet->getActiveSheet()->SetCellValue("n$conta", "$$t_venta_real");
+$objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$$t_venta_ajustada");
+/*$objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$$t_venta_real");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$$t_diferencia");*/
 
 
