@@ -336,7 +336,7 @@ $(document).ready(function () {
   });
 
   table = $('#lm-table').DataTable({
-    responsive: { details: false },
+    scrollX: true,
     autoWidth:  false,
     order:      [[0, 'desc']],
     language: {
@@ -363,5 +363,6 @@ $(document).ready(function () {
   });
 });
 </script>
+<script src="src/ink-alerts.js"></script>
 </body>
 </html>
