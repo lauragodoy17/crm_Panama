@@ -59,7 +59,7 @@
     .mc-card-val   { font-size:.9rem; font-weight:700; color:#0f172a; margin:0; }
 
     /* ── Tabla ──────────────────────────────────────── */
-    .mc-table-wrap { border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(15,23,42,.09); margin-bottom:24px; }
+    .mc-table-wrap { border-radius:10px; overflow-x:auto; box-shadow:0 2px 10px rgba(15,23,42,.09); margin-bottom:24px; }
     #mc-table { width:100%; font-size:.83rem; border-collapse:collapse; }
     #mc-table thead th {
       background:#f8fafc; color:#374151; font-weight:600;
@@ -271,10 +271,10 @@
                   <th>Materia</th>
                   <th>Grado</th>
                   <?php if (isset($_GET["id_pedido"])): ?>
-                    <th>Cant. solicitada</th>
-                    <th>Cant. aprobada</th>
+                    <th>Cantidad solicitada</th>
+                    <th>Cantidad aprobada</th>
                   <?php else: ?>
-                    <th>Cant. entregada</th>
+                    <th>Cantidad entregada</th>
                   <?php endif; ?>
                 </tr>
               </thead>
@@ -352,11 +352,31 @@
   <script src="vendors/scripts/layout-settings.js"></script>
   <script>
     $("#rechazar").click(function(){
-      window.location = "php/accion_muestreo.php?rechazar=<?= $_GET['id_pedido'] ?? '' ?>";
+      inkConfirm({
+        title: '¿Rechazar este muestreo?',
+        text:  'El muestreo pasará al estado Rechazado.',
+        type:  'danger',
+        btnOk: 'Sí, rechazar'
+      }, function(){
+        window.location = "php/accion_muestreo.php?rechazar=<?= $_GET['id_pedido'] ?? '' ?>";
+      });
     });
+
+    $("#form_aprobar").on('submit', function(e){
+      e.preventDefault();
+      var form = this;
+      inkConfirm({
+        title: '¿Aprobar este muestreo?',
+        text:  'Se registrarán las cantidades aprobadas y el muestreo quedará en estado Aprobado.',
+        type:  'info',
+        btnOk: 'Sí, aprobar'
+      }, function(){ form.submit(); });
+    });
+
     $("#imprimir").click(function(){
       window.print();
     });
   </script>
+<script src="src/ink-alerts.js"></script>
 </body>
 </html>

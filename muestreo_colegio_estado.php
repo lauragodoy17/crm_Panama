@@ -65,7 +65,7 @@
     .mc-op-badge a { color: #b45309; font-weight: 700; text-decoration: underline; }
 
     /* ── Tabla ──────────────────────────────────────── */
-    .mc-table-wrap { border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(15,23,42,.09); margin-bottom:24px; }
+    .mc-table-wrap { border-radius:10px; overflow-x:auto; box-shadow:0 2px 10px rgba(15,23,42,.09); margin-bottom:24px; }
     #mc-table { width:100%; font-size:.83rem; border-collapse:collapse; }
     #mc-table thead th {
       background:#f8fafc; color:#374151; font-weight:600;
@@ -269,7 +269,7 @@
                 <th>Título</th>
                 <th>Cantidad</th>
                 <?php if ($pedido["id_estado"] == 2 || $pedido["id_estado"] == 4): ?>
-                  <th>Cant. aprobada</th>
+                  <th>Cantidad aprobada</th>
                 <?php endif; ?>
               </tr>
             </thead>

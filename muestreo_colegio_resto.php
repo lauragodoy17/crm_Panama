@@ -73,7 +73,7 @@
     .mc-op-badge a { color: #b45309; font-weight: 700; text-decoration: underline; }
 
     /* ── Tabla ──────────────────────────────────────── */
-    .mc-table-wrap { border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(15,23,42,.09); margin-bottom:24px; }
+    .mc-table-wrap { border-radius:10px; overflow-x:auto; box-shadow:0 2px 10px rgba(15,23,42,.09); margin-bottom:24px; }
     #mc-table { width:100%; font-size:.83rem; border-collapse:collapse; }
     #mc-table thead th {
       background:#f8fafc; color:#374151; font-weight:600;
@@ -299,10 +299,10 @@
                 <th>Materia</th>
                 <th>Grado</th>
                 <?php if (isset($_GET["id_pedido"])): ?>
-                  <th>Cant. solicitada</th>
-                  <th>Cant. aprobada</th>
+                  <th>Cantidad solicitada</th>
+                  <th>Cantidad aprobada</th>
                 <?php else: ?>
-                  <th>Cant. entregada</th>
+                  <th>Cantidad entregada</th>
                 <?php endif; ?>
               </tr>
             </thead>
@@ -379,11 +379,19 @@
   <script>
     $("#entregar").click(function(){
       var factura = $("#factura").val();
-      window.location = "php/accion_muestreo.php?entregado=<?= $_GET['id_pedido'] ?? '' ?>&factura=" + factura;
+      inkConfirm({
+        title: '¿Despachar este muestreo?',
+        text:  'El muestreo pasará al estado Despachado.',
+        type:  'info',
+        btnOk: 'Sí, despachar'
+      }, function(){
+        window.location = "php/accion_muestreo.php?entregado=<?= $_GET['id_pedido'] ?? '' ?>&factura=" + factura;
+      });
     });
     $("#imprimir").click(function(){
       window.print();
     });
   </script>
+<script src="src/ink-alerts.js"></script>
 </body>
 </html>
