@@ -39,26 +39,6 @@
         margin: 2px 0 0;
         font-weight: 400;
       }
-      .sm-hist-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #4361ee;
-        border: 1.5px solid #c7d2fe;
-        background: #eff6ff;
-        border-radius: 8px;
-        padding: 7px 14px;
-        text-decoration: none;
-        transition: background .15s, border-color .15s;
-      }
-      .sm-hist-btn:hover {
-        background: #e0e7ff;
-        border-color: #a5b4fc;
-        color: #3451d1;
-        text-decoration: none;
-      }
 
       .sm-section {
         background: #fff;
@@ -227,11 +207,6 @@
                     </li>
                   </ol>
                 </nav>
-              </div>
-              <div class="col-md-4 col-sm-12 text-right">
-                <a href="ver_muestreo.php" class="sm-hist-btn">
-                  <i class="bi bi-clock-history"></i> Historial de muestras
-                </a>
               </div>
             </div>
           </div>
