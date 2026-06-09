@@ -17,8 +17,6 @@ if ($_SESSION['zona']=='5656' || ($_SESSION["tipo"]!=3 && $_SESSION["tipo"]!=6 &
 $total_colegios   = $bdd->query("SELECT COUNT(*) FROM colegios WHERE $where_stats")->fetchColumn();
 $total_zonas      = $bdd->query("SELECT COUNT(DISTINCT cod_zona) FROM colegios WHERE $where_stats AND cod_zona != 0")->fetchColumn();
 $total_deptos     = $bdd->query("SELECT COUNT(DISTINCT departamento) FROM colegios WHERE $where_stats")->fetchColumn();
-$con_responsable  = $bdd->query("SELECT COUNT(*) FROM colegios WHERE $where_stats AND responsable IS NOT NULL AND responsable != ''")->fetchColumn();
-$pct_asignados    = $total_colegios > 0 ? round(($con_responsable / $total_colegios) * 100, 1) : 0;
 
 // Datos para filtros
 if ($_SESSION['tipo'] == 3) {
@@ -108,7 +106,7 @@ if ($show_resp_filter) {
                 <div class="title"><h4>Zonificación</h4></div>
                 <nav aria-label="breadcrumb">
                   <ol class="breadcrumb">
-                    <li class="breadcrumb-item">Zonificación</li>
+                    <li class="breadcrumb-item"><a href="index.php">Inicio</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Ver colegios</li>
                   </ol>
                 </nav>
@@ -124,8 +122,9 @@ if ($show_resp_filter) {
           </div>
 
           <!-- Tarjetas de estadísticas -->
+          <?php $col_stat = ($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 6) ? 'col-xl-6 col-lg-6 col-md-6' : 'col-xl-4 col-lg-4 col-md-6'; ?>
           <div class="row">
-            <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="<?= $col_stat ?>">
               <div class="stat-card-modern">
                 <div class="stat-icon-modern sblue"><i class="bi bi-building"></i></div>
                 <div class="stat-info-modern">
@@ -136,7 +135,7 @@ if ($show_resp_filter) {
               </div>
             </div>
             <?php if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 6): ?>
-            <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="<?= $col_stat ?>">
               <div class="stat-card-modern">
                 <div class="stat-icon-modern sorange"><i class="bi bi-map"></i></div>
                 <div class="stat-info-modern">
@@ -147,7 +146,7 @@ if ($show_resp_filter) {
               </div>
             </div>
             <?php endif; ?>
-            <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="<?= $col_stat ?>">
               <div class="stat-card-modern">
                 <div class="stat-icon-modern sgreen"><i class="bi bi-geo-alt"></i></div>
                 <div class="stat-info-modern">
@@ -157,18 +156,6 @@ if ($show_resp_filter) {
                 </div>
               </div>
             </div>
-            <?php if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 6): ?>
-            <div class="col-xl-3 col-lg-6 col-md-6">
-              <div class="stat-card-modern">
-                <div class="stat-icon-modern spurple"><i class="bi bi-person-check"></i></div>
-                <div class="stat-info-modern">
-                  <h3><?= $pct_asignados ?>%</h3>
-                  <p class="stat-label">Colegios asignados</p>
-                  <span class="stat-sub">Con responsable definido</span>
-                </div>
-              </div>
-            </div>
-            <?php endif; ?>
           </div>
 
           <!-- Barra de filtros -->
@@ -407,6 +394,7 @@ if ($show_resp_filter) {
             language: {
                 lengthMenu:   "Mostrar _MENU_ registros",
                 zeroRecords:  "No se encontraron resultados",
+                emptyTable:   "No hay información para mostrar",
                 info:         "Mostrando _START_ a _END_ de _TOTAL_ registros",
                 infoEmpty:    "Sin registros disponibles",
                 infoFiltered: "(filtrado de _MAX_ registros)",

@@ -584,6 +584,9 @@
           </td>
         </tr>
         <?php endforeach; ?>
+        <?php if (empty($solicitudes)): ?>
+        <tr><td colspan="7" class="tbl-empty"><i class="bi bi-inbox"></i>No hay información para mostrar</td></tr>
+        <?php endif; ?>
       </tbody>
     </table>
   </div>

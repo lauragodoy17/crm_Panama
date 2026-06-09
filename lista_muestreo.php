@@ -224,6 +224,7 @@
           "language": {
             "lengthMenu": "Display _MENU_ registros por página",
             "zeroRecords": "Nada encontrado, lo siento",
+            "emptyTable": "No hay información para mostrar",
             "info": "Mostrando página _PAGE_ de _PAGES_",
             "infoEmpty": "No hay registros disponibles",
             "infoFiltered": "(filtrado de _MAX_ registros en total )",

@@ -75,8 +75,8 @@
               <div class="title"><h4>Crear colegio</h4></div>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item">Zonificación</li>
-                  <li class="breadcrumb-item active">Crear colegio</li>
+                  <li class="breadcrumb-item"><a href="ver_colegios.php">Zonificación</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Crear colegio</li>
                 </ol>
               </nav>
             </div>

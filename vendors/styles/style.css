@@ -34,7 +34,6 @@ body,html{-webkit-font-smoothing:antialiased;width:100%;height:100%}html{-webkit
 .filter-toolbar .ft-btn.ft-apply:hover{background:#3a51d4}
 .filter-toolbar .ft-btn.ft-clear{background:#edf2f7;color:#4a5568}
 .filter-toolbar .ft-btn.ft-clear:hover{background:#e2e8f0}
-
 /* Contenedor tabla moderno */
 .modern-card{background:#fff;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.04);overflow:hidden;margin-bottom:24px}
 .modern-card .card-head{padding:16px 20px;border-bottom:1px solid #f0f4f8;display:flex;align-items:center;justify-content:space-between}
@@ -229,5 +228,18 @@ body,html{-webkit-font-smoothing:antialiased;width:100%;height:100%}html{-webkit
 }
 
 /* Ajuste header y contenedor principal para sidebar de 260px */
+.tbl-empty {
+  text-align: center !important;
+  padding: 40px 20px !important;
+  color: #9ca3af;
+  font-size: 14px;
+}
+.tbl-empty i {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: #d1d5db;
+}
+
 @media(min-width:1301px){.header{width:calc(100% - 260px)!important}.main-container{padding-left:280px!important}}
 @media (min-width:1301px) and (max-width:1400px){.header{width:calc(100% - 250px)}.brand-logo,.left-side-bar{width:250px}.main-container{padding-left:270px}}@media (min-width:1200px) and (max-width:1400px){.device-usage-chart .width-50-p{width:100%}}@media (min-width:1301px){.sidebar-shrink .left-side-bar,.sidebar-shrink .left-side-bar.open{left:-281px}.sidebar-shrink .header{width:100%}.sidebar-shrink .main-container{padding-left:20px}}@media (max-width:1300px){.main-container{padding-left:5px;padding-right:5px}.header-left .menu-icon{display:-webkit-box;display:-ms-flexbox;display:flex}.header{width:100%}.left-side-bar{left:-281px}.left-side-bar .close-sidebar{display:block}.left-side-bar:before{display:block;opacity:0;visibility:hidden}.left-side-bar.open:before{opacity:1;visibility:visible;display:none}.left-side-bar .brand-logo a{text-align:left;padding:5px 15px}.left-side-bar .brand-logo a .svg,.left-side-bar .brand-logo a img{margin:0}.header-right .brand-logo{display:table}.header-right .menu-icon{display:block;padding-left:15px;padding-top:7px}.footer-wrap{width:100%}.mobile-menu-overlay{display:block;opacity:0;visibility:hidden}.mobile-menu-overlay.show{opacity:.6;visibility:visible}}@media (min-width:1025px){.header-left .header-search{display:block!important}}@media (max-width:1024px){.header{position:relative}.header-left{width:25%}.header-right{width:75%}.main-container{padding-top:10px}.header-left .search-toggle-icon{display:-webkit-box;display:-ms-flexbox;display:flex}.header-left .header-search{padding:15px 20px;position:absolute;left:0;top:100%;background:#fff;display:none}.register-page-wrap .wizard-content .wizard{padding-left:300px}.register-page-wrap .wizard-content .wizard .steps{width:300px}}@media (max-width:991px){.device-usage-chart .width-50-p{width:100%}}@media (max-width:767px){.header{position:fixed;left:0;top:0;-webkit-box-shadow:0 5px 25px rgba(0,0,0,.1);box-shadow:0 5px 25px rgba(0,0,0,.1)}.main-container{padding-top:80px}.login-box{padding:40px 15px}.login-header .brand-logo a img{max-width:150px}.pre-loader{background-size:43%}.xs-pd-20-10{padding:20px 10px}.xs-mb-20{margin-bottom:20px}.h1,h1{font-size:2rem}.h2,h2{font-size:1.6rem}.h4,h4{font-size:1.4rem}.main-container,.timeline ul li{padding-bottom:0}.footer-wrap{position:relative;height:auto}.user-notification{margin-right:5px}.user-notification .dropdown-menu{width:100%;min-width:300px}.user-info-dropdown .dropdown-toggle .user-name{display:none}.page-header{margin-bottom:30px}.forgot-password{text-align:center}.ionicons-list li{width:16.6%}.timeline .timeline-date{position:relative;top:0;margin-bottom:20px;left:35px}.timeline ul:before{left:10px}.timeline ul li{padding-left:0}.timeline ul li:before{left:2px;top:28px}.fc-toolbar .fc-left,.fc-toolbar .fc-right{float:none!important;padding-bottom:10px}.fc-toolbar .fc-left:after,.fc-toolbar .fc-right:after{content:"";clear:both;display:table}.faq-wrap .card-header .btn{font-size:17px}.error-page h1{font-size:150px}}@media (max-width:660px){.docs-buttons .btn-group-crop{display:block}.select-role .btn-group .btn{padding-left:35px;font-size:14px}.select-role .btn-group .btn .icon{left:5px;width:25px;height:25px}.select-role .btn-group .btn .icon .svg{width:25px;height:25px}.forgot-password a{font-size:14px;font-weight:600}.btn-group-lg>.btn,.btn-lg{font-size:16px}.register-page-wrap .wizard-content .wizard{padding-left:0}.register-page-wrap .wizard-content .wizard .steps{display:none}}
