@@ -320,7 +320,7 @@
     <div class="ad-card">
       <div class="ad-card-icon blue"><i class="bi bi-book"></i></div>
       <div>
-        <p class="ad-card-label">Adopciones</p>
+        <p class="ad-card-label">Total de títulos adoptados</p>
         <p class="ad-card-val"><?= $total_adoptados ?></p>
       </div>
     </div>
