@@ -83,12 +83,13 @@
     border-collapse: collapse;
   }
   #tabla-atenciones thead th {
-    background: #0f172a;
-    color: #e2e8f0;
+    background: #f8fafc;
+    color: #374151;
     font-weight: 600;
     padding: 11px 12px;
     text-align: left;
     border: none;
+    border-bottom: 2px solid #e2e8f0;
     white-space: nowrap;
     font-size: 0.80rem;
   }

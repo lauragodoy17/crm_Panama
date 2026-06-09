@@ -58,13 +58,14 @@
     min-width: 1000px;
   }
   #tabla-presup thead th {
-    background: #0f172a;
-    color: #e2e8f0;
+    background: #f8fafc;
+    color: #374151;
     font-weight: 600;
     padding: 11px 8px;
     text-align: center;
     white-space: nowrap;
     border: none;
+    border-bottom: 2px solid #e2e8f0;
     font-size: 0.80rem;
     letter-spacing: .02em;
     position: sticky;
@@ -136,9 +137,10 @@
     padding: 10px 8px;
     font-weight: 700;
     font-size: 0.85rem;
-    background: #0f172a;
-    color: #f1f5f9;
+    background: #f8fafc;
+    color: #374151;
     border: none;
+    border-top: 2px solid #e2e8f0;
     text-align: center;
   }
   #tabla-presup tfoot td:first-child { text-align: left; padding-left: 14px; }

@@ -88,12 +88,13 @@
     .vs-table-wrap { border-radius: 10px; overflow: hidden; box-shadow: 0 1px 8px rgba(15,23,42,.09); margin-bottom: 20px; }
     .vs-table { width: 100%; font-size: 0.82rem; border-collapse: collapse; }
     .vs-table thead th {
-      background: #0f172a;
-      color: #e2e8f0;
+      background: #f8fafc;
+      color: #374151;
       font-weight: 600;
       padding: 10px 12px;
       text-align: left;
       border: none;
+      border-bottom: 2px solid #e2e8f0;
       white-space: nowrap;
       font-size: 0.79rem;
     }
@@ -101,7 +102,7 @@
     .vs-table tbody tr { background: #fff; }
     .vs-table tbody tr:nth-child(even) { background: #f8fafc; }
     .vs-table tbody td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
-    .vs-table tfoot td { padding: 9px 12px; font-weight: 700; font-size: 0.83rem; background: #0f172a; color: #f1f5f9; border: none; }
+    .vs-table tfoot td { padding: 9px 12px; font-weight: 700; font-size: 0.83rem; background: #f8fafc; color: #374151; border: none; border-top: 2px solid #e2e8f0; }
 
     /* inputs dentro de tabla */
     .vs-table input[type="text"],

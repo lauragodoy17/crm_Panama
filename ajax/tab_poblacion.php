@@ -110,14 +110,14 @@
     box-shadow:0 1px 8px rgba(15,23,42,.09);
   }
   #tabla-pob thead th {
-    background:#0f172a; color:#e2e8f0;
+    background:#f8fafc; color:#374151;
     font-weight:600; padding:9px 10px;
     text-align:center; white-space:nowrap;
-    border:1px solid rgba(255,255,255,.1);
+    border:none; border-bottom:2px solid #e2e8f0;
     font-size:0.79rem; letter-spacing:.03em;
   }
   #tabla-pob thead th.th-grado { text-align:left; padding-left:14px; min-width:100px; }
-  #tabla-pob thead th.th-total { background:#1e293b; }
+  #tabla-pob thead th.th-total { background:#f0f4f8; }
 
   /* filas por nivel */
   #tabla-pob tbody tr.nivel-pre  td.td-grado { border-left:3px solid #f6a935; background:#fffbf0; }
@@ -155,11 +155,11 @@
   /* tfoot */
   #tabla-pob tfoot td {
     padding:8px 8px; font-weight:700; font-size:0.83rem;
-    border:1px solid rgba(255,255,255,.15);
-    text-align:center; background:#0f172a; color:#f1f5f9;
+    border:none; border-top:2px solid #e2e8f0;
+    text-align:center; background:#f8fafc; color:#374151;
   }
-  #tabla-pob tfoot td.tft-label { text-align:left; padding-left:14px; background:#1e293b; }
-  #tabla-pob tfoot td.tft-tot   { background:#1e293b; }
+  #tabla-pob tfoot td.tft-label { text-align:left; padding-left:14px; background:#f0f4f8; }
+  #tabla-pob tfoot td.tft-tot   { background:#f0f4f8; }
 
   /* ── Footer acciones ─────────────────────────────────────────── */
   .pob-footer { display:flex; justify-content:center; margin-top:20px; }
