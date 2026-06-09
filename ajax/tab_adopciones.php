@@ -360,6 +360,11 @@
   </div>
 
   <style>
+    .pr-toast { position:fixed; top:24px; right:24px; min-width:260px; padding:14px 20px; border-radius:10px; font-size:.87rem; font-weight:600; color:#fff; z-index:99999; box-shadow:0 6px 20px rgba(0,0,0,.18); display:flex; align-items:center; gap:10px; opacity:0; transform:translateY(-16px); transition:opacity .3s, transform .3s; pointer-events:none; }
+    .pr-toast.show  { opacity:1; transform:translateY(0); }
+    .pr-toast.ok    { background:#16a34a; }
+    .pr-toast.error { background:#dc2626; }
+    .pr-toast i { font-size:1.1rem; }
     .lb-modal .modal-content  { border:none; border-radius:12px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,.15); }
     .lb-modal .modal-header   { background:#fff; padding:18px 24px 14px; border-bottom:1px solid #e9ecef; }
     .lb-modal .modal-title    { font-size:16px; font-weight:700; color:#111827; margin:0 0 3px; }
@@ -557,6 +562,11 @@
         $req_hp->execute();
         $num_hp= $req_hp->rowCount();
 
+        $sql_exist_d = "SELECT DISTINCT id_libro_eureka FROM areas_objetivas WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$gp_periodo["id"]."'";
+        $req_exist_d = $bdd->prepare($sql_exist_d);
+        $req_exist_d->execute();
+        $ids_exist_adop = array_map('intval', array_column($req_exist_d->fetchAll(PDO::FETCH_ASSOC), 'id_libro_eureka'));
+
 		echo "<form action='php/guardar_definicion.php' class='miFormulario' method='POST' id='form_definicion' name='f2'>";
                               
             echo "<div class='ad-table-wrap mt-2'>
@@ -579,6 +589,7 @@
                   </tr>
                 </thead>
                 <tbody>";
+                    if (empty($libros_p)) echo '<tr><td colspan="13" class="tbl-empty"><i class="bi bi-inbox"></i>No hay información para mostrar</td></tr>';
                     foreach ($libros_p as $libro_p) {
 
                         if ($libro_p["id_grado"] == 15 || $libro_p["id_grado"] == 16 ) {
@@ -1509,6 +1520,7 @@
                        ?>
 	
 </div>
+<script>var librosYaEnAdop = <?= json_encode($ids_exist_adop) ?>;</script>
 <script src="../vendors/scripts/core.js"></script>
 <script src="../src/plugins/datatables/js/jquery.dataTables.min.js"></script>
 <script src="../src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
@@ -1814,6 +1826,48 @@
       }
     });
 
+    // ── Toast ────────────────────────────────────────────────────
+    function adToast(msg, tipo) {
+        var $t = $('#ad-toast');
+        var icon = tipo === 'error' ? 'bi bi-x-circle-fill' : 'bi bi-check-circle-fill';
+        $t.removeClass('ok error').addClass(tipo);
+        $t.find('i').attr('class', icon);
+        $t.find('.pr-toast-msg').text(msg);
+        $t.addClass('show');
+        setTimeout(function(){ $t.removeClass('show'); }, 3500);
+    }
+
+    // ── Validar duplicados al guardar libros en adopciones ───────
+    $('#modal_adopciones form.miFormulario').on('submit', function(e) {
+        var ids = [];
+        var errMsg = '';
+        $('input[name="libs_aod[]"]').each(function() {
+            var val = $(this).val();
+            if (!val) return;
+            var libroId = val.split('/')[2];
+            if (!libroId || libroId === '0') return;
+            if (ids.indexOf(libroId) !== -1) {
+                errMsg = 'Hay libros repetidos en el formulario';
+                return false;
+            }
+            if (librosYaEnAdop.indexOf(parseInt(libroId)) !== -1) {
+                errMsg = 'Uno de los libros ya existe en adopciones';
+                return false;
+            }
+            ids.push(libroId);
+        });
+        if (errMsg) {
+            e.preventDefault();
+            adToast(errMsg, 'error');
+            return false;
+        }
+    });
+
 </script>
+
+<div class="pr-toast" id="ad-toast">
+  <i class="bi bi-check-circle-fill"></i>
+  <span class="pr-toast-msg"></span>
+</div>
 
 </div><!-- /.ad-wrap -->

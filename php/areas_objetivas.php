@@ -1,6 +1,9 @@
 <?php 
 	require_once("aut.php");
 	require_once('../conexion/bdd.php');
+	require_once("registrar_historial.php");
+
+	$id_usuario_h = intval($_SESSION["id"] ?? 0);
 	
 		$sql_periodo="SELECT id FROM periodos WHERE id='".$_POST["periodo"]."'";
 
@@ -11,18 +14,23 @@
 
 		$libs_2=[];
 
-		
+
 
 		foreach ($_POST["libs_ao"] as $libros => $libro) {
 
 			if (empty($libro)) {
         		continue;
    			}
-   			
+
 			list($materia,$grado,$lib,$grado_otro) = explode("/", $libro);
 
-			if ($lib !=0) {
+			// Saltar si el libro ya existe en este colegio/periodo
+			$sql_dup = "SELECT id FROM areas_objetivas WHERE id_libro_eureka='".$lib."' AND id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$gp_periodo["id"]."'";
+			$req_dup = $bdd->prepare($sql_dup);
+			$req_dup->execute();
+			if ($req_dup->rowCount() > 0) continue;
 
+			if ($lib !=0) {
 
 				if ($grado != 17) {
 
@@ -70,7 +78,14 @@
 				 print_r($query_p->errorInfo());
 				 die ('Erreur execute');
 				}
-		
+
+				// Historial: log new adopted book
+				$req_lib_h = $bdd->prepare("SELECT libro FROM libros WHERE id=:id");
+				$req_lib_h->execute([':id' => $lib]);
+				$lib_h_row = $req_lib_h->fetch();
+				$lib_h_nombre = $lib_h_row ? $lib_h_row['libro'] : "Libro #$lib";
+				registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+					'Nuevo libro adoptado', '', $lib_h_nombre);
 
 				if ($grado== 15 || $grado ==16 ) {
 					$sq_l2 = "SELECT id FROM libros WHERE pri_sec='".$lib."'";
