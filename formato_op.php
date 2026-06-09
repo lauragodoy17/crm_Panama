@@ -60,7 +60,7 @@
 					<td><b>Tipo documento:</b> <?php echo $op["tipo"]. " (".$op["descrip"].")" ?></td>
 					<td><b>Número de documento:</b> <?php echo $op["n_doc"] ?></td>
 
-					<?php if ($op["doc_alterno"] != "") { ?>
+					<?php if (!empty($op["doc_alterno"])) { ?>
 						<td><b>Documento alterno:</b> <?php echo $op["doc_alterno"] ?></td>
 					<?php } ?>
 					
@@ -82,7 +82,8 @@
 			<b>Contacto:</b> <?php echo $op["solicitante"] ?><br>
 			<b>Ciudad destino:</b> <?php echo $op["ciudad_destino"] ?><br>
 			<?php if ($op["id_pedido"]==0) {
-				list($antes,$archivo)=explode("_", $op["archivo"]);
+				$partes = explode("_", $op["archivo"], 2);
+				$archivo = $partes[1] ?? $op["archivo"];
 			?>
 
 				<span class="d-print-none"> <b>Archivo Adjunto:</b> <a href="adjuntos/<?php echo $op["archivo"] ?>" style="cursor: pointer;" target="_blank" download="archivo"><?php echo $archivo ?></a><br><br></span>
