@@ -55,9 +55,14 @@ $estado_badge = [
     .ft-date-wrap    { display:flex; align-items:center; gap:6px; }
     .ft-date-label   { font-size:12px; color:#64748b; font-weight:600; white-space:nowrap; margin:0; }
     .lm-count-badge  { font-size:12px; color:#64748b; background:#f1f5f9; border-radius:20px; padding:3px 10px; font-weight:500; }
-    .dt-link-cole    { color:#4361ee; font-weight:500; text-decoration:none; }
-    .dt-link-cole:hover { text-decoration:underline; }
     .estado-badge    { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; }
+    .lm-btn-ver {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid #4361ee; color: #4361ee; background: transparent;
+      text-decoration: none; white-space: nowrap; transition: background .15s, color .15s;
+    }
+    .lm-btn-ver:hover { background: #4361ee; color: #fff; text-decoration: none; }
     .eb-1 { background:#fef3c7; color:#b45309; }
     .eb-2 { background:#dcfce7; color:#15803d; }
     .eb-3 { background:#fee2e2; color:#dc2626; }
@@ -141,6 +146,7 @@ $estado_badge = [
                 <th>Responsable</th>
                 <th>Colegio</th>
                 <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -168,12 +174,13 @@ $estado_badge = [
                 <td><?= $empresa ?></td>
                 <td><?= $n_zona ?></td>
                 <td><?= $resp ?></td>
+                <td><?= htmlspecialchars($p['colegio']) ?></td>
+                <td><span class="estado-badge <?= $e_cls ?>"><?= $e_nombre ?></span></td>
                 <td>
-                  <a href="muestreo_colegio_estado.php?id_pedido=<?= $p['id'] ?>" class="dt-link-cole">
-                    <?= htmlspecialchars($p['colegio']) ?>
+                  <a href="muestreo_colegio_estado.php?id_pedido=<?= $p['id'] ?>" class="lm-btn-ver">
+                    <i class="bi bi-eye"></i> Ver detalle
                   </a>
                 </td>
-                <td><span class="estado-badge <?= $e_cls ?>"><?= $e_nombre ?></span></td>
               </tr>
               <?php endforeach; ?>
             </tbody>

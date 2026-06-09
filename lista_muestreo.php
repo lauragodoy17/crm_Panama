@@ -13,6 +13,16 @@ $status_cfg = [
 ];
 $st = $status_cfg[$tp] ?? $status_cfg[2];
 
+// Paleta de color por estado: header, filas pares, hover, acento para botón y borde
+$st_accent = [
+  1 => ['hdr'=>'#5b21b6', 'even'=>'#faf5ff', 'hover'=>'#ede9fe', 'accent'=>'#6d28d9'],
+  2 => ['hdr'=>'#92400e', 'even'=>'#fffbeb', 'hover'=>'#fef3c7', 'accent'=>'#b45309'],
+  3 => ['hdr'=>'#166534', 'even'=>'#f0fdf4', 'hover'=>'#dcfce7', 'accent'=>'#16a34a'],
+  4 => ['hdr'=>'#1e40af', 'even'=>'#eff6ff', 'hover'=>'#dbeafe', 'accent'=>'#2563eb'],
+  5 => ['hdr'=>'#991b1b', 'even'=>'#fff1f2', 'hover'=>'#fee2e2', 'accent'=>'#b91c1c'],
+];
+$ac = $st_accent[$tp] ?? $st_accent[2];
+
 $gp_periodo = $bdd->query("SELECT id FROM periodos ORDER BY id DESC LIMIT 1")->fetch();
 
 if ($tp == 1) {
@@ -100,10 +110,29 @@ if ($tp != 1) {
     .lm-count-badge  { font-size:12px; color:#64748b; background:#f1f5f9; border-radius:20px; padding:3px 10px; font-weight:500; }
     .ft-date-wrap    { display:flex; align-items:center; gap:6px; }
     .ft-date-label   { font-size:12px; color:#64748b; font-weight:600; white-space:nowrap; margin:0; }
-    .dt-link-cole    { color:#4361ee; font-weight:500; text-decoration:none; }
-    .dt-link-cole:hover { text-decoration:underline; }
     .estado-badge    { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; }
     .eb-pending  { background:#fef3c7; color:#b45309; }
+    /* ── Color temático por estado ─────────────────────────────── */
+    #lm-table thead th {
+      background: <?= $ac['hdr'] ?> !important;
+      color: #fff !important;
+      font-weight: 600;
+      font-size: 0.80rem;
+      padding: 11px 12px;
+      white-space: nowrap;
+      border: none;
+    }
+    #lm-table tbody tr:nth-child(even) td { background: <?= $ac['even'] ?>; }
+    #lm-table tbody tr:hover td           { background: <?= $ac['hover'] ?> !important; }
+    #lm-table tbody tr                    { border-left: 3px solid transparent; transition: border-color .15s; }
+    #lm-table tbody tr:hover              { border-left-color: <?= $ac['accent'] ?>; }
+    .lm-btn-ver {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid <?= $ac['accent'] ?>; color: <?= $ac['accent'] ?>; background: transparent;
+      text-decoration: none; white-space: nowrap; transition: background .15s, color .15s;
+    }
+    .lm-btn-ver:hover { background: <?= $ac['accent'] ?>; border-color: <?= $ac['accent'] ?>; color: #fff; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -227,6 +256,7 @@ if ($tp != 1) {
                 <th>Zona</th>
                 <th>Responsable</th>
                 <th>Colegio</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -246,6 +276,9 @@ if ($tp != 1) {
                 }
                 $fecha_d = date('d/m/Y', strtotime($p['fecha']));
                 $fecha_r = substr($p['fecha'], 0, 10);
+                $url_detalle = ($tp == 2)
+                  ? "muestreo_colegio.php?id_pedido={$p['id']}"
+                  : "muestreo_colegio_resto.php?id_pedido={$p['id']}&tp={$tp}";
               ?>
               <tr data-date="<?= $fecha_r ?>" data-zona="<?= htmlspecialchars($zona_d) ?>">
                 <td><?= $p['id'] ?></td>
@@ -253,12 +286,11 @@ if ($tp != 1) {
                 <td><?= $empresa ?></td>
                 <td><?= $n_zona ?></td>
                 <td><?= $resp ?></td>
+                <td><?= htmlspecialchars($p['colegio']) ?></td>
                 <td>
-                  <?php if ($tp == 2): ?>
-                  <a href="muestreo_colegio.php?id_pedido=<?= $p['id'] ?>" class="dt-link-cole"><?= htmlspecialchars($p['colegio']) ?></a>
-                  <?php else: ?>
-                  <a href="muestreo_colegio_resto.php?id_pedido=<?= $p['id'] ?>&tp=<?= $tp ?>" class="dt-link-cole"><?= htmlspecialchars($p['colegio']) ?></a>
-                  <?php endif; ?>
+                  <a href="<?= $url_detalle ?>" class="lm-btn-ver">
+                    <i class="bi bi-eye"></i> Ver detalle
+                  </a>
                 </td>
               </tr>
               <?php endforeach; ?>
