@@ -22,6 +22,9 @@
 	$colegio = $_POST['cole'];
 	//$objetivo = $_POST['objetivo'];
 
+	$bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	try {
+
 	do {
 	    $caracteres = "1234567890"; //posibles caracteres a usar
 	    $numerodeletras=10; //numero de letras para generar el texto
@@ -47,6 +50,8 @@
 
 
 	foreach ($_POST["libro_e"] as $libros => $libro) {
+
+		if (empty($libro) || strpos($libro, '/') === false) continue;
 
 		list($id_libro,$cantidad) = explode("/", $libro);
 				
@@ -210,6 +215,16 @@
 
 
 
-	header('Location: '.$_SERVER['HTTP_REFERER']);
+	$_ref = $_SERVER['HTTP_REFERER'] ?? '../solicitar_muestreo.php?tp=1';
+	$_sep = strpos($_ref, '?') !== false ? '&' : '?';
+	header('Location: ' . $_ref . $_sep . 'status=ok');
+	exit;
+
+	} catch (Exception $e) {
+		$_ref = $_SERVER['HTTP_REFERER'] ?? '../solicitar_muestreo.php?tp=1';
+		$_sep = strpos($_ref, '?') !== false ? '&' : '?';
+		header('Location: ' . $_ref . $_sep . 'status=error');
+		exit;
+	}
 
 ?>
