@@ -1,6 +1,9 @@
 <?php
 	require_once("../php/aut.php");
 	include("../conexion/bdd.php");
+	require_once("registrar_historial.php");
+
+	$id_usuario_h = intval($_SESSION["id"] ?? 0);
 
 	$sql_y = "SELECT 
 			    CASE 
@@ -80,11 +83,27 @@
 
 			$row_cod = $req_cod->fetch();
 
+			// Fetch old values and book name for historial
+			if ($row_cod["id_grado_otro"] == 0) {
+				$req_old_d = $bdd->prepare("SELECT precio, precio_venta_final, tasa_compra_d, descuento_d FROM presupuestos WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND id_libro='".$libro."'");
+				$req_lib_d = $bdd->prepare("SELECT libro FROM libros WHERE id=:id");
+				$req_lib_d->execute([':id' => $libro]);
+			} else {
+				$req_old_d = $bdd->prepare("SELECT precio, precio_venta_final, tasa_compra_d, descuento_d FROM presupuestos WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND cod_area='".$row_cod["codigo"]."'");
+				$req_lib_d = $bdd->prepare("SELECT l.libro FROM libros l JOIN areas_objetivas a ON l.id=a.id_libro_eureka WHERE a.codigo='".$libro."'");
+				$req_lib_d->execute();
+			}
+			$req_old_d->execute();
+			$old_d = $req_old_d->fetch();
+			if (isset($req_lib_d) && $row_cod["id_grado_otro"] == 0) $req_lib_d->execute([':id' => $libro]);
+			$lib_d_row = isset($req_lib_d) ? $req_lib_d->fetch() : false;
+			$lib_d_nombre = $lib_d_row ? $lib_d_row['libro'] : "Libro $libro";
+
 			if ($row_cod["id_grado_otro"] == 0) {
 				$sql_e = "UPDATE presupuestos SET  tasa_compra_d='".$tasa_c."',descuento_d='".$descuento."', precio='".$precio."', precio_venta_final='".$precio_padre."' WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND id_libro='".$libro."'";
 
 			}else{
-				
+
 				$sql_e = "UPDATE presupuestos SET  tasa_compra_d='".$tasa_c."',descuento_d='".$descuento."', precio='".$precio."', precio_venta_final='".$precio_padre."' WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND cod_area='".$row_cod["codigo"]."'";
 			}
 
@@ -97,6 +116,26 @@
 			if ($sth_e == false) {
 				print_r($query_e->errorInfo());
 				die ('Erreur execute');
+			}
+
+			// Historial
+			if ($old_d) {
+				if (abs((float)($old_d['tasa_compra_d'] ?? 0) - (float)$tasa_c) > 0.0001) {
+					$tc_old_pct = round((float)($old_d['tasa_compra_d'] ?? 0) * 100, 2) . '%';
+					$tc_new_pct = round((float)$tasa_c * 100, 2) . '%';
+					registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+						"Tasa de compra - $lib_d_nombre", $tc_old_pct, $tc_new_pct);
+				}
+				if (abs((float)($old_d['descuento_d'] ?? 0) - (float)$descuento) > 0.0001) {
+					$desc_old_pct = round((float)($old_d['descuento_d'] ?? 0) * 100, 2) . '%';
+					$desc_new_pct = round((float)$descuento * 100, 2) . '%';
+					registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+						"Descuento - $lib_d_nombre", $desc_old_pct, $desc_new_pct);
+				}
+				if (abs((float)($old_d['precio_venta_final'] ?? 0) - (float)$precio_padre) > 0.0001) {
+					registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+						"Precio venta padre - $lib_d_nombre", (string)$old_d['precio_venta_final'], (string)$precio_padre);
+				}
 			}
 		}
 		
@@ -393,6 +432,14 @@
 					print_r($query_e->errorInfo());
 					die ('Erreur execute');
 				}
+
+				// Historial: adopción eliminada
+				$req_lib_rem = $bdd->prepare("SELECT l.libro FROM libros l JOIN presupuestos p ON l.id=p.id_libro WHERE p.id=:id");
+				$req_lib_rem->execute([':id' => $valor]);
+				$lib_rem_row = $req_lib_rem->fetch();
+				$lib_rem_nombre = $lib_rem_row ? $lib_rem_row['libro'] : "Libro presupuesto #$valor";
+				registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+					'Adopción eliminada', $lib_rem_nombre, '');
 			}
 
 		}
@@ -411,6 +458,18 @@
 		}
 
 	}else{
+		// Log each currently-defined book as removed before setting all to 0
+		if (!empty($defs)) {
+			$req_lib_all = $bdd->prepare("SELECT l.libro FROM libros l JOIN presupuestos p ON l.id=p.id_libro WHERE p.id=:id");
+			foreach ($defs as $def_id) {
+				$req_lib_all->execute([':id' => $def_id]);
+				$lib_all_row = $req_lib_all->fetch();
+				$lib_all_nombre = $lib_all_row ? $lib_all_row['libro'] : "Libro presupuesto #$def_id";
+				registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+					'Adopción eliminada', $lib_all_nombre, '');
+			}
+		}
+
 		$sql_e = "UPDATE presupuestos SET definido='0' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
 
 		$query_e = $bdd->prepare( $sql_e );
@@ -457,13 +516,24 @@
 			$row_cod = $req_cod->fetch();
 
 			if ($row_cod["id_grado_otro"] == 0) {
-						
-				$sql_e = "UPDATE presupuestos SET  uni_vr='".$uni_vr."' WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND id_libro='".$libro."'";
+				$req_old_vr = $bdd->prepare("SELECT uni_vr FROM presupuestos WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND id_libro='".$libro."'");
+				$req_lib_vr = $bdd->prepare("SELECT libro FROM libros WHERE id=:id");
+				$req_lib_vr->execute([':id' => $libro]);
+				$lib_vr_row = $req_lib_vr->fetch();
+				$lib_vr_nombre = $lib_vr_row ? $lib_vr_row['libro'] : "Libro $libro";
 
+				$sql_e = "UPDATE presupuestos SET  uni_vr='".$uni_vr."' WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND id_libro='".$libro."'";
 			}else{
-						
+				$req_old_vr = $bdd->prepare("SELECT uni_vr FROM presupuestos WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND cod_area='".$row_cod["codigo"]."'");
+				$req_lib_vr2 = $bdd->prepare("SELECT l.libro FROM libros l JOIN areas_objetivas a ON l.id=a.id_libro_eureka WHERE a.codigo='".$libro."'");
+				$req_lib_vr2->execute();
+				$lib_vr_row = $req_lib_vr2->fetch();
+				$lib_vr_nombre = $lib_vr_row ? $lib_vr_row['libro'] : "Libro cod $libro";
+
 				$sql_e = "UPDATE presupuestos SET  uni_vr='".$uni_vr."' WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."' AND cod_area='".$row_cod["codigo"]."'";
 			}
+			$req_old_vr->execute();
+			$old_vr = $req_old_vr->fetch();
 
 			$query_e = $bdd->prepare( $sql_e );
 			if ($query_e == false) {
@@ -474,6 +544,11 @@
 			if ($sth_e == false) {
 				print_r($query_e->errorInfo());
 				die ('Erreur execute');
+			}
+
+			if ($old_vr && abs((float)($old_vr['uni_vr'] ?? 0) - (float)$uni_vr) > 0.0001) {
+				registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+					"Unidades de venta real - $lib_vr_nombre", (string)$old_vr['uni_vr'], (string)$uni_vr);
 			}
 
 		}

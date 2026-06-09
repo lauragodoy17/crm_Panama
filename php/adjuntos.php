@@ -3,6 +3,8 @@
 	ini_set('display_errors', 1);
 	ini_set('display_startup_errors', 1);
 	include("../conexion/bdd.php");
+	if (session_status() === PHP_SESSION_NONE) session_start();
+	require_once("registrar_historial.php");
 
 	header("Content-Type:text/html;charset=utf-8");	
 	$dir_subida = '../adjuntos/';
@@ -24,6 +26,9 @@
 			print_r($query_z->errorInfo());
 			die ('Erreur execute');
 		}
+
+		registrar_historial($bdd, $_POST['colegio'], intval($_SESSION["id"] ?? 0), 'Adjuntos',
+			'Nuevo adjunto', '', $_POST['nombre'] ?? $nombre_archivo);
 
 	}else {
 

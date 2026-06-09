@@ -4,8 +4,9 @@
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);*/
 
-	require_once("aut.php"); 
+	require_once("aut.php");
 	require_once('../conexion/bdd.php');
+	require_once("registrar_historial.php");
 
 	use PHPMailer\PHPMailer\PHPMailer;
 	use PHPMailer\PHPMailer\SMTP;
@@ -171,6 +172,9 @@
 		echo "An error has occurred please try again: {$mail->ErrorInfo}";
 	}
 
+
+	registrar_historial($bdd, $_POST["id_colegio"], intval($_SESSION["id"] ?? 0), 'Atenciones al cliente',
+		'Nueva solicitud de recursos', '', 'Solicitud #'.$conse["conse"]);
 
 	header('Location: ../colegio.php?codigo='.$_POST["cod_colegio"].'&periodo='.$_POST["periodo"].'&tab=atenciones');
 	
