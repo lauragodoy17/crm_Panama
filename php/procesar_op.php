@@ -50,5 +50,5 @@
 
 	
 
-	header('Location: ../formato_op.php?op='.$_POST["op"].'');
+	header('Location: ../formato_op.php?op='.$_POST["op"].'&ink_status=ok&ink_msg='.urlencode('OP atendida correctamente.'));
 ?>

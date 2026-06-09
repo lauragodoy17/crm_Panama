@@ -16,6 +16,6 @@
 		die ('Erreur execute');
 	}
 
-	header('Location: ../muestras_entregadas.php');
+	header('Location: ../muestras_entregadas.php?ink_status=ok&ink_msg='.urlencode('Muestra eliminada correctamente.'));
 
 ?>

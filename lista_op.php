@@ -186,6 +186,6 @@
         });
            
     </script>
-    
+<script src="src/ink-alerts.js"></script>
   </body>
 </html>

@@ -34,6 +34,6 @@
 		$req->execute();
 		
 		
-	echo "<script>alert('Muestreo aprobado');window.location='../lista_muestreo.php?tp=2';</script>";
+	header("location: ../lista_muestreo.php?tp=2&ink_status=ok&ink_msg=".urlencode('Muestreo aprobado correctamente.'));
 	
 ?>

@@ -16,5 +16,5 @@
 		die ('Erreur execute');
 	}
 
-	echo "<script>alert('OP Anulada');window.location='../lista_op.php?tp=2';</script>;";
+	header("location: ../lista_op.php?tp=2&ink_status=ok&ink_msg=".urlencode('OP anulada correctamente.'));
  ?>

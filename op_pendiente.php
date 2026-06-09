@@ -577,6 +577,17 @@
           });
         <?php } ?>
       });
+      $('form[action="php/procesar_op.php"]').on('submit', function(e){
+        e.preventDefault();
+        var form = this;
+        inkConfirm({
+          title: '¿Atender esta OP?',
+          text:  'Se registrará el despacho y la OP quedará como atendida.',
+          type:  'success',
+          btnOk: 'Sí, atender'
+        }, function(){ form.submit(); });
+      });
     </script>
+<script src="src/ink-alerts.js"></script>
   </body>
 </html>
