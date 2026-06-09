@@ -15,11 +15,14 @@
   $cnt_solic = (int)$req_solic->fetchColumn();
 
   $sql_pend = "SELECT COUNT(*) as cnt FROM solicitudes_recursos
-               WHERE id_colegio='".$_GET['colegio']."' AND id_periodo='".$_GET['periodo']."' AND estado != 4";
+               WHERE id_colegio='".$_GET['colegio']."' AND id_periodo='".$_GET['periodo']."' AND estado IN (1,2)";
   $req_pend = $bdd->prepare($sql_pend); $req_pend->execute();
   $cnt_pend = (int)$req_pend->fetchColumn();
 
-  $cnt_entregadas = $cnt_solic - $cnt_pend;
+  $sql_entregadas = "SELECT COUNT(*) as cnt FROM solicitudes_recursos
+                     WHERE id_colegio='".$_GET['colegio']."' AND id_periodo='".$_GET['periodo']."' AND estado=4";
+  $req_entregadas = $bdd->prepare($sql_entregadas); $req_entregadas->execute();
+  $cnt_entregadas = (int)$req_entregadas->fetchColumn();
 ?>
 
 <style>
