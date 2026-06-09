@@ -166,7 +166,7 @@ if ($tp != 1) {
       <div class="row">
         <div class="col-xl-3 col-lg-4 col-md-6">
           <div class="stat-card-modern">
-            <div class="stat-icon-modern" style="background:#eef2ff;color:#4361ee">
+            <div class="stat-icon-modern" style="background:<?= $ac['hover'] ?>;color:<?= $ac['accent'] ?>">
               <i class="bi <?= $st['icon'] ?>"></i>
             </div>
             <div class="stat-info-modern">
@@ -206,7 +206,7 @@ if ($tp != 1) {
       <div class="modern-card">
         <div class="card-head">
           <h5><i class="bi bi-list-ul mr-2"></i> Lista — <?= $st['label'] ?></h5>
-          <span class="lm-count-badge"><?= $total ?> registros</span>
+          <span class="lm-count-badge" style="background:<?= $ac['hover'] ?>;color:<?= $ac['accent'] ?>"><?= $total ?> registros</span>
         </div>
         <div class="table-responsive px-2 pb-2">
 
