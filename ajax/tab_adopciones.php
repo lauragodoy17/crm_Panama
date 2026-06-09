@@ -75,10 +75,16 @@
   /* ── Contenedor con scroll propio ────────────────────────── */
   .ad-table-wrap {
     border-radius: 10px;
-    overflow: auto;           /* scroll horizontal Y vertical */
-    max-height: 60vh;         /* limita la altura para que el scrollbar quede visible */
+    overflow: auto;
+    max-height: 60vh;
     box-shadow: 0 2px 12px rgba(15,23,42,.10);
+    scrollbar-width: thin;
+    scrollbar-color: #4361ee #e2e8f0;
   }
+  .ad-table-wrap::-webkit-scrollbar        { height: 10px; width: 10px; }
+  .ad-table-wrap::-webkit-scrollbar-track  { background: #e2e8f0; border-radius: 0 0 10px 10px; }
+  .ad-table-wrap::-webkit-scrollbar-thumb  { background: #4361ee; border-radius: 10px; border: 2px solid #e2e8f0; }
+  .ad-table-wrap::-webkit-scrollbar-thumb:hover { background: #2a3fc7; }
 
   /* ── Tabla ────────────────────────────────────────────────── */
   #dataTables-adop {
