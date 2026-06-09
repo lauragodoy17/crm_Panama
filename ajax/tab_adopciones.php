@@ -595,7 +595,6 @@
                   </tr>
                 </thead>
                 <tbody>";
-                    if (empty($libros_p)) echo '<tr><td colspan="13" class="tbl-empty"><i class="bi bi-inbox"></i>No hay información para mostrar</td></tr>';
                     foreach ($libros_p as $libro_p) {
 
                         if ($libro_p["id_grado"] == 15 || $libro_p["id_grado"] == 16 ) {
@@ -1536,10 +1535,12 @@
 <script>
 
     $(document).ready(function () {
+        $.fn.dataTable.ext.errMode = 'none';
         $('#dataTables-adop').dataTable({
           "language": {
             "lengthMenu": "Display _MENU_ registros por página",
             "zeroRecords": "Nada encontrado, lo siento",
+            "emptyTable": "No hay información para mostrar",
             "info": "",
             "infoEmpty": "",
             "infoFiltered": "",

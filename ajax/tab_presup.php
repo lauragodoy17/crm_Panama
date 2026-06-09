@@ -502,8 +502,6 @@
             </thead>
             <tbody>";
 
-    if (empty($libros_p)) echo '<tr><td colspan="12" class="tbl-empty"><i class="bi bi-inbox"></i>No hay información para mostrar</td></tr>';
-
     foreach ($libros_p as $libro_p) {
 
         if ($libro_p["cod_area"] !="") {
@@ -866,11 +864,13 @@
 <script>
 
   $(document).ready(function(){
+    $.fn.dataTable.ext.errMode = 'none';
     $('#tabla-presup').dataTable({
       "paging":    false,
       "searching": false,
       "info":      false,
       "ordering":  true,
+      "language": { "emptyTable": "No hay información para mostrar" },
       order: [[2, 'asc']],
       columnDefs: [
         { type: 'natural', targets: 2 },
