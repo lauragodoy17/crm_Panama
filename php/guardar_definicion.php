@@ -266,6 +266,16 @@
 			//almaceno en un array los que se marcaron como definidos
 			$defs2[]=$id_presupuesto;
 
+			// Historial: nuevo checkbox marcado como adoptado
+			if (!in_array($id_presupuesto, $defs ?? [])) {
+				$req_lib_def = $bdd->prepare("SELECT l.libro FROM libros l JOIN presupuestos p ON l.id=p.id_libro WHERE p.id=:id");
+				$req_lib_def->execute([':id' => $id_presupuesto]);
+				$lib_def_row = $req_lib_def->fetch();
+				$lib_def_nombre = $lib_def_row ? $lib_def_row['libro'] : "Presupuesto #$id_presupuesto";
+				registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+					'Libro adoptado', '', $lib_def_nombre);
+			}
+
 			$sql2 = "SELECT aprobado FROM presupuestos WHERE id='".$id_presupuesto."'";
 			$req2 = $bdd->prepare($sql2);
 			$req2->execute();
