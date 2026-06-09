@@ -1,734 +1,582 @@
-<?php require_once("php/aut.php"); ?>
+<?php
+  require_once("php/aut.php");
+  require_once("conexion/bdd.php");
+
+  $sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia,
+                 o.fecha_entrega, o.archivo, o.observaciones, o.estado, o.transportista,
+                 o.obs_envio, o.guia, o.adjunto_envio, o.ciudad_destino,
+                 o.id_pedido, o.id_pedido_dist, o.id_muestreo,
+                 o.id_devol_c, o.id_devol_p, o.id_devol_v, o.fecha_at, o.usuario_at, o.año,
+                 t.id as tid, t.tipo, t.descrip,
+                 c.id as cid, c.cliente, c.documento, c.direccion, c.telefonos, c.ciudad,
+                 CONCAT(u.nombres,' ',u.apellidos) AS usuario,
+                 e.estado AS n_estado
+          FROM ordenes_pedidos o
+          JOIN tipo_doc t ON o.tipo_doc=t.id
+          JOIN clientes c ON c.id=o.cliente
+          JOIN usuarios u ON u.id=o.usuario
+          JOIN estados_op e ON e.id=o.estado
+          WHERE o.id='".$_GET["op"]."'";
+
+  $req = $bdd->prepare($sql); $req->execute();
+  $op  = $req->fetch();
+
+  $estado_cfg = [
+    1 => ['label'=>'Pendiente', 'bg'=>'#fef3c7', 'color'=>'#b45309', 'icon'=>'bi-clock'],
+    2 => ['label'=>'Atendida',  'bg'=>'#dcfce7', 'color'=>'#15803d', 'icon'=>'bi-check-circle-fill'],
+    4 => ['label'=>'Anulada',   'bg'=>'#fee2e2', 'color'=>'#dc2626', 'icon'=>'bi-x-circle-fill'],
+  ];
+  $es = $estado_cfg[$op['estado']] ?? ['label'=>$op['n_estado'],'bg'=>'#f1f5f9','color'=>'#64748b','icon'=>'bi-circle'];
+?>
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <!-- Basic Page Info -->
     <meta charset="utf-8" />
-    <?php if ($_GET['tp']!=2) { ?>
-      <title>Inkpulse - OP pendiente</title>
-    <?php }else{ ?>
-      <title>Inkpulse - OP atendida</title>
-    <?php } ?>
-    
-
-    <!-- Site favicon -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="vendors/images/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="vendors/images/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="vendors/images/favicon-16x16.png"
-    />
-
-    <!-- Mobile Specific Metas -->
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
-
-    <!-- Google Font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <!-- CSS -->
+    <title>Inkpulse - <?= $op['estado']!=2 ? 'OP pendiente' : 'OP atendida' ?></title>
+    <link rel="apple-touch-icon" sizes="180x180" href="vendors/images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="vendors/images/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="vendors/images/favicon-16x16.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="vendors/styles/icon-font.min.css"
-    />
+    <link rel="stylesheet" type="text/css" href="vendors/styles/icon-font.min.css" />
     <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
     <style>
+      *, *::before, *::after { box-sizing: border-box; }
+
+      /* ── OP Header card ─────────────────────────────────────── */
+      .op-hdr {
+        display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: 14px; padding: 20px 24px;
+      }
+      .op-hdr-left  { display: flex; align-items: center; gap: 16px; }
+      .op-hdr-icon  {
+        width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+        background: linear-gradient(135deg,#4361ee,#6d28d9);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; color: #fff;
+      }
+      .op-hdr-title { font-size: 1.2rem; font-weight: 800; color: #0f172a; margin: 0 0 6px; }
+      .op-hdr-meta  { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .op-estado-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 12px; border-radius: 20px; font-size: .78rem; font-weight: 700;
+        background: <?= $es['bg'] ?>; color: <?= $es['color'] ?>;
+      }
+      .op-fecha-tag { font-size: .78rem; color: #64748b; }
+      .op-hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+      .op-usuario-tag {
+        display: flex; align-items: center; gap: 6px;
+        font-size: .8rem; font-weight: 600; color: #374151;
+        background: #f1f5f9; padding: 5px 12px; border-radius: 8px;
+      }
+      .op-btn-print {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 14px; border-radius: 8px; font-size: .78rem; font-weight: 600;
+        background: #f1f5f9; color: #374151; border: 1.5px solid #d1d5db;
+        text-decoration: none; transition: background .15s;
+      }
+      .op-btn-print:hover { background: #e2e8f0; text-decoration: none; color: #0f172a; }
+
+      /* ── Section cards ──────────────────────────────────────── */
+      .op-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 18px;
+                 box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04); }
+      .op-card-head {
+        padding: 14px 20px; border-bottom: 1px solid #e2e8f0;
+        font-size: .88rem; font-weight: 700; color: #0f172a;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .op-card-head i { font-size: 1rem; color: #4361ee; }
+      .op-card-body { padding: 20px 24px; }
+
+      /* ── Info grids ─────────────────────────────────────────── */
+      .op-info-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+      .op-info-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+      @media (max-width: 860px) { .op-info-4 { grid-template-columns: 1fr 1fr; } }
+      @media (max-width: 540px) { .op-info-2, .op-info-4 { grid-template-columns: 1fr; } }
+
+      .op-field-label {
+        font-size: .68rem; color: #64748b; font-weight: 600;
+        text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px;
+      }
+      .op-val { font-size: .875rem; font-weight: 500; color: #0f172a; line-height: 1.4; word-break: break-word; }
+      .op-val.muted { color: #94a3b8; }
+      .op-val a { color: #4361ee; font-weight: 600; text-decoration: none; }
+      .op-val a:hover { text-decoration: underline; }
+      .op-obs-text { font-size: .875rem; color: #374151; line-height: 1.6; white-space: pre-wrap; }
+
+      /* ── Form fields ────────────────────────────────────────── */
+      .op-form-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 16px; }
+      @media (max-width: 900px) { .op-form-grid-5 { grid-template-columns: 1fr 1fr 1fr; } }
+      @media (max-width: 560px) { .op-form-grid-5 { grid-template-columns: 1fr 1fr; } }
+
+      .op-input, .op-select, .op-textarea {
+        width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+        font-size: .875rem; font-family: 'Inter', sans-serif; color: #0f172a;
+        background: #fff; transition: border-color .2s; box-sizing: border-box;
+      }
+      .op-input:focus, .op-select:focus, .op-textarea:focus {
+        outline: none; border-color: #4361ee; box-shadow: 0 0 0 3px rgba(67,97,238,.08);
+      }
+      .op-input[type=file] { padding: 6px 10px; cursor: pointer; }
+      .op-textarea { resize: vertical; min-height: 90px; }
+
+      .op-required { color: #ef4444; font-size: .75rem; margin-left: 2px; }
+
+      /* Select2 override to match op-input */
+      #cliente + .select2-container .select2-selection--single {
+        height: auto !important; border: 1.5px solid #e2e8f0 !important;
+        border-radius: 8px !important; padding: 7px 12px !important;
+        font-size: .875rem; font-family: 'Inter', sans-serif; color: #0f172a;
+      }
+      #cliente + .select2-container .select2-selection__arrow { top: 7px !important; }
+      #cliente + .select2-container--focus .select2-selection--single {
+        border-color: #4361ee !important; box-shadow: 0 0 0 3px rgba(67,97,238,.08) !important;
+      }
+      #tipo_doc { max-width: 100%; }
+
+      /* ── Despacho info rows ──────────────────────────────────── */
+      .op-desp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 12px; }
+      @media (max-width: 860px) { .op-desp-grid { grid-template-columns: 1fr 1fr 1fr; } }
+      @media (max-width: 560px) { .op-desp-grid { grid-template-columns: 1fr 1fr; } }
+
+      /* ── Action buttons ──────────────────────────────────────── */
+      .op-actions { display: flex; justify-content: center; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
+      .op-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 11px 30px; border-radius: 10px; font-size: .9rem; font-weight: 700;
+        border: none; cursor: pointer; text-decoration: none; transition: opacity .15s;
+      }
+      .op-btn:hover { opacity: .88; text-decoration: none; }
+      .op-btn-atender { background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff; }
+      .op-btn-anular  { background: linear-gradient(135deg,#ef4444,#dc2626); color: #fff; }
+
       input[type=number] { -moz-appearance:textfield; }
-      input[type=number]::-webkit-inner-spin-button, 
-      input[type=number]::-webkit-outer-spin-button { 
-          -webkit-appearance: none; 
-          margin: 0; 
-      }
-      .custom-select2 {
-        width:  auto !important;
-      }
+      input[type=number]::-webkit-inner-spin-button,
+      input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
     </style>
   </head>
   <body>
-    
     <?php include("template/nav_side.php"); ?>
     <div class="main-container">
       <div class="pd-ltr-20 xs-pd-20-10">
         <div class="min-height-200px">
+
+          <!-- Breadcrumb -->
           <div class="page-header">
             <div class="row">
               <div class="col-md-6 col-sm-12">
                 <div class="title">
-                  <?php if ($_GET['tp']!=2) { ?>
-                    <h4>OP pendiente</h4>
-                  <?php }else{ ?>
-                    <h4>Op atendida</h4>
-                  <?php } ?>
+                  <h4><?= $op['estado']!=2 ? 'OP pendiente' : 'OP atendida' ?></h4>
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
                   <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                      OP
-                    </li>
+                    <li class="breadcrumb-item">OP</li>
                     <li class="breadcrumb-item active" aria-current="page">
-                      <?php if ($_GET['tp']!=2) { ?>
-                        Pendiente
-                      <?php }else{ ?>
-                        Atendida
-                      <?php } ?>
+                      <?= $op['estado']!=2 ? 'Pendiente' : 'Atendida' ?>
                     </li>
                   </ol>
                 </nav>
               </div>
-              
             </div>
           </div>
-          <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-            
-            <?php 
-              
 
-              $sql = "SELECT o.id as opid, o.op_per,o.fecha, o.n_doc, o.solicitante, o.valor, o.guia, o.fecha_entrega, o.archivo, o.observaciones, o.estado, o.transportista, o.obs_envio, o.guia, o.adjunto_envio, o.ciudad_destino, o.id_pedido, o.id_pedido_dist, o.id_muestreo, o.id_devol_c, o.id_devol_p, o.id_devol_v, o.fecha_at,o.usuario_at, o.año, t.id as tid,t.tipo,t.descrip, c.id as cid, c.cliente, c.documento, c.direccion, c.telefonos, c.ciudad, CONCAT(u.nombres,' ',u.apellidos) AS usuario, e.estado AS n_estado FROM ordenes_pedidos o JOIN tipo_doc t ON o.tipo_doc=t.id JOIN clientes c ON c.id=o.cliente JOIN usuarios u ON u.id=o.usuario JOIN estados_op e ON e.id=o.estado WHERE o.id='".$_GET["op"]."'";
+          <!-- OP Header -->
+          <div class="op-card">
+            <div class="op-hdr">
+              <div class="op-hdr-left">
+                <div class="op-hdr-icon"><i class="bi bi-file-earmark-text"></i></div>
+                <div>
+                  <h2 class="op-hdr-title">OP # <?= htmlspecialchars($op['año'].' - '.$op['opid']) ?></h2>
+                  <div class="op-hdr-meta">
+                    <span class="op-estado-badge">
+                      <i class="bi <?= $es['icon'] ?>"></i> <?= $es['label'] ?>
+                    </span>
+                    <span class="op-fecha-tag"><i class="bi bi-calendar3"></i> Fecha de creación: <?= htmlspecialchars($op['fecha']) ?></span>
+                  </div>
+                </div>
+              </div>
+              <div class="op-hdr-right">
+                <div class="op-usuario-tag">
+                  <i class="bi bi-person-circle"></i> <?= htmlspecialchars($op['usuario']) ?>
+                </div>
+                <a href="formato_op.php?op=<?= $op['opid'] ?>" target="_blank" class="op-btn-print">
+                  <i class="bi bi-printer"></i> Imprimir
+                </a>
+              </div>
+            </div>
+          </div>
 
+          <form action="php/procesar_op.php" method="POST" enctype="multipart/form-data">
 
-              $req = $bdd->prepare($sql);
-              $req->execute();
-
-              $op = $req->fetch();
-
-              echo '<h3 style="display: inline-block;">OP # '.$op["año"].' - '.$op["opid"].'</h3> &nbsp;&nbsp;<a style="display: inline-block;" href="formato_op.php?op='.$op["opid"].'" target="_blank" class="btn btn-info btn-sm"><i class="bi bi-printer"></i></a><br><br>';
-
-              echo "<h4 style='display:inline-block; float: left;'><b>Estado:</b> ".$op["n_estado"]."</h4>";
-              echo "<h4 style='display:inline-block; float: right;'><b>Usuario:</b> ".$op["usuario"]."</h4>";
-
-              echo "<br><br><h5 style='display:inline-block;'><b>Fecha de creación:</b> ".$op["fecha"]."</h5>";
-                  
-            ?>
-            <form action="php/procesar_op.php" method="POST" enctype="multipart/form-data">
-            <table class="table table-bordered" style="font-size: 15px;">
-              <tr>
-                <td><b>Tipo de documento:</b>
-                    <?php if ($op["estado"] == 4) {
-                        echo $op["tipo"];
-                    ?>
-
-                    <?php }else{ ?>
-                      <select name="tipo_doc" id="tipo_doc" class="form-control custom-select2">
-                        <?php
-                          $sql = "SELECT id, tipo FROM tipo_doc";
-                          $req = $bdd->prepare($sql);
-                          $req->execute();
-                          $tipos= $req->fetchAll();
-                          foreach ($tipos as $tipo) {
-                            if ($op["tid"]==$tipo["id"]) {
-                              echo "<option value='".$tipo["id"]."' SELECTED>".$tipo["tipo"]."</option>";
-                            }else{
-                              echo "<option value='".$tipo["id"]."'>".$tipo["tipo"]."</option>";
-                            }
-                            
-                          }
-                        ?>
-                      </select>
-                    <?php } ?>
-                </td>
-                <td><b>Cliente:</b>
-                  <?php if ($op["estado"] == 4) {
-                    echo $op["cliente"];
-                  ?>
-
-                  <?php }else{?>
-                    <select name="cliente" id="cliente" class="custom-select2">
+          <!-- Información general -->
+          <div class="op-card">
+            <div class="op-card-head"><i class="bi bi-info-circle"></i> Información general</div>
+            <div class="op-card-body">
+              <div class="op-info-2">
+                <!-- Tipo de documento -->
+                <div>
+                  <p class="op-field-label">Tipo de documento</p>
+                  <?php if ($op['estado'] == 4): ?>
+                    <p class="op-val"><?= htmlspecialchars($op['tipo']) ?></p>
+                  <?php else: ?>
+                    <select name="tipo_doc" id="tipo_doc" class="op-select">
                       <?php
-                        $sql = "SELECT id, cliente FROM clientes";
-                        $req = $bdd->prepare($sql);
-                        $req->execute();
-                        $clientes= $req->fetchAll();
-                        foreach ($clientes as $cliente) {
-                          if ($op["cid"]==$cliente["id"]) {
-                            echo "<option value='".$cliente["id"]."' SELECTED>".$cliente["cliente"]."</option>";
-                          }else{
-                            echo "<option value='".$cliente["id"]."'>".$cliente["cliente"]."</option>";
-                          }
-                          
+                        $r = $bdd->prepare("SELECT id, tipo FROM tipo_doc");
+                        $r->execute(); $tipos = $r->fetchAll();
+                        foreach ($tipos as $tipo) {
+                          $sel = ($op['tid']==$tipo['id']) ? 'selected' : '';
+                          echo "<option value='{$tipo['id']}' $sel>{$tipo['tipo']}</option>";
                         }
                       ?>
-                  </select>
-                  <?php } ?>
-                </td>
-              </tr>
-              <tr>
-                <td><b>Contacto:</b> <?php echo $op["solicitante"]; ?></td>
-                <td><b>Ciudad destino:</b> <?php echo $op["ciudad_destino"]; ?></td>
-                <?php if ($op["id_pedido"]==0) {?>
-                  <td><b>Archivo Adjunto:</b> <a href="adjuntos/<?php echo $op["archivo"] ?>" style="cursor: pointer;" target="_blank"><?php echo $op["archivo"] ?></a></td>
-                  <!--<?php if ($op["op_per"] !=0) { ?>
-                    <td><b>OP personalizada:</b> <?php echo $op["op_per"]; ?></td>
-                  <?php } ?>-->
-                <?php } ?>
-
-                <?php if ($op["id_pedido"]!=0) {
-
-                    $sql = "SELECT estado FROM pedidos WHERE id='".$op["id_pedido"]."'";
-                    $req = $bdd->prepare($sql);
-                    $req->execute();
-
-                    $pedido= $req->fetch();
-                    if ($pedido["estado"] ==2) {
-                      echo'<td><b>Pedido de venta:</b> <a href=" pedido_colegio.php?id_pedido='.$op["id_pedido"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_pedido"].'</a></td>';
-
-                    }else{
-                      echo'<td><b>Pedido de venta:</b> <a href=" pedido_colegio.php?id_pedido='.$op["id_pedido"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_pedido"].'</a></td>';
-                    }
-
-                    
-                                  
-                  }
-
-                ?>
-
-                <?php if ($op["id_pedido_dist"]!=0) {
-
-                  $sql = "SELECT estado FROM pedidos2 WHERE id='".$op["id_pedido_dist"]."'";
-                  $req = $bdd->prepare($sql);
-                  $req->execute();
-
-                  $pedido= $req->fetch();
-                  if ($pedido["estado"] ==2) {
-                    echo'<td><b>Pedido de venta sin adopción:</b> <a href="pedido_colegio_sa.php?id_pedido='.$op["id_pedido_dist"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
-
-                  }else{
-                    echo'<td><b>Pedido de venta sin adopción:</b> <a href="pedido_colegio_sa.php?id_pedido='.$op["id_pedido_dist"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_pedido_dist"].'</a></td>';
-                  }
-
-                    
-                                  
-                }
-
-                ?>
-
-                <?php if ($op["id_muestreo"]!=0) {
-
-                    $sql = "SELECT estado FROM muestreos WHERE id='".$op["id_muestreo"]."'";
-                    $req = $bdd->prepare($sql);
-                    $req->execute();
-
-                    $pedido= $req->fetch();
-                    if ($pedido["estado"] ==2) {
-                      
-                      echo'<td><b>Pedido de muestras:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=3" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
-                    }else{
-                      echo'<td><b>Pedido de muestras:</b> <a href="muestreo_colegio_resto.php?id_pedido='.$op["id_muestreo"].'&tp=4" style="cursor: pointer;" target="_blank">#'.$op["id_muestreo"].'</a></td>';
-
-                      
-                    }
-
-                    
-                                  
-                }
-
-                ?>
-
-                <?php if ($op["id_devol_c"]!=0) {
-
-                    $sql = "SELECT estado FROM devoluciones WHERE id='".$op["id_devol_c"]."'";
-                    $req = $bdd->prepare($sql);
-                    $req->execute();
-
-                    $pedido= $req->fetch();
-                    
-                      echo'<td><b>Devolución de muestra:</b> <a href="vista_devol.php?id_devol='.$op["id_devol_c"].'&tipo=1" style="cursor: pointer;" target="_blank">#'.$op["id_devol_c"].'</a></td>';
-                    
-                                  
-                }
-
-                ?>
-
-                <?php if ($op["id_devol_p"]!=0) {
-
-                    $sql = "SELECT estado FROM devoluciones WHERE id='".$op["id_devol_p"]."'";
-                    $req = $bdd->prepare($sql);
-                    $req->execute();
-
-                    $pedido= $req->fetch();
-                    
-                      echo'<td><b>Devolución de proveedor:</b> <a href="vista_devol.php?id_devol='.$op["id_devol_p"].'&tipo=2" style="cursor: pointer;" target="_blank">#'.$op["id_devol_p"].'</a></td>';
-                    
-                                  
-                }
-
-                ?>
-
-                <?php if ($op["id_devol_v"]!=0) {
-
-                    $sql = "SELECT estado FROM devoluciones_v WHERE id='".$op["id_devol_v"]."'";
-                    $req = $bdd->prepare($sql);
-                    $req->execute();
-
-                    $pedido= $req->fetch();
-                    
-                      echo'<td><b>Devolución de proveedor:</b> <a href="devolucion_colegio.php?id_pedido='.$op["id_devol_v"].'" style="cursor: pointer;" target="_blank">#'.$op["id_devol_v"].'</a></td>';
-                    
-                                  
-                }
-
-                ?>
-
-                <?php if ($op["id_pedido"]==0 && $op["id_pedido_dist"]==0 && $op["id_muestreo"]==0 && $op["id_devol_c"]==0 && $op["id_devol_p"]==0 && $op["id_devol_v"]==0 ) {
-
-                    $sql_ag = "SELECT id_pedido FROM op_pedidos_agrupados WHERE op='".$op["opid"]."'";
-                    $req_ag = $bdd->prepare($sql_ag);
-                    $req_ag->execute();
-                    $agps = $req_ag->fetchAll();
-
-                    echo '<td><b>Pedido de venta agrupados: </b>';
-                      foreach ($agps as $agp) {
-
-                        echo'<a href="pedido_colegio_aprobado.php?id_pedido='.$agp["id_pedido"].'" style="cursor: pointer;" target="_blank">#'.$agp["id_pedido"].'</a>, ';
-                      } 
-                    echo '</td>';
-                                                    
-                }
-
-                ?>
-
-                
-              </tr>
-              <?php if ($op["estado"] == 2) {
-
-                $sql = "SELECT CONCAT(nombres,' ',apellidos) AS usr_aten FROM usuarios WHERE id='".$op["usuario_at"]."' ";
-
-                $req = $bdd->prepare($sql);
-                $req->execute();
-
-                $aten= $req->fetch();
-
-
-              ?>
-                <tr>
-                  <td><b>Fecha de atención:</b> <?php echo $op["fecha_at"]; ?></td>
-                  <td><b>Usuario que atendió:</b> <?php echo $aten["usr_aten"]; ?></td>
-                </tr>
-              <?php } ?>
-            </table>
-        
-            <div class="row">
-              
-              <div class="col-sm-3 offset-sm-4">
-                              
-                <h5><b>Observaciones:</b> <?php echo $op["observaciones"]; ?></h5>
-              </div>
-
-              
-            </div><br><br>
-            <?php if ($op["estado"] != 4) { ?>
-              <?php if ($op["estado"] == 2) {
-
-              $sql = "SELECT transportista,n_doc, guia, fecha_entrega,valor,obs_envio,adjunto_envio FROM op_atendidas WHERE opid='".$_GET["op"]."'";
-
-
-              $req = $bdd->prepare($sql);
-              $req->execute();
-
-              $ats = $req->fetchAll();
-
-
-              ?>
-              <?php foreach ($ats as $at) { ?>
-                <table class="table table-bordered" style="font-size: 15px;">
-                  
-                  <tr>
-                    <td><b>Número de documento:</b> <?php echo $at["n_doc"]; ?></td>
-                    <td><b>Transportista:</b> <?php echo $at["transportista"]; ?></td>
-                    <td><b>Guía:</b> <?php echo $at["guia"]; ?></td>
-                    <td><b>Fecha de despacho:</b> <?php echo $at["fecha_entrega"]; ?></td>
-                    <td><b>Valor despachado:</b> <?php echo $at["valor"]; ?></td>
-                  </tr>
-                  
-                </table>
-                <div class="col-sm-3 offset-sm-4">
-                              
-                <h5><b>Observaciones de despacho:</b> <?php echo $at["obs_envio"]; ?></h5><br>
-              </div>
-                 <center><b>Adjunto soporte de entrega:</b> <a href="adjuntos/envio/<?php echo $at["adjunto_envio"] ?>" style="cursor: pointer;" target="_blank"><?php echo $at["adjunto_envio"] ?></a></center><br><br>
-              <?php } ?>
-
-              <div class="row">
-            
-            </div><br><br>
-            <?php } ?>
-            
-              <div class="row">
-                <div class="col-sm-2">
-                  <!-- PAGE CONTENT BEGINS -->              
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="n_doc"> Número de documento<small style="color:red;"> *</small></label>
-
-                    <input required type="text" name="n_doc" id="n_doc" placeholder="Documento del sistema" class="form-control" />
-                      
-                  </div>
-                </div>
-
-                <!--<div class="col-sm-2">
-                  
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="recoge"> Recoge<small style="color:red;"> *</small></label>
-
-                    <select name="recoge" id="recoge" class="form-control">
-                      <option value="0">Seleccione</option>
-                      <option value="1">Transportista</option>
-                      <option value="2">Persona</option>
                     </select>
-                      
-                  </div>
-                </div>-->
-
-                <div class="col-sm-2">
-                  <!-- PAGE CONTENT BEGINS -->              
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="transportista"> Entregado a<small style="color:red;"> *</small></label>
-
-                    <input required type="text" name="transportista" id="transportista" placeholder="Entregado a" class="form-control" />
-                      
-                  </div>
+                  <?php endif; ?>
                 </div>
 
-                
-
-                <div class="col-sm-2 transp">
-                  <!-- PAGE CONTENT BEGINS -->              
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="guia"> Guía</label>
-
-                    <input type="text" name="guia" id="guia" placeholder="Guía" class="form-control" />
-                      
-                  </div>
-                </div>
-
-                <div class="col-sm-2">
-                  <!-- PAGE CONTENT BEGINS -->              
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="fecha_entrega"> Fecha despacho<small style="color:red;"> *</small></label>
-
-                    <input required type="text" data-date-format="yyyy-mm-dd" name="fecha_entrega" id="fecha_entrega" placeholder="Fecha despacho" class="form-control date-picker" />
-                      
-                  </div>
-                </div>
-
-                <div class="col-sm-2">
-                  <!-- PAGE CONTENT BEGINS -->              
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="valor"> Valor despachado<small style="color:red;"> *</small></label>
-
-                    <input required type="text" name="valor" id="valor" placeholder="Valor despachado" class="form-control" />
-                      
-                  </div>
-                </div>
-
-              </div>
-
-              <div class="row">
-              
-              <div class="col-sm-3 offset-sm-4">
-                              
-                <div class="form-group">
-                  <label class="control-label no-padding-right" for="obs_envio"> Observaciones despacho</label>
-
-                  <textarea cols="25" rows="5" name="obs_envio" id="obs_envio" class="form-control"></textarea>
-                
+                <!-- Cliente -->
+                <div>
+                  <p class="op-field-label">Cliente</p>
+                  <?php if ($op['estado'] == 4): ?>
+                    <p class="op-val"><?= htmlspecialchars($op['cliente']) ?></p>
+                  <?php else: ?>
+                    <select name="cliente" id="cliente">
+                      <?php
+                        $r = $bdd->prepare("SELECT id, cliente FROM clientes");
+                        $r->execute(); $clientes = $r->fetchAll();
+                        foreach ($clientes as $cli) {
+                          $sel = ($op['cid']==$cli['id']) ? 'selected' : '';
+                          echo "<option value='{$cli['id']}' $sel>{$cli['cliente']}</option>";
+                        }
+                      ?>
+                    </select>
+                  <?php endif; ?>
                 </div>
               </div>
 
-              
+              <div class="op-info-4">
+                <!-- Contacto -->
+                <div>
+                  <p class="op-field-label">Contacto</p>
+                  <p class="op-val"><?= !empty($op['solicitante']) ? htmlspecialchars($op['solicitante']) : '<span class="muted">—</span>' ?></p>
+                </div>
+
+                <!-- Ciudad destino -->
+                <div>
+                  <p class="op-field-label">Ciudad destino</p>
+                  <p class="op-val"><?= !empty($op['ciudad_destino']) ? htmlspecialchars($op['ciudad_destino']) : '<span class="muted">—</span>' ?></p>
+                </div>
+
+                <!-- Archivo adjunto (solo cuando no hay pedido de venta) -->
+                <?php if ($op['id_pedido'] == 0): ?>
+                <div>
+                  <p class="op-field-label">Archivo adjunto</p>
+                  <p class="op-val">
+                    <?php if (!empty($op['archivo'])): ?>
+                      <a href="adjuntos/<?= htmlspecialchars($op['archivo']) ?>" target="_blank">
+                        <i class="bi bi-paperclip"></i> <?= htmlspecialchars($op['archivo']) ?>
+                      </a>
+                    <?php else: ?>
+                      <span class="muted">—</span>
+                    <?php endif; ?>
+                  </p>
+                </div>
+                <?php endif; ?>
+
+                <!-- Fuente / origen -->
+                <?php
+                  if ($op['id_pedido'] != 0) {
+                    $r = $bdd->prepare("SELECT estado FROM pedidos WHERE id='".$op['id_pedido']."'");
+                    $r->execute(); $pv = $r->fetch();
+                    $tp = ($pv['estado']==2) ? 3 : 4;
+                    echo '<div><p class="op-field-label">Pedido de venta</p><p class="op-val"><a href="pedido_colegio.php?id_pedido='.$op['id_pedido'].'&tp='.$tp.'" target="_blank">#'.$op['id_pedido'].'</a></p></div>';
+                  }
+                  if ($op['id_pedido_dist'] != 0) {
+                    $r = $bdd->prepare("SELECT estado FROM pedidos2 WHERE id='".$op['id_pedido_dist']."'");
+                    $r->execute(); $pd = $r->fetch();
+                    $tp = ($pd['estado']==2) ? 3 : 4;
+                    echo '<div><p class="op-field-label">Pedido sin adopción</p><p class="op-val"><a href="pedido_colegio_sa.php?id_pedido='.$op['id_pedido_dist'].'&tp='.$tp.'" target="_blank">#'.$op['id_pedido_dist'].'</a></p></div>';
+                  }
+                  if ($op['id_muestreo'] != 0) {
+                    $r = $bdd->prepare("SELECT estado FROM muestreos WHERE id='".$op['id_muestreo']."'");
+                    $r->execute(); $ms = $r->fetch();
+                    $tp = ($ms['estado']==2) ? 3 : 4;
+                    echo '<div><p class="op-field-label">Pedido de muestras</p><p class="op-val"><a href="muestreo_colegio_resto.php?id_pedido='.$op['id_muestreo'].'&tp='.$tp.'" target="_blank">#'.$op['id_muestreo'].'</a></p></div>';
+                  }
+                  if ($op['id_devol_c'] != 0) {
+                    echo '<div><p class="op-field-label">Devolución de muestra</p><p class="op-val"><a href="vista_devol.php?id_devol='.$op['id_devol_c'].'&tipo=1" target="_blank">#'.$op['id_devol_c'].'</a></p></div>';
+                  }
+                  if ($op['id_devol_p'] != 0) {
+                    echo '<div><p class="op-field-label">Devolución de proveedor</p><p class="op-val"><a href="vista_devol.php?id_devol='.$op['id_devol_p'].'&tipo=2" target="_blank">#'.$op['id_devol_p'].'</a></p></div>';
+                  }
+                  if ($op['id_devol_v'] != 0) {
+                    echo '<div><p class="op-field-label">Devolución de venta</p><p class="op-val"><a href="devolucion_colegio.php?id_pedido='.$op['id_devol_v'].'" target="_blank">#'.$op['id_devol_v'].'</a></p></div>';
+                  }
+                  if ($op['id_pedido']==0 && $op['id_pedido_dist']==0 && $op['id_muestreo']==0
+                    && $op['id_devol_c']==0 && $op['id_devol_p']==0 && $op['id_devol_v']==0) {
+                    $r_ag = $bdd->prepare("SELECT id_pedido FROM op_pedidos_agrupados WHERE op='".$op['opid']."'");
+                    $r_ag->execute(); $agps = $r_ag->fetchAll();
+                    if (!empty($agps)) {
+                      echo '<div><p class="op-field-label">Pedidos agrupados</p><p class="op-val">';
+                      foreach ($agps as $agp) {
+                        echo '<a href="pedido_colegio_aprobado.php?id_pedido='.$agp['id_pedido'].'" target="_blank">#'.$agp['id_pedido'].'</a> ';
+                      }
+                      echo '</p></div>';
+                    }
+                  }
+                ?>
+
+                <!-- Si estado==2: mostrar quien y cuando atendió -->
+                <?php if ($op['estado'] == 2):
+                  $r = $bdd->prepare("SELECT CONCAT(nombres,' ',apellidos) AS usr_aten FROM usuarios WHERE id='".$op['usuario_at']."'");
+                  $r->execute(); $aten = $r->fetch();
+                ?>
+                <div>
+                  <p class="op-field-label">Fecha de atención</p>
+                  <p class="op-val"><?= htmlspecialchars($op['fecha_at']) ?></p>
+                </div>
+                <div>
+                  <p class="op-field-label">Atendido por</p>
+                  <p class="op-val"><?= htmlspecialchars($aten['usr_aten'] ?? '—') ?></p>
+                </div>
+                <?php endif; ?>
+
+              </div>
             </div>
-            
-            
-            
-            <?php if ($op["estado"] !=4) { ?>
-              <div class="row">
-                
-                <div class="col-sm-3 offset-sm-4">
-                                
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="adjunto_envio"> Soporte de entrega<small style="color:red;"> *</small></label>
+          </div>
 
-                    <input type="file" name="adjunto_envio" id="adjunto_envio" placeholder="Adjunto" class="form-control" required="" />
+          <!-- Observaciones -->
+          <div class="op-card">
+            <div class="op-card-head"><i class="bi bi-chat-text"></i> Observaciones</div>
+            <div class="op-card-body">
+              <?php if (!empty($op['observaciones'])): ?>
+                <p class="op-obs-text"><?= htmlspecialchars($op['observaciones']) ?></p>
+              <?php else: ?>
+                <p class="op-val muted">Sin observaciones</p>
+              <?php endif; ?>
+            </div>
+          </div>
+
+          <?php if ($op['estado'] != 4): ?>
+
+            <?php if ($op['estado'] == 2):
+              $r_at = $bdd->prepare("SELECT transportista, n_doc, guia, fecha_entrega, valor, obs_envio, adjunto_envio FROM op_atendidas WHERE opid='".$_GET['op']."'");
+              $r_at->execute(); $ats = $r_at->fetchAll();
+              foreach ($ats as $at):
+            ?>
+            <!-- Despacho registrado -->
+            <div class="op-card">
+              <div class="op-card-head" style="color:#15803d"><i class="bi bi-check-circle-fill" style="color:#15803d"></i> Despacho registrado</div>
+              <div class="op-card-body">
+                <div class="op-desp-grid" style="margin-bottom:12px">
+                  <div>
+                    <p class="op-field-label">Número de documento</p>
+                    <p class="op-val"><?= htmlspecialchars($at['n_doc']) ?: '<span class="muted">—</span>' ?></p>
+                  </div>
+                  <div>
+                    <p class="op-field-label">Entregado a</p>
+                    <p class="op-val"><?= htmlspecialchars($at['transportista']) ?: '<span class="muted">—</span>' ?></p>
+                  </div>
+                  <div>
+                    <p class="op-field-label">Guía</p>
+                    <p class="op-val"><?= htmlspecialchars($at['guia']) ?: '<span class="muted">—</span>' ?></p>
+                  </div>
+                  <div>
+                    <p class="op-field-label">Fecha de despacho</p>
+                    <p class="op-val"><?= htmlspecialchars($at['fecha_entrega']) ?: '<span class="muted">—</span>' ?></p>
+                  </div>
+                  <div>
+                    <p class="op-field-label">Valor despachado</p>
+                    <p class="op-val"><?= htmlspecialchars($at['valor']) ?: '<span class="muted">—</span>' ?></p>
+                  </div>
+                </div>
+                <?php if (!empty($at['obs_envio'])): ?>
+                <div style="margin-bottom:12px">
+                  <p class="op-field-label">Observaciones de despacho</p>
+                  <p class="op-obs-text"><?= htmlspecialchars($at['obs_envio']) ?></p>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($at['adjunto_envio'])): ?>
+                <div>
+                  <p class="op-field-label">Adjunto soporte de entrega</p>
+                  <p class="op-val">
+                    <a href="adjuntos/envio/<?= htmlspecialchars($at['adjunto_envio']) ?>" target="_blank">
+                      <i class="bi bi-paperclip"></i> <?= htmlspecialchars($at['adjunto_envio']) ?>
+                    </a>
+                  </p>
+                </div>
+                <?php endif; ?>
+              </div>
+            </div>
+            <?php endforeach; endif; ?>
+
+            <!-- Formulario de despacho -->
+            <div class="op-card">
+              <div class="op-card-head"><i class="bi bi-truck"></i> Registrar despacho</div>
+              <div class="op-card-body">
+                <div class="op-form-grid-5">
+                  <div>
+                    <p class="op-field-label">Número de documento <span class="op-required">*</span></p>
+                    <input required type="text" name="n_doc" id="n_doc" placeholder="Documento del sistema" class="op-input" />
+                  </div>
+                  <div>
+                    <p class="op-field-label">Entregado a <span class="op-required">*</span></p>
+                    <input required type="text" name="transportista" id="transportista" placeholder="Entregado a" class="op-input" />
+                  </div>
+                  <div>
+                    <p class="op-field-label">Guía</p>
+                    <input type="text" name="guia" id="guia" placeholder="Guía" class="op-input" />
+                  </div>
+                  <div>
+                    <p class="op-field-label">Fecha despacho <span class="op-required">*</span></p>
+                    <input required type="text" data-date-format="yyyy-mm-dd" name="fecha_entrega" id="fecha_entrega" placeholder="Fecha despacho" class="op-input date-picker" />
+                  </div>
+                  <div>
+                    <p class="op-field-label">Valor despachado <span class="op-required">*</span></p>
+                    <input required type="text" name="valor" id="valor" placeholder="Valor despachado" class="op-input" />
                   </div>
                 </div>
 
-                
-              </div>
-            <?php } ?>
-            <input type="hidden" name="op" value="<?php echo $op["opid"] ?>">
-            <?php if ($op["estado"] !=4) { ?>
-              <br><center><button class="btn btn-success">Atender</button>
-            <?php } ?>
-            <?php if ($op["estado"] ==1) { ?>
-                  
-              <a class="btn btn-danger" data-toggle="modal" data-target="#ModalAnu">Anular</a></center>
-            <?php }?>
-          <?php } ?>          
-            </form>
-            <hr>
-         
-            <div class="modal fade" id="ModalAnu" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <form class="form-horizontal" method="POST" id="form_anu" action="php/anular_op.php">
-      
-                  <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Anular OP</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  </div>
-                  <div class="modal-body">
-                  
-                     <div class="form-group" style="margin: 10px">
-                      <label class="control-label no-padding-right" for="motivo_anu"> Motivo de anulación <small style="color:red;"> *</small></label>
+                <div style="margin-bottom:16px">
+                  <p class="op-field-label">Observaciones de despacho</p>
+                  <textarea name="obs_envio" id="obs_envio" class="op-textarea" placeholder="Observaciones del despacho..."></textarea>
+                </div>
 
-                      <textarea cols="25" rows="5" name="motivo_anu" id="motivo_anu" class="form-control" required></textarea>
-                      <input type="hidden" name="op" value="<?php echo $op["opid"] ?>">
-                
+                <div>
+                  <p class="op-field-label">Soporte de entrega <span class="op-required">*</span></p>
+                  <input type="file" name="adjunto_envio" id="adjunto_envio" class="op-input" required="" />
+                </div>
+              </div>
+            </div>
+
+            <input type="hidden" name="op" value="<?= $op['opid'] ?>">
+
+            <!-- Botones de acción -->
+            <div class="op-actions">
+              <button type="submit" class="op-btn op-btn-atender">
+                <i class="bi bi-check-lg"></i> Atender
+              </button>
+              <?php if ($op['estado'] == 1): ?>
+              <a class="op-btn op-btn-anular" data-toggle="modal" data-target="#ModalAnu">
+                <i class="bi bi-x-lg"></i> Anular
+              </a>
+              <?php endif; ?>
+            </div>
+
+          <?php endif; ?>
+
+          </form>
+
+          <!-- Modal Anular -->
+          <div class="modal fade" id="ModalAnu" tabindex="-1" role="dialog" aria-labelledby="modalAnuLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                <form class="form-horizontal" method="POST" id="form_anu" action="php/anular_op.php">
+                  <div class="modal-header" style="background:#fff4f4; border-bottom:1px solid #fecaca;">
+                    <h4 class="modal-title" id="modalAnuLabel" style="color:#dc2626; font-weight:700; font-size:1rem;">
+                      <i class="bi bi-x-circle-fill"></i> Anular OP
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body" style="padding:20px;">
+                    <div class="form-group">
+                      <label class="op-field-label" for="motivo_anu">Motivo de anulación <span class="op-required">*</span></label>
+                      <textarea name="motivo_anu" id="motivo_anu" class="op-textarea" required></textarea>
+                      <input type="hidden" name="op" value="<?= $op['opid'] ?>">
                     </div>
-          
                   </div>
-
-                  <div class="modal-footer">
-                  <button type="button" class="btn btn-warning" data-dismiss="modal">Cerrar</button>
-                  <button type="submit" class="btn btn-danger" id="anular">Anular</button>
+                  <div class="modal-footer" style="background:#fafafa;">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="op-btn op-btn-anular" id="anular">
+                      <i class="bi bi-x-lg"></i> Anular
+                    </button>
                   </div>
-
-                  </form>
-                </div>
-                </div>
+                </form>
+              </div>
             </div>
-
           </div>
 
-
-            
-                
-
-              </div><!-- /.col -->
-            </div><!-- /.row -->
-            </form>
-          </div>
         </div>
         <?php include("template/footer.php"); ?>
       </div>
     </div>
-    
-    <!-- js -->
+
     <script src="vendors/scripts/core.js"></script>
     <script src="vendors/scripts/script.min.js"></script>
     <script src="vendors/scripts/process.js"></script>
     <script src="vendors/scripts/layout-settings.js"></script>
 
     <script>
+      $(document).ready(function(){
+        $('#cliente').select2({
+          placeholder: 'Seleccionar cliente',
+          allowClear: true,
+          minimumResultsForSearch: 0,
+          width: '100%',
+          language: {
+            noResults: function(){ return 'Sin resultados'; },
+            searching:  function(){ return 'Buscando...'; }
+          }
+        });
+      });
+
       $('#materia').on('change',function(){
-      var valor = $(this).val();
-      //alert(valor);
-      var dataString = 'mat_gra='+valor;
-              
-      $.ajax({
-
-        url: "ajax/buscar_l_eureka_sp.php",
-        type: "POST",
-        data: dataString,
-        dataType: "html",
-        success: function (resp) {
-                   
-            $("#libro").html(resp);                        
-            //console.log(resp);
-        },
-        error: function (jqXHR,estado,error){
-            alert("error");
-            console.log(estado);
-            console.log(error);
-        },
-        complete: function (jqXHR,estado){
-            console.log(estado);
-        }
-
-                          
-      })
-                
-    });
+        var valor = $(this).val();
+        var dataString = 'mat_gra='+valor;
+        $.ajax({ url:"ajax/buscar_l_eureka_sp.php", type:"POST", data:dataString, dataType:"html",
+          success:function(resp){ $("#libro").html(resp); },
+          error:function(){ alert("error"); }
+        });
+      });
 
       $('#libro').on('change',function(){
-        var cant =$('#cantidad').val();
-        var libro=$('#libro').val();
-        var grado = $('#libro option:selected').attr('data-grado');
-        
+        var cant=$('#cantidad').val(), libro=$('#libro').val();
+        var grado=$('#libro option:selected').attr('data-grado');
+        if (grado==15||grado==16) {
+          $('#l_cantidad').addClass("d-none"); $('#cantidad').addClass("d-none");
+          $.ajax({ url:"ajax/buscar_pri_sec.php", type:"POST", data:'pri_sec='+libro, dataType:"html",
+            success:function(resp){ $("#ls_pri_sec").html('').append(resp); }
+          });
+        } else { $('#libro_e').val(libro+'/'+cant); }
+      });
 
-        if (grado==15 || grado==16) {
-          $('#l_cantidad').addClass("d-none");
-          $('#cantidad').addClass("d-none");
-          
-          var dataString = 'pri_sec='+libro;
-                  
-          $.ajax({
+      $('#cantidad').keyup(function(){
+        var cant=$('#cantidad').val(), libro=$('#libro').val();
+        var grado=$('#libro option:selected').attr('data-grado');
+        if (grado!=15||grado!=16) { $('#libro_e').val(libro+'/'+cant); }
+      });
 
-              url: "ajax/buscar_pri_sec.php",
-              type: "POST",
-              data: dataString,
-              dataType: "html",
-              success: function (resp) {
-                  $("#ls_pri_sec").html('');
-                  $("#ls_pri_sec").append(resp);                       
-                  console.log(resp);
-              },
-              error: function (jqXHR,estado,error){
-                  alert("error");
-                  console.log(estado);
-                  console.log(error);
-              },
-              complete: function (jqXHR,estado){
-                  console.log(estado);
-              }
-
-                              
-          })
-
-        }else{
-          $('#libro_e').val(libro+'/'+cant);
-        }
-
-        
-
-      })
-
-    $('#cantidad').keyup(function(){
-      var cant =$('#cantidad').val();
-      var libro=$('#libro').val();
-      var grado = $('#libro option:selected').attr('data-grado');
-          
-      if (grado!=15 || grado!=16) {
-        $('#libro_e').val(libro+'/'+cant);
-      }
-    
-  })
-
-  
-
-  var m = 1;
-
-  $("#agregar_libro").click(function(){
-    if (m>98) {
-      $("#agregar_libro").addClass("d-none");
-    }
-    
-    $("#agg_l"+m).removeClass("d-none")
-
-    m++;
-    <?php for ($i=1; $i < 100; $i++) { ?>
-
-      $('#materia<?php echo $i; ?>').on('change',function(){
-          var valor = $(this).val();
-          //alert(valor);
-          var dataString = 'mat_gra='+valor;
-                  
-          $.ajax({
-
-              url: "ajax/buscar_l_eureka_sp.php",
-              type: "POST",
-              data: dataString,
-              dataType: "html",
-              success: function (resp) {
-                     
-                  $("#libro<?php echo $i; ?>").html(resp);                        
-                  //console.log(resp);
-              },
-              error: function (jqXHR,estado,error){
-                  alert("error");
-                  console.log(estado);
-                  console.log(error);
-              },
-              complete: function (jqXHR,estado){
-                  console.log(estado);
-              }
-
-                              
-        })
-                
-        });
-
-    
-
-      $('#libro<?php echo $i; ?>').on('change',function(){
-        var cant =$('#cantidad<?php echo $i; ?>').val();
-        var libro=$('#libro<?php echo $i; ?>').val();
-        var grado = $('#libro<?php echo $i; ?> option:selected').attr('data-grado');
-        
-
-        if (grado==15 || grado==16) {
-          $('#l_cantidad<?php echo $i; ?>').addClass("d-none");
-          $('#cantidad<?php echo $i; ?>').addClass("d-none");
-          
-          var dataString = 'pri_sec='+libro;
-                  
-          $.ajax({
-
-              url: "ajax/buscar_pri_sec.php",
-              type: "POST",
-              data: dataString,
-              dataType: "html",
-              success: function (resp) {
-                  $("#ls_pri_sec<?php echo $i; ?>").html('');
-                  $("#ls_pri_sec<?php echo $i; ?>").append(resp);                       
-                  console.log(resp);
-              },
-              error: function (jqXHR,estado,error){
-                  alert("error");
-                  console.log(estado);
-                  console.log(error);
-              },
-              complete: function (jqXHR,estado){
-                  console.log(estado);
-              }
-
-                              
-          })
-
-        }else{
-          $('#libro_e<?php echo $i; ?>').val(libro+'/'+cant);
-        }
-
-        
-
-      })
-
-      $('#cantidad<?php echo $i; ?>').keyup(function(){
-        var cant =$('#cantidad<?php echo $i; ?>').val();
-        var libro=$('#libro<?php echo $i; ?>').val();
-        var grado = $('#libro option:selected').attr('data-grado');
-          
-        if (grado!=15 || grado!=16) {
-          $('#libro_e<?php echo $i; ?>').val(libro+'/'+cant);
-        }
-        
-
-
-
-      })
-
-    <?php } ?>
-      
-
-      
-  })
+      var m=1;
+      $("#agregar_libro").click(function(){
+        if (m>98) { $("#agregar_libro").addClass("d-none"); }
+        $("#agg_l"+m).removeClass("d-none"); m++;
+        <?php for ($i=1; $i<100; $i++) { ?>
+          $('#materia<?php echo $i; ?>').on('change',function(){
+            var v=$(this).val();
+            $.ajax({ url:"ajax/buscar_l_eureka_sp.php", type:"POST", data:'mat_gra='+v, dataType:"html",
+              success:function(resp){ $("#libro<?php echo $i; ?>").html(resp); }
+            });
+          });
+          $('#libro<?php echo $i; ?>').on('change',function(){
+            var cant=$('#cantidad<?php echo $i; ?>').val(), libro=$('#libro<?php echo $i; ?>').val();
+            var grado=$('#libro<?php echo $i; ?> option:selected').attr('data-grado');
+            if (grado==15||grado==16) {
+              $('#l_cantidad<?php echo $i; ?>').addClass("d-none"); $('#cantidad<?php echo $i; ?>').addClass("d-none");
+              $.ajax({ url:"ajax/buscar_pri_sec.php", type:"POST", data:'pri_sec='+libro, dataType:"html",
+                success:function(resp){ $("#ls_pri_sec<?php echo $i; ?>").html('').append(resp); }
+              });
+            } else { $('#libro_e<?php echo $i; ?>').val(libro+'/'+cant); }
+          });
+          $('#cantidad<?php echo $i; ?>').keyup(function(){
+            var cant=$('#cantidad<?php echo $i; ?>').val(), libro=$('#libro<?php echo $i; ?>').val();
+            var grado=$('#libro option:selected').attr('data-grado');
+            if (grado!=15||grado!=16) { $('#libro_e<?php echo $i; ?>').val(libro+'/'+cant); }
+          });
+        <?php } ?>
+      });
     </script>
-    
   </body>
 </html>
