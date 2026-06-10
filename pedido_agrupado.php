@@ -1,400 +1,406 @@
-<?php require_once("php/aut.php"); ?>
+<?php
+require_once("php/aut.php");
+require_once("conexion/bdd.php");
+
+$pedidos_ids = $_POST['pedidos'] ?? [];
+$periodo_id  = intval($_POST['periodo'] ?? 0);
+
+// --- Info del pedido / cliente (último pedido para el encabezado) ---
+$pedido  = null;
+$cliente = null;
+foreach ($pedidos_ids as $pid) {
+  $s = $bdd->prepare(
+    "SELECT pe.fecha, pe.observaciones, pe.fecha_r, pe.cliente, pe.fac_rem, pe.dir_ent,
+            z.codigo AS codzona, z.zona, c.colegio, u.nombres, u.apellidos, u.tipo,
+            u.id AS uid, e.estado, pe.tipo AS petipo
+     FROM pedidos pe
+     JOIN colegios c       ON pe.id_colegio = c.id
+     JOIN zonas z          ON z.codigo = c.cod_zona
+     JOIN usuarios u       ON u.cod_zona = z.codigo
+     JOIN estados_pedidos e ON e.id = pe.estado
+     WHERE pe.id = ?"
+  );
+  $s->execute([$pid]);
+  $pedido = $s->fetch();
+
+  $sc = $bdd->prepare("SELECT cliente FROM clientes WHERE id = ?");
+  $sc->execute([$pedido['cliente'] ?? 0]);
+  $cliente = $sc->fetch();
+}
+
+// --- IDs únicos de libros entre todos los pedidos ---
+$libros_a = [];
+foreach ($pedidos_ids as $pid) {
+  $sq = $bdd->prepare(
+    "SELECT l.id AS libroid
+     FROM pedidos pe
+     JOIN libros_pedidos lp ON lp.cod_pedido = pe.codigo
+     JOIN libros l          ON l.id = lp.id_libro
+     JOIN presupuestos p    ON p.id_colegio = pe.id_colegio
+       AND p.id_libro = lp.id_libro AND pe.id_periodo = p.id_periodo
+     WHERE pe.id = ? AND p.definido = 1 AND lp.cantidad != 0
+     GROUP BY l.id, p.cod_area"
+  );
+  $sq->execute([$pid]);
+  foreach ($sq->fetchAll() as $r) {
+    $libros_a[] = $r['libroid'];
+  }
+}
+$libros_a = array_unique($libros_a);
+
+// --- Pre-procesar libros ---
+$libros  = [];
+$total_v = 0;
+$total_c = 0;
+$uid     = intval($pedido['uid'] ?? 0);
+
+foreach ($libros_a as $libro_a) {
+  $sq = $bdd->prepare(
+    "SELECT pe.id, l.id AS libroid, l.id_grado, l.libro, l.precio, l.isbn,
+            m.materia, lp.cantidad, p.cod_area, p.descuento_d, p.tasa_compra_d,
+            lp.id AS lpid, lp.plataforma
+     FROM pedidos pe
+     JOIN libros_pedidos lp ON lp.cod_pedido = pe.codigo
+     JOIN libros l          ON l.id = lp.id_libro
+     JOIN materias m        ON l.id_materia = m.id
+     JOIN presupuestos p    ON p.id_colegio = pe.id_colegio
+       AND p.id_libro = lp.id_libro AND pe.id_periodo = p.id_periodo
+     WHERE lp.id_libro = ? AND p.id_periodo = ? AND pe.id_usuario = ?
+       AND p.definido = 1 AND lp.cantidad != 0
+     GROUP BY l.id, p.cod_area"
+  );
+  $sq->execute([$libro_a, $periodo_id, $uid]);
+  $libro = $sq->fetch();
+  if (!$libro) continue;
+
+  // Grado
+  if (($libro['cod_area'] ?? '') == '') {
+    $sg = $bdd->prepare("SELECT grado FROM grados WHERE id = ?");
+    $sg->execute([$libro['id_grado']]);
+    $g = $sg->fetch();
+  } else {
+    $sa = $bdd->prepare("SELECT id_grado_otro FROM areas_objetivas WHERE codigo = ?");
+    $sa->execute([$libro['cod_area']]);
+    $ao = $sa->fetch();
+    $sg = $bdd->prepare("SELECT grado FROM grados WHERE id = ?");
+    $sg->execute([$ao['id_grado_otro'] ?? 0]);
+    $g = $sg->fetch();
+  }
+
+  // Ubicación
+  $su = $bdd->prepare(
+    "SELECT l.id_tipo, l.lugar, u.piso, u.ubicacion, lu.posicion
+     FROM lugares l
+     JOIN ubicaciones u         ON l.id = u.id_lugar
+     JOIN libros_ubicaciones lu ON u.id = lu.ubicacion
+     WHERE lu.id_libro = ?"
+  );
+  $su->execute([$libro['libroid']]);
+  $ubi = '';
+  foreach ($su->fetchAll() as $ub) {
+    $ubi .= ($ub['id_tipo'] == 1)
+      ? $ub['lugar'].$ub['piso'].' Pallet '.$ub['ubicacion'].' '.$ub['posicion'].', '
+      : $ub['lugar'].' Bandeja '.$ub['ubicacion'].', ';
+  }
+
+  // Sumar cantidades a través de todos los pedidos
+  $cant_sum = 0;
+  foreach ($pedidos_ids as $pid) {
+    $sqc = $bdd->prepare(
+      "SELECT lp.cantidad, lp.cantidad_aprob
+       FROM libros_pedidos lp JOIN pedidos p ON lp.cod_pedido = p.codigo
+       WHERE p.id = ? AND lp.id_libro = ?"
+    );
+    $sqc->execute([$pid, $libro['libroid']]);
+    foreach ($sqc->fetchAll() as $c) {
+      $cant_sum += ($c['cantidad_aprob'] > 0) ? intval($c['cantidad_aprob']) : intval($c['cantidad']);
+    }
+  }
+
+  $desc_pct = floatval($libro['descuento_d']) * 100;
+  $p_fact   = floatval($libro['precio']) * (1 - floatval($libro['descuento_d']));
+  $v_venta  = $p_fact * $cant_sum;
+  $total_v += $v_venta;
+  $total_c += $cant_sum;
+
+  $libros[] = [
+    'isbn'       => $libro['isbn'],
+    'libro'      => $libro['libro'],
+    'ubi'        => rtrim($ubi, ', '),
+    'materia'    => $libro['materia'],
+    'grado'      => $g['grado'] ?? '—',
+    'precio'     => floatval($libro['precio']),
+    'desc_pct'   => $desc_pct,
+    'p_fact'     => $p_fact,
+    'cantidad'   => $cant_sum,
+    'v_venta'    => $v_venta,
+    'plataforma' => intval($libro['plataforma'] ?? 0),
+  ];
+}
+
+$show_plataforma = (intval($pedido['petipo'] ?? 0) == 3 || ($pedido['codzona'] ?? '') == '5656');
+$promotor        = htmlspecialchars(trim(($pedido['nombres'] ?? '').' '.($pedido['apellidos'] ?? '')));
+$pedidos_label   = implode(', ', array_map('intval', (array)$pedidos_ids));
+$tipo_doc        = (intval($pedido['fac_rem'] ?? 0) == 1) ? 'Factura' : 'Remisión';
+$tipo_pedido_str = '';
+if ($show_plataforma) {
+  $tipo_pedido_str = (intval($pedido['petipo'] ?? 0) == 1) ? 'Libros sueltos' : 'Paquete';
+}
+$n_titulos = count($libros);
+?>
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <!-- Basic Page Info -->
-    <meta charset="utf-8" />
-    <title>Inkpulse - Pedido agrupado</title>
+<head>
+  <meta charset="utf-8" />
+  <title>Inkpulse — Pedido agrupado</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="vendors/images/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="vendors/images/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="vendors/images/favicon-16x16.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="src/plugins/datatables/css/dataTables.bootstrap4.min.css" />
+  <link rel="stylesheet" type="text/css" href="src/plugins/datatables/css/responsive.bootstrap4.min.css" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/icon-font.min.css" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
+  <style>
+    /* Print */
+    @page { margin: 20px; }
+    @media print {
+      .mc-actions, .breadcrumb, .d-print-none, .left-side-bar, .header { display: none !important; }
+      a[href]:after { content: none !important; }
+      body { font-size: 9px; }
+      .ag-table-wrap, .table-responsive { overflow: visible !important; width: 100% !important; height: auto !important; }
+      .main-container, .pd-ltr-20 { overflow: visible !important; }
+      .dataTables_scrollBody { overflow: visible !important; height: auto !important; }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; }
+    }
 
-    <!-- Site favicon -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="vendors/images/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="vendors/images/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="vendors/images/favicon-16x16.png"
-    />
+    /* Info cards */
+    .mc-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .mc-card {
+      background: #fff; border-radius: 10px; padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(15,23,42,.08);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .mc-card-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .mc-card-icon.blue   { background: #dbeafe; color: #1d4ed8; }
+    .mc-card-icon.green  { background: #dcfce7; color: #15803d; }
+    .mc-card-icon.orange { background: #ffedd5; color: #c2410c; }
+    .mc-card-icon.purple { background: #ede9fe; color: #6d28d9; }
+    .mc-card-icon.teal   { background: #ccfbf1; color: #0d9488; }
+    .mc-card-label { font-size: .71rem; color: #64748b; margin: 0 0 2px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .mc-card-val   { font-size: .9rem; font-weight: 700; color: #0f172a; margin: 0; }
 
-    <!-- Mobile Specific Metas -->
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
+    /* Table */
+    .ag-table-wrap { border-radius: 10px; overflow-x: auto; box-shadow: 0 2px 10px rgba(15,23,42,.09); margin-bottom: 24px; }
+    #ag-table { width: 100%; font-size: .83rem; border-collapse: collapse; }
+    #ag-table thead th {
+      background: #1e40af !important; color: #fff !important;
+      font-weight: 600; font-size: .80rem; padding: 11px 12px;
+      text-align: left; border: none; white-space: nowrap;
+    }
+    #ag-table tbody tr              { background: #fff; }
+    #ag-table tbody tr:nth-child(even) { background: #eff6ff; }
+    #ag-table tbody tr:hover        { background: #dbeafe !important; }
+    #ag-table tbody td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
+    #ag-table tfoot td {
+      padding: 10px 12px; background: #f8fafc; color: #374151;
+      font-weight: 700; font-size: .83rem; border: none; border-top: 2px solid #e2e8f0;
+    }
 
-    <!-- Google Font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <!-- CSS -->
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="src/plugins/datatables/css/dataTables.bootstrap4.min.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="src/plugins/datatables/css/responsive.bootstrap4.min.css"
-    />
+    /* Actions */
+    .mc-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; padding-bottom: 16px; }
+    .mc-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 22px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: opacity .15s, transform .1s;
+    }
+    .mc-btn:hover { opacity: .88; transform: translateY(-1px); text-decoration: none; }
+    .mc-btn-teal  { background: #0d9488; color: #fff !important; }
+    .mc-btn-amber { background: #d97706; color: #fff !important; }
+  </style>
+</head>
+<body>
 
-    <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="vendors/styles/icon-font.min.css"
-    />
-    <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
+<?php include("template/nav_side.php"); ?>
+<div class="main-container">
+  <div class="pd-ltr-20 xs-pd-20-10">
+    <div class="min-height-200px">
 
-    
-  </head>
-  <body>
-    
-    <?php include("template/nav_side.php"); ?>
-    <div class="main-container">
-      <div class="pd-ltr-20 xs-pd-20-10">
-        <div class="min-height-200px">
-          <div class="page-header">
-            <div class="row">
-              <div class="col-md-6 col-sm-12">
-                <div class="title">
-                  <h4>Pedido agrupado</h4>
-                </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                      Pedidos
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                      Pedido agrupado
-                    </li>
-                  </ol>
-                </nav>
-              </div>
-              
-            </div>
-          </div>
-          <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-            
-            <div class="row">
-              <div class="col-sm-12">
-              
-                <table class="table table-bordered table-hover">
-                  <tr>
-                    <td># Pedidos:
-
-                      <?php
-                        foreach ($_POST['pedidos'] as $pedidoa) {
-                          echo $pedidoa.", ";
-
-                          $sql_pedido="SELECT pe.fecha,pe.observaciones,pe.fecha_r, pe.cliente, pe.fac_rem,pe.dir_ent,z.codigo as codzona, z.zona, c.colegio, u.nombres, u.apellidos, u.tipo,u.id as uid, e.estado, pe.tipo as petipo FROM pedidos pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado WHERE pe.id='".$pedidoa."'";
-
-                          $req_pedido = $bdd->prepare($sql_pedido);
-                          $req_pedido->execute();
-                          $pedido = $req_pedido->fetch();
-
-                          $sql_cliente="SELECT cliente FROM clientes WHERE id='".$pedido["cliente"]."'";
-
-                          $req_cliente = $bdd->prepare($sql_cliente);
-                          $req_cliente->execute();
-                          $cliente = $req_cliente->fetch();
-                        }
-
-                      ?>
-
-                    </td>
-                    <td>Promotor: <?php echo $pedido["nombres"]." ".$pedido["apellidos"] ?></td>
-                                
-                  </tr>
-                  <tr>
-    
-                  </tr>
-                  <tr>
-                    <td>Cliente: <?php echo $cliente["cliente"] ?></td>
-                    <?php if ($pedido["fac_rem"] ==1) { ?>
-                      <td>Factura</td>
-                    <?php }else{ ?>
-                      <td>Remisión</td>
-                    <?php } ?>
-
-                    <?php if ($pedido["tipo"]==3 || $pedido["codzona"]=='5656') { ?>
-                      <?php if ($pedido["petipo"] ==1) { ?>
-                        <td>Tipo de pedido: Libros sueltos</td>
-                      <?php }else{ ?>
-                        <td>Tipo de pedido: Paquete</td>
-                      <?php } ?>
-                    <?php } ?>
-
-                  </tr>
-                </table>
-                <center id="impre"></center>
-                <input type="hidden" id="fecha_impre">
-                <table class="table table-striped table-bordered table-hover" id="dataTables-example">
-                  <thead>
-                    <tr>
-                      <th>Isbn</th>
-                      <th>Título</th>
-                      <th>Ubicación</th>
-                      <th class="hidden-print">Materia</th>
-                      <th>Grado</th>
-                      <th>PVP</th>
-                      <th>Desc.</th>
-                      <th>Precio Facturación</th>
-                      <th>Cantidad</th>
-                      <th>Valor Venta</th>
-                      <?php if ($pedido["tipo"]==3 || $pedido["codzona"]=='5656') { ?>
-                        <th>Plataforma</th>
-                      <?php } ?>
-                                           
-                    </tr>
-                  </thead>
-                  <tbody>
-
-                    <?php 
-      
-                      foreach ($_POST['pedidos'] as $pedidoa) {
-
-                        $sql_pedido="SELECT pe.fecha,pe.observaciones,pe.fecha_r, pe.cliente, pe.fac_rem,pe.dir_ent,z.codigo as codzona, z.zona, c.colegio, u.nombres, u.apellidos, u.tipo,u.id as uid, e.estado, pe.tipo as petipo FROM pedidos pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado WHERE pe.id='".$pedidoa."'";
-
-                        $req_pedido = $bdd->prepare($sql_pedido);
-                        $req_pedido->execute();
-                        $pedido = $req_pedido->fetch();
-
-                        $sql_cliente="SELECT cliente FROM clientes WHERE id='".$pedido["cliente"]."'";
-
-                        $req_cliente = $bdd->prepare($sql_cliente);
-                        $req_cliente->execute();
-                        $cliente = $req_cliente->fetch();
-
-                        $sql = "SELECT pe.id, l.id as libroid, l.id_grado, l.libro, l.precio, l.isbn, m.materia, lp.cantidad, p.cod_area, p.descuento_d, p.tasa_compra_d, lp.id as lpid,lp.plataforma FROM pedidos pe JOIN libros_pedidos lp ON lp.cod_pedido=pe.codigo JOIN libros l ON l.id=lp.id_libro JOIN materias m ON l.id_materia=m.id JOIN presupuestos p ON p.id_colegio=pe.id_colegio AND p.id_libro=lp.id_libro AND pe.id_periodo=p.id_periodo AND lp.cantidad!=0 WHERE pe.id='".$pedidoa."' AND p.definido=1 GROUP BY l.id,p.cod_area";
-                        $req = $bdd->prepare($sql);
-                        $req->execute();
-
-                                
-                        $libros = $req->fetchAll();
-
-                        foreach ($libros as $libro) {
-                          $libros_a[]=$libro["libroid"];
-                        }
-                                                     
-                      }
-                            
-                      $libros_a=array_unique($libros_a);
-                                  
-                    ?>
-                             
-                                    
-                    <?php
-                                          
-                      foreach($libros_a as $libro_a) {
-                                            
-                        $sql = "SELECT pe.id, l.id as libroid, l.id_grado, l.libro, l.precio, l.isbn, m.materia, lp.cantidad, p.cod_area, p.descuento_d, p.tasa_compra_d, lp.id as lpid,lp.plataforma FROM pedidos pe JOIN libros_pedidos lp ON lp.cod_pedido=pe.codigo JOIN libros l ON l.id=lp.id_libro JOIN materias m ON l.id_materia=m.id JOIN presupuestos p ON p.id_colegio=pe.id_colegio AND p.id_libro=lp.id_libro AND pe.id_periodo=p.id_periodo WHERE lp.id_libro='".$libro_a."' AND p.id_periodo='".$_POST['periodo']."' AND pe.id_usuario='".$pedido["uid"]."' AND p.definido=1 AND lp.cantidad!=0 GROUP BY l.id,p.cod_area";
-                        $req = $bdd->prepare($sql);
-                        $req->execute();
-
-                        $libro = $req->fetch();
-                                           
-                        $descuento=$libro["descuento_d"] * 100;
-                        $precio_fact=$libro["precio"] -($libro["precio"] * $libro["descuento_d"]);
-                         
-                        //$total_cantidad[]=$libro["cantidad"];
-
-                        $sql = "SELECT l.id_tipo, l.lugar, u.piso, u.ubicacion, lu.posicion FROM lugares l JOIN ubicaciones u ON l.id=u.id_lugar JOIN libros_ubicaciones lu ON u.id=lu.ubicacion WHERE lu.id_libro='".$libro["libroid"]."'";
-                        $req = $bdd->prepare($sql);
-                        $req->execute();
-
-                        $ubicaciones = $req->fetchAll();
-
-                        $ubi="";
-
-                        foreach ($ubicaciones as $ubicacion) {
-                          if ($ubicacion["id_tipo"] ==1) {
-                            $ubi.=$ubicacion["lugar"]."".$ubicacion["piso"]." Pallet ".$ubicacion["ubicacion"]." ".$ubicacion["posicion"].", ";
-                          }else{
-                            $ubi.=$ubicacion["lugar"]." Bandeja ".$ubicacion["ubicacion"].", ";
-                          }
-                        }
-                                                                  
-                        echo'<tr class="odd gradeX">';
-                          echo'<td class="">'.$libro["isbn"].'</td>';
-                          echo'<td class="">'.$libro["libro"].'</td>';
-                          echo'<td class="">'.$ubi.'</td>';
-                          echo'<td class="center hidden-print">'.$libro["materia"].'</td>';
-                          if ($libro["cod_area"] == "") {
-
-                            $sql_g = "SELECT grado FROM grados WHERE id='".$libro["id_grado"]."'";
-                            $req_g = $bdd->prepare($sql_g);
-                            $req_g->execute();
-                            $grado= $req_g->fetch();
-                                                  
-                          }else{
-                                                  
-                            $sql = "SELECT id_grado_otro FROM areas_objetivas WHERE codigo='".$libro["cod_area"]."'";
-                            $req = $bdd->prepare($sql);
-                            $req->execute();
-
-                            $go = $req->fetch();
-
-                            $sql_g = "SELECT grado FROM grados WHERE id='".$go["id_grado_otro"]."'";
-                            $req_g = $bdd->prepare($sql_g);
-                            $req_g->execute();
-                            $grado= $req_g->fetch();
-
-                          if ($_GET["id_pedido"] >500) {
-                            
-                            $sql_c = "SELECT cantidad FROM libros_pedidos WHERE cod_area='".$libro["cod_area"]."'";
-                            $req_c = $bdd->prepare($sql_c);
-                            $req_c->execute();
-                            $cantidad= $req_c->fetch();
-                            $libro["cantidad"]=$cantidad["cantidad"];
-
-                          }
-  
-                        }
-                        echo'<td class="center">'.$grado["grado"].'</td>';
-                        echo'<td class="center">$ '.number_format($libro["precio"],0,",", ".").'</td>';
-                        echo'<td class="center">'.$descuento.' %</td>';
-                        echo'<td class="center">$ '.number_format($precio_fact,0,",", ".").'</td>';
-
-                        echo'<td class="center">';
-                          foreach ($_POST['pedidos'] as $pedidoa) {
-
-                            $sql = "SELECT lp.cantidad, lp.cantidad_aprob FROM libros_pedidos lp JOIN pedidos p ON lp.cod_pedido=p.codigo WHERE p.id='".$pedidoa."' AND lp.id_libro='".$libro["libroid"]."' ";
-                            $req = $bdd->prepare($sql);
-                            $req->execute();
-
-                            $cantidades = $req->fetchAll();
-
-                            foreach ($cantidades as $cantidad) {
-
-                              if ($cantidad["cantidad_aprob"]>0) {
-                                $cantidad_sum[$libro["libroid"]]+=$cantidad["cantidad_aprob"];
-                              }else{
-                                $cantidad_sum[$libro["libroid"]]+=$cantidad["cantidad"];
-                              }
-                              
-                              
-                              
-                            }
-                          
-                          }
-                          echo $cantidad_sum[$libro["libroid"]];
-
-                          $v_venta=$precio_fact * $cantidad_sum[$libro["libroid"]];
-                          $total_venta[]=$v_venta;
-
-                          $total_cantidad[]=$cantidad_sum[$libro["libroid"]];
-                          //echo $cantidades_l[$libro["libroid"]];
-                        echo '</td>';
-                        //echo'<td class="center">'.$libro["cantidad"].'</td>';
-                        echo'<td class="center">$ '.number_format($v_venta,0,",", ".").'</td>';
-                                               
-                        if ($pedido["tipo"]==3 || $pedido["codzona"]=='5656') { 
-
-                          if ($libro["plataforma"]==0) {
-                            echo'<td class="center">No</td>';
-                          }else{
-                            echo'<td class="center">Si</td>';
-                          }
-                                               
-                        }
-                                                                                           
-                      }
-                      $total_v=array_sum($total_venta);
-                      $total_c=array_sum($total_cantidad);
-                    ?>
-                                        
-                  </tr>
-                </tbody>
-                <td class="center"></td>
-                <td class="center hidden-print"></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"><b>Total:</b></td>
-                <td class="center"><b><?php echo $total_c; ?></b></td>
-                <td class="center"><b>$ <?php echo number_format($total_v,0,",", "."); ?></b></td>
-                                   
-              </table>
-               
-              <form action="solicitar_op.php" method="POST">
-                <?php foreach ($_POST['pedidos'] as $pedidoa) { ?>
-                  <input type="hidden" name="pedidos_agp[]" value="<?php echo $pedidoa ?>">
-                <?php } ?>
-                <br><center> <button type="button" id="imprimir" class="btn btn-info hidden-print">Imprimir</button> <button  class="btn btn-warning hidden-print">Solicitar OP</button></center>
-              </form>
-                                         
-              </div><!-- /.col -->
-            </div><!-- /.row -->
-            
-
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-md-8 col-sm-12">
+            <div class="title"><h4>Pedido agrupado</h4></div>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">Pedidos</li>
+                <li class="breadcrumb-item active">Agrupado</li>
+              </ol>
+            </nav>
           </div>
         </div>
-        <?php include("template/footer.php"); ?>
       </div>
+
+      <!-- Tarjetas de info -->
+      <div class="mc-cards">
+        <div class="mc-card">
+          <div class="mc-card-icon blue"><i class="bi bi-layers"></i></div>
+          <div>
+            <p class="mc-card-label"># Pedidos</p>
+            <p class="mc-card-val"><?= $pedidos_label ?></p>
+          </div>
+        </div>
+        <div class="mc-card">
+          <div class="mc-card-icon purple"><i class="bi bi-person"></i></div>
+          <div>
+            <p class="mc-card-label">Promotor</p>
+            <p class="mc-card-val"><?= $promotor ?></p>
+          </div>
+        </div>
+        <div class="mc-card">
+          <div class="mc-card-icon green"><i class="bi bi-building"></i></div>
+          <div>
+            <p class="mc-card-label">Cliente</p>
+            <p class="mc-card-val"><?= htmlspecialchars($cliente['cliente'] ?? '—') ?></p>
+          </div>
+        </div>
+        <div class="mc-card">
+          <div class="mc-card-icon orange"><i class="bi bi-file-text"></i></div>
+          <div>
+            <p class="mc-card-label">Documento</p>
+            <p class="mc-card-val"><?= $tipo_doc ?></p>
+          </div>
+        </div>
+        <?php if ($tipo_pedido_str): ?>
+        <div class="mc-card">
+          <div class="mc-card-icon teal"><i class="bi bi-tag"></i></div>
+          <div>
+            <p class="mc-card-label">Tipo de pedido</p>
+            <p class="mc-card-val"><?= htmlspecialchars($tipo_pedido_str) ?></p>
+          </div>
+        </div>
+        <?php endif; ?>
+      </div>
+
+      <!-- Tabla de libros -->
+      <div class="modern-card">
+        <div class="card-head">
+          <h5><i class="bi bi-journals mr-2"></i> Libros agrupados</h5>
+          <span style="font-size:12px;color:#64748b;background:#f1f5f9;border-radius:20px;padding:3px 10px;font-weight:500"><?= $n_titulos ?> títulos</span>
+        </div>
+        <div class="ag-table-wrap px-2 pb-2">
+          <table id="ag-table">
+            <thead>
+              <tr>
+                <th>ISBN</th>
+                <th>Título</th>
+                <th>Ubicación</th>
+                <th class="d-print-none">Materia</th>
+                <th>Grado</th>
+                <th>PVP</th>
+                <th>Desc.</th>
+                <th>Precio Fact.</th>
+                <th>Cantidad</th>
+                <th>Valor Venta</th>
+                <?php if ($show_plataforma): ?><th>Plataforma</th><?php endif; ?>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($libros as $lb): ?>
+              <tr>
+                <td><?= htmlspecialchars($lb['isbn']) ?></td>
+                <td><?= htmlspecialchars($lb['libro']) ?></td>
+                <td><?= htmlspecialchars($lb['ubi']) ?></td>
+                <td class="d-print-none"><?= htmlspecialchars($lb['materia']) ?></td>
+                <td><?= htmlspecialchars($lb['grado']) ?></td>
+                <td>$ <?= number_format($lb['precio'], 0, ',', '.') ?></td>
+                <td><?= number_format($lb['desc_pct'], 1) ?> %</td>
+                <td>$ <?= number_format($lb['p_fact'], 0, ',', '.') ?></td>
+                <td><?= $lb['cantidad'] ?></td>
+                <td>$ <?= number_format($lb['v_venta'], 0, ',', '.') ?></td>
+                <?php if ($show_plataforma): ?>
+                <td><?= $lb['plataforma'] ? 'Sí' : 'No' ?></td>
+                <?php endif; ?>
+              </tr>
+              <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="7"></td>
+                <td class="d-print-none"></td>
+                <td><b>Total:</b></td>
+                <td><b><?= $total_c ?></b></td>
+                <td><b>$ <?= number_format($total_v, 0, ',', '.') ?></b></td>
+                <?php if ($show_plataforma): ?><td></td><?php endif; ?>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <form action="solicitar_op.php" method="POST">
+        <?php foreach ($pedidos_ids as $pid): ?>
+          <input type="hidden" name="pedidos_agp[]" value="<?= intval($pid) ?>">
+        <?php endforeach; ?>
+        <div class="mc-actions d-print-none">
+          <button type="button" id="imprimir" class="mc-btn mc-btn-teal">
+            <i class="bi bi-printer"></i> Imprimir
+          </button>
+          <button type="submit" class="mc-btn mc-btn-amber">
+            <i class="bi bi-box-seam"></i> Solicitar OP
+          </button>
+        </div>
+      </form>
+
     </div>
-    
-    <!-- js -->
-    <script src="vendors/scripts/core.js"></script>
-    <script src="vendors/scripts/script.min.js"></script>
-    <script src="vendors/scripts/process.js"></script>
-    <script src="vendors/scripts/layout-settings.js"></script>
-    <script src="src/plugins/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
-    <script src="src/plugins/datatables/js/dataTables.responsive.min.js"></script>
-    <script src="src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+    <?php include("template/footer.php"); ?>
+  </div>
+</div>
 
-    <script>
-      
-      $(document).ready(function () {
-        $('#dataTables-example').dataTable({
+<script src="vendors/scripts/core.js"></script>
+<script src="vendors/scripts/script.min.js"></script>
+<script src="vendors/scripts/process.js"></script>
+<script src="vendors/scripts/layout-settings.js"></script>
+<script src="src/plugins/datatables/js/jquery.dataTables.min.js"></script>
+<script src="src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
+<script src="src/plugins/datatables/js/dataTables.responsive.min.js"></script>
+<script src="src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+<script src="src/ink-alerts.js"></script>
+<script>
+$(document).ready(function () {
+  $('#ag-table').DataTable({
+    scrollX: true,
+    autoWidth: false,
+    paging: false,
+    order: [[0, 'asc']],
+    language: {
+      lengthMenu:   'Mostrar _MENU_ registros',
+      zeroRecords:  'No se encontraron resultados',
+      emptyTable:   'No hay libros para mostrar',
+      info:         'Mostrando _START_ a _END_ de _TOTAL_ registros',
+      infoEmpty:    'Sin registros disponibles',
+      infoFiltered: '(filtrado de _MAX_ registros)',
+      search:       '',
+      paginate: { first: '«', previous: '‹', next: '›', last: '»' }
+    },
+    initComplete: function () { $('.dataTables_filter').hide(); }
+  });
+});
 
-          "language": {
-            "lengthMenu": "Display _MENU_ registros por página",
-            "zeroRecords": "Nada encontrado, lo siento",
-            "info": "Mostrando página _PAGE_ de _PAGES_",
-            "infoEmpty": "No hay registros disponibles",
-            "infoFiltered": "(filtrado de _MAX_ registros en total )",
-            "search": "Buscar&nbsp;:",
-            paginate: {
-              first:"Primero",
-              previous:"Anterior",
-              next:"Siguiente",
-              last:"Último"
-            }
-          },
-          paging: false,
-          order: [[0, 'desc']]
-        });
-      });
-
-      $(".vista_soli" ).click(function( e ) {
-
-        e.preventDefault();
-        var url= $(this).attr("href")
-        var caracteristicas = "height=700,width=1300,scrollTo,resizable=1,scrollbars=1,location=0";
-        nueva=window.open(url, "Popup", caracteristicas);
-
-      })
-
-      $("#imprimir").click(function(){
-        window.print();
-      })
-
-
-    </script>
-    
-  </body>
+$('#imprimir').on('click', function () { window.print(); });
+</script>
+</body>
 </html>
