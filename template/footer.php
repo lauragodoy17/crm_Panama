@@ -2,6 +2,20 @@
   Ink-pulse - CRM de Eureka Contenidos Educativos
 </div>
 
+<script>
+(function () {
+  var observer = new MutationObserver(function () {
+    setTimeout(function () {
+      $(window).trigger('resize');
+      if ($.fn && $.fn.dataTable) {
+        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+      }
+    }, 320);
+  });
+  observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+
 <!-- Modal: Pedido de venta -->
 <div class="modal fade" id="modal_pedidos" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width:420px">
