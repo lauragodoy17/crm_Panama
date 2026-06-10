@@ -10,7 +10,8 @@
     use PhpOffice\PhpSpreadsheet\IOFactory;
     //set_time_limit(300);
     header("Content-Type:text/html;charset=utf-8"); 
-    $dir_subida = $_SERVER['DOCUMENT_ROOT'] .'/adjuntos/excel_cli/';
+    $dir_subida = dirname(__DIR__) . '/adjuntos/excel_cli/';
+    if (!is_dir($dir_subida)) { mkdir($dir_subida, 0755, true); }
     $fichero_subido = $dir_subida . basename($_FILES['archivo']['name']);
     if($_FILES["archivo"]["type"]=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
             echo '<pre>';
