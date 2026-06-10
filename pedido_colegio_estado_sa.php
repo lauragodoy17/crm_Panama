@@ -62,14 +62,13 @@
       
       }
       @media print {
-        a {display: none;}
-        
-        a[href]:after {
-            content: none !important;
-        }
-        body{
-          font-size: 9px;
-        }
+        a { display: none; }
+        a[href]:after { content: none !important; }
+        body { font-size: 9px; }
+        .table-responsive { overflow: visible !important; width: 100% !important; }
+        .main-container, .pd-ltr-20 { overflow: visible !important; }
+        table { page-break-inside: auto; }
+        tr    { page-break-inside: avoid; }
       }
       .dataTables_info{
         display: none;

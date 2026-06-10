@@ -149,6 +149,6 @@
 
 		
 		
-	echo "<script>alert('Pedido Solicitado');window.location='../colegios_pedidos.php?periodo=".$_POST['periodo']." ';</script>";
+	header('Location: ../colegios_pedidos.php?periodo='.$_POST['periodo'].'&ink_status=ok&ink_msg='.urlencode('Pedido solicitado correctamente.'));
 	
 ?>
