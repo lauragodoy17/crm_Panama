@@ -117,12 +117,6 @@ sort($zonas_uniq);
                 </span>
               </h4>
             </div>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">Pedidos</li>
-                <li class="breadcrumb-item active"><?= $st['label'] ?></li>
-              </ol>
-            </nav>
           </div>
         </div>
       </div>

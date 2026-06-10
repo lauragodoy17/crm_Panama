@@ -74,12 +74,6 @@ $periodo_nombre = htmlspecialchars($gp_periodo["periodo"] ?? "—");
         <div class="row align-items-center">
           <div class="col-md-8 col-sm-12">
             <div class="title"><h4>Pedidos de venta</h4></div>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">Pedidos</li>
-                <li class="breadcrumb-item active">Seleccionar colegio</li>
-              </ol>
-            </nav>
           </div>
         </div>
       </div>

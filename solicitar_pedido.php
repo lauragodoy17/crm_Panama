@@ -182,9 +182,9 @@ $tipos_doc    = $bdd->query("SELECT id, tipo, descrip FROM tipo_doc WHERE act=1"
         <div class="row">
           <div class="col-md-6 col-sm-12">
             <div class="title"><h4>Solicitar pedido</h4></div>
-            <nav aria-label="breadcrumb" role="navigation">
+            <nav aria-label="breadcrumb">
               <ol class="breadcrumb">
-                <li class="breadcrumb-item">Pedidos</li>
+                <li class="breadcrumb-item"><a href="colegios_pedidos.php?periodo=<?= $periodo_id ?>">Pedidos</a></li>
                 <li class="breadcrumb-item active">Solicitar</li>
               </ol>
             </nav>
