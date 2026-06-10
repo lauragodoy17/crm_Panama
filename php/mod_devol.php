@@ -26,7 +26,7 @@
 
 	foreach ($_POST["libro_e"] as $libros => $libro) {
 
-		list($id_libro,$cantidad) = explode("/", $libro);
+		list($id_libro,$cantidad) = array_pad(explode("/", $libro), 2, '');
 			
 		if ($id_libro !='') {
 			
