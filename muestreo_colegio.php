@@ -136,12 +136,14 @@
                   <?php endif; ?>
                 </h4>
               </div>
+              <?php if (isset($_GET["id_pedido"])): ?>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item">Muestreo</li>
-                  <li class="breadcrumb-item active"><?= isset($_GET["id_pedido"]) ? 'Pendiente' : 'Entregadas' ?></li>
+                  <li class="breadcrumb-item"><a href="lista_muestreo.php?tp=<?= intval($_GET['tp'] ?? 2) ?>">Muestreo</a></li>
+                  <li class="breadcrumb-item active">Pendiente</li>
                 </ol>
               </nav>
+              <?php endif; ?>
             </div>
           </div>
         </div>

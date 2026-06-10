@@ -129,12 +129,14 @@
                   <?= isset($_GET["id_pedido"]) ? 'Ver muestreo' : 'Muestras entregadas' ?>
                 </h4>
               </div>
+              <?php if (isset($_GET["id_pedido"])): ?>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item">Muestreo</li>
-                  <li class="breadcrumb-item active"><?= isset($_GET["id_pedido"]) ? 'Ver' : 'Entregadas' ?></li>
+                  <li class="breadcrumb-item"><a href="ver_muestreo.php">Muestreo</a></li>
+                  <li class="breadcrumb-item active">Ver muestreo</li>
                 </ol>
               </nav>
+              <?php endif; ?>
             </div>
           </div>
         </div>

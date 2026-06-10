@@ -106,12 +106,6 @@ sort($zonas_uniq);
                 </span>
               </h4>
             </div>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">Muestreo</li>
-                <li class="breadcrumb-item active">Muestras legalizadas</li>
-              </ol>
-            </nav>
           </div>
         </div>
       </div>

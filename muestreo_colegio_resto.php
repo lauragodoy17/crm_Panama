@@ -150,7 +150,11 @@
               </div>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item">Muestreo</li>
+                  <?php if (isset($_GET['id_muestras_e'])): ?>
+                  <li class="breadcrumb-item"><a href="muestras_entregadas.php">Muestras entregadas</a></li>
+                  <?php else: ?>
+                  <li class="breadcrumb-item"><a href="lista_muestreo.php?tp=<?= intval($_GET['tp'] ?? 3) ?>">Muestreo</a></li>
+                  <?php endif; ?>
                   <li class="breadcrumb-item active"><?= $bc ?></li>
                 </ol>
               </nav>

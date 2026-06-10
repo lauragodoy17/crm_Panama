@@ -199,14 +199,6 @@
                     <p class="sm-page-desc">Registra la información de las muestras que deseas legalizar.</p>
                   <?php endif; ?>
                 </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item">Muestreo</li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                      <?php echo $_GET['tp']!=2 ? 'Solicitar' : 'Legalizar'; ?>
-                    </li>
-                  </ol>
-                </nav>
               </div>
             </div>
           </div>
