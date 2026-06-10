@@ -73,6 +73,13 @@
       .dataTables_info{
         display: none;
       }
+      .mc-btn {
+        display:inline-flex; align-items:center; gap:7px;
+        padding:9px 22px; border-radius:8px; font-size:14px; font-weight:600;
+        border:none; cursor:pointer; transition:opacity .15s, transform .1s;
+      }
+      .mc-btn:hover { opacity:.88; transform:translateY(-1px); }
+      .mc-btn-teal  { background:#0d9488; color:#fff !important; }
     </style>
   </head>
   <body>
@@ -93,7 +100,7 @@
                       Pedidos
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                    Ver
+                    Detalle
                     </li>
                   </ol>
                 </nav>
@@ -353,7 +360,7 @@
                       <label for="">Dirección de entrega:</label>
                       <?php echo $pedido["dir_ent"]; ?><br><br>
                       <h3><?php echo $pedido["estado"]; ?></h3><br>
-                      <button type="button" id="imprimir" class="btn btn-info hidden-print">Imprimir</button>
+                      <button type="button" id="imprimir" class="mc-btn mc-btn-teal hidden-print"><i class="bi bi-printer"></i> Imprimir</button>
                     </center>
                 </form>
 

@@ -492,7 +492,7 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
 
         <!-- Acciones -->
         <div class="mc-actions d-print-none">
-          <button type="button" id="imprimir" class="mc-btn mc-btn-gray">
+          <button type="button" id="imprimir" class="mc-btn mc-btn-teal">
             <i class="bi bi-printer"></i> Imprimir
           </button>
           <?php if ($can_act): ?>
@@ -569,7 +569,6 @@ $('#form_pedido').on('submit', function () {
 });
 
 window.addEventListener('beforeprint', function () {
-  $('#impre').html('<p style="font-size:11px;color:#64748b;margin:0">Impreso: <?= date("Y-m-d H:i") ?></p>');
   $.ajax({ url:'ajax/fecha_impre.php', type:'POST', data:'feid=<?= date("Y-m-d H:i:s") ?>/<?= $id_pedido ?>' });
 });
 

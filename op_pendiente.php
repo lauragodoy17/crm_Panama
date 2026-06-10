@@ -75,10 +75,10 @@
       .op-btn-print {
         display: inline-flex; align-items: center; gap: 6px;
         padding: 6px 14px; border-radius: 8px; font-size: .78rem; font-weight: 600;
-        background: #f1f5f9; color: #374151; border: 1.5px solid #d1d5db;
-        text-decoration: none; transition: background .15s;
+        background: #0d9488; color: #fff; border: none;
+        text-decoration: none; transition: opacity .15s;
       }
-      .op-btn-print:hover { background: #e2e8f0; text-decoration: none; color: #0f172a; }
+      .op-btn-print:hover { opacity: .88; text-decoration: none; color: #fff; }
 
       /* ── Section cards ──────────────────────────────────────── */
       .op-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 18px;

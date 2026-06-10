@@ -91,7 +91,13 @@
 
       input[type=number] { -moz-appearance:textfield; }
 
-
+      .mc-btn {
+        display:inline-flex; align-items:center; gap:7px;
+        padding:9px 22px; border-radius:8px; font-size:14px; font-weight:600;
+        border:none; cursor:pointer; transition:opacity .15s, transform .1s;
+      }
+      .mc-btn:hover { opacity:.88; transform:translateY(-1px); }
+      .mc-btn-teal  { background:#0d9488; color:#fff !important; }
     </style>
 
   </head>
@@ -118,7 +124,7 @@
                 <nav aria-label="breadcrumb" role="navigation">
                   <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                      Pedido
+                      Pedidos
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                     <?php if ($tp==2) { ?>
@@ -421,7 +427,7 @@
                 <?php if ($pedido["verify"]==0 ) { ?>
                   <button type="button" class="btn btn-success d-print-none modificar">Confirmar</button>
                 <?php } ?>
-                <button type="button" id="imprimir" class="btn btn-info d-print-none">Imprimir</button>
+                <button type="button" id="imprimir" class="mc-btn mc-btn-teal d-print-none"><i class="bi bi-printer"></i> Imprimir</button>
               </form>
 
                
@@ -470,8 +476,6 @@
 
 
       window.addEventListener("beforeprint", function(event) {
-        $("#impre").html("<h5><?php echo date("Y-m-d H:i") ?></h5>");
-          
         var dataString = 'feid='+"<?php echo date("Y-m-d H:i:s") ?>"+'/'+"<?php echo $_GET["id_pedido"] ?>";
               
           $.ajax({

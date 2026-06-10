@@ -145,7 +145,7 @@
       border: none; cursor: pointer; text-decoration: none; transition: opacity .15s;
     }
     .op-btn:hover { opacity: .88; text-decoration: none; }
-    .op-btn-print { background: #f1f5f9; color: #374151; border: 1.5px solid #d1d5db; }
+    .op-btn-print { background: #0d9488; color: #fff; border: none; }
     .op-btn-back  { background: linear-gradient(135deg,#4361ee,#6d28d9); color:#fff; }
 
     /* ── Print ──────────────────────────────────────────────── */
