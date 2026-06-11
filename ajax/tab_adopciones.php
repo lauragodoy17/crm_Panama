@@ -346,8 +346,8 @@
         <p class="ad-card-val" id="ad-card-vr">—</p>
       </div>
     </div>
-    <div class="ad-card">
-      <div class="ad-card-icon purple"><i class="bi bi-percent"></i></div>
+    <div class="ad-card" id="ad-card-cum-wrap">
+      <div class="ad-card-icon purple" id="ad-card-cum-icon"><i class="bi bi-percent"></i></div>
       <div>
         <p class="ad-card-label">% Cumplimiento</p>
         <p class="ad-card-val" id="ad-card-cum">—</p>
@@ -1417,7 +1417,7 @@
 
                                             var cumplimiento=(total_uni_vr_d / total_vp_d) * 100;
 
-                                            $('#cumplimiento').text(isNaN(cumplimiento) ? '—' : cumplimiento.toFixed(1) + '%');
+                                            setCumCard(cumplimiento);
 
 
                                           })
@@ -1784,6 +1784,28 @@
         }
     })
 
+    function setCumCard(pct) {
+        var text = isNaN(pct) ? '—' : pct.toFixed(1) + '%';
+        $('#cumplimiento').text(text);
+        $('#ad-card-cum').text(text);
+        var $card = $('#ad-card-cum-wrap');
+        var $icon = $('#ad-card-cum-icon');
+        var $val  = $('#ad-card-cum');
+        if (isNaN(pct)) {
+            $card.css({'background':'#fff', 'box-shadow':'0 1px 6px rgba(15,23,42,.08)'});
+            $icon.css({'background':'#ede9fe', 'color':'#6d28d9'});
+            $val.css('color', '#0f172a');
+        } else if (pct < 80) {
+            $card.css({'background':'#fee2e2', 'box-shadow':'0 1px 6px rgba(220,38,38,.15)'});
+            $icon.css({'background':'#fecaca', 'color':'#dc2626'});
+            $val.css('color', '#dc2626');
+        } else {
+            $card.css({'background':'#dcfce7', 'box-shadow':'0 1px 6px rgba(21,128,61,.15)'});
+            $icon.css({'background':'#bbf7d0', 'color':'#15803d'});
+            $val.css('color', '#15803d');
+        }
+    }
+
     var total_vp_d=0;
 
      $('.venta1_d').each(function(){
@@ -1810,12 +1832,10 @@
 
    	var cumplimiento=(total_uni_vr_d / total_vp_d) * 100;
 
-    $('#cumplimiento').text(isNaN(cumplimiento) ? '—' : cumplimiento.toFixed(1) + '%');
-
     // ── Actualizar tarjetas de resumen ────────────────────────
     $('#ad-card-vp').text($('#total_vp_d').text() || '—');
     $('#ad-card-vr').text($('#total_vr').text()   || '—');
-    $('#ad-card-cum').text(isNaN(cumplimiento) ? '—' : cumplimiento.toFixed(1) + '%');
+    setCumCard(cumplimiento);
 
     // ── Filtro todos / adoptados ──────────────────────────────
     var $filas = $('#dataTables-adop tbody tr');
