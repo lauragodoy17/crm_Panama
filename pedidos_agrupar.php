@@ -71,6 +71,19 @@ foreach ($pedidos_raw as $pedido) {
     }
     .mc-btn:hover { opacity: .88; transform: translateY(-1px); }
     .mc-btn-blue { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #fff !important; }
+    @page { margin: 15px; size: landscape; }
+    @media print {
+      a, .left-side-bar, .header, .d-print-none { display: none !important; }
+      a[href]:after { content: none !important; }
+      body { font-size: 8px; }
+      .main-container, .pd-ltr-20, .table-responsive { overflow: visible !important; }
+      #pa-table { width: 100% !important; table-layout: auto !important; font-size: 7.5px !important; }
+      #pa-table th, #pa-table td { padding: 3px 4px !important; }
+      #pa-table thead th { background: #1e40af !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      #pa-table thead, #pa-table tfoot { display: table-row-group !important; }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -187,7 +200,6 @@ foreach ($pedidos_raw as $pedido) {
 <script>
 $(document).ready(function () {
   var table = $('#pa-table').DataTable({
-    scrollX: true,
     autoWidth: false,
     paging: false,
     order: [[0, 'desc']],

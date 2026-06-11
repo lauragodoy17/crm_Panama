@@ -24,18 +24,20 @@ $estado_map = [2=>'1', 3=>'2', 4=>'4', 5=>'3'];
 $estado_val = $estado_map[$tp] ?? '1';
 
 if ($_SESSION['tipo'] != 10) {
-  $sql = "SELECT p.id, z.zona, u.nombres, u.apellidos, u.tipo, p.fecha, c.colegio, c.sub_zona, c.responsable
+  $sql = "SELECT p.id, z.zona, u.nombres, u.apellidos, u.tipo, p.fecha, c.colegio, c.sub_zona, c.responsable, cal.calendario
           FROM pedidos p
           JOIN colegios c ON p.id_colegio=c.id
           JOIN zonas z ON z.codigo=c.cod_zona
           JOIN usuarios u ON u.cod_zona=z.codigo
+          LEFT JOIN calendarios cal ON c.id_calendario=cal.id
           WHERE p.estado='{$estado_val}' GROUP BY p.id";
 } else {
-  $sql = "SELECT p.id, z.zona, u.nombres, u.apellidos, u.tipo, p.fecha, c.colegio, c.sub_zona, c.responsable
+  $sql = "SELECT p.id, z.zona, u.nombres, u.apellidos, u.tipo, p.fecha, c.colegio, c.sub_zona, c.responsable, cal.calendario
           FROM pedidos p
           JOIN colegios c ON p.id_colegio=c.id
           JOIN zonas z ON z.codigo=c.cod_zona
           JOIN usuarios u ON u.cod_zona=z.codigo
+          LEFT JOIN calendarios cal ON c.id_calendario=cal.id
           WHERE p.estado='{$estado_val}' AND (c.cod_zona='".$_SESSION['zona']."' OR c.zona_madre='".$_SESSION['zona']."') GROUP BY p.id";
 }
 $req = $bdd->prepare($sql);
@@ -97,6 +99,19 @@ sort($zonas_uniq);
       text-decoration: none; white-space: nowrap; transition: background .15s, color .15s;
     }
     .lm-btn-ver:hover { background: <?= $ac['accent'] ?>; color: #fff; text-decoration: none; }
+    @page { margin: 15px; size: landscape; }
+    @media print {
+      a, .left-side-bar, .header, .d-print-none { display: none !important; }
+      a[href]:after { content: none !important; }
+      body { font-size: 8px; }
+      .main-container, .pd-ltr-20, .table-responsive { overflow: visible !important; }
+      #lp-table { width: 100% !important; table-layout: auto !important; font-size: 7.5px !important; }
+      #lp-table th, #lp-table td { padding: 3px 4px !important; }
+      #lp-table thead th { background: #1e40af !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      #lp-table thead, #lp-table tfoot { display: table-row-group !important; }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -176,6 +191,7 @@ sort($zonas_uniq);
                 <th>Zona</th>
                 <th>Responsable</th>
                 <th>Colegio</th>
+                <th>Calendario</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -204,6 +220,7 @@ sort($zonas_uniq);
                 <td><?= $n_zona ?></td>
                 <td><?= $resp ?></td>
                 <td><?= htmlspecialchars($p['colegio']) ?></td>
+                <td><?= htmlspecialchars($p['calendario'] ?? '—') ?></td>
                 <td>
                   <a href="pedido_colegio.php?id_pedido=<?= $p['id'] ?>&tp=<?= $tp ?>" class="lm-btn-ver">
                     <i class="bi bi-eye"></i> Ver detalle
@@ -251,7 +268,6 @@ $(document).ready(function () {
   });
 
   table = $('#lp-table').DataTable({
-    scrollX: true,
     autoWidth: false,
     order: [[0, 'desc']],
     language: {
