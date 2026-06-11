@@ -25,38 +25,50 @@
       .mc-actions, .left-side-bar, .header { display:none !important; }
       a[href]:after { content:none !important; }
       body { font-size:9px; }
-      .mc-obs-wrap textarea { height:auto !important; overflow:visible !important; page-break-inside:avoid; }
+      .mc-obs-wrap textarea { height:auto !important; min-height:0 !important; overflow:visible !important; white-space:pre-wrap !important; page-break-inside:avoid; }
+      #mc-table thead, #mc-table tfoot { display: table-row-group !important; }
+      .mc-table-wrap { overflow:visible !important; }
+      .main-container, .pd-ltr-20 { overflow:visible !important; }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; }
     }
 
-    /* ── Info cards ─────────────────────────────────── */
+    /* ── Info table ─────────────────────────────────── */
     .mc-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: #e2e8f0;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.06);
     }
     .mc-card {
       background: #fff;
-      border-radius: 10px;
-      padding: 14px 16px;
-      box-shadow: 0 1px 6px rgba(15,23,42,.08);
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 13px;
+    }
+    .mc-card.full-width {
+      grid-column: 1 / -1;
+      background: #f8fafc;
     }
     .mc-card-icon {
-      width: 42px; height: 42px;
-      border-radius: 10px;
+      width: 30px; height: 30px; border-radius: 7px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; flex-shrink: 0;
+      font-size: .85rem; flex-shrink: 0;
     }
     .mc-card-icon.blue   { background:#dbeafe; color:#1d4ed8; }
     .mc-card-icon.green  { background:#dcfce7; color:#15803d; }
     .mc-card-icon.orange { background:#ffedd5; color:#c2410c; }
     .mc-card-icon.purple { background:#ede9fe; color:#6d28d9; }
     .mc-card-icon.teal   { background:#ccfbf1; color:#0d9488; }
-    .mc-card-label { font-size:.71rem; color:#64748b; margin:0 0 2px 0; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
-    .mc-card-val   { font-size:.9rem; font-weight:700; color:#0f172a; margin:0; }
+    .mc-card-label { font-size:.63rem; color:#94a3b8; margin:0 0 1px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+    .mc-card-val   { font-size:.82rem; font-weight:600; color:#0f172a; margin:0; }
+    .mc-card.full-width .mc-card-label { display:inline; margin:0 5px 0 0; }
+    .mc-card.full-width .mc-card-label::after { content:':'; }
+    .mc-card.full-width .mc-card-val   { display:inline; font-weight:500; font-size:.82rem; }
 
     /* ── Tabla ──────────────────────────────────────── */
     .mc-table-wrap { border-radius:10px; overflow-x:auto; box-shadow:0 2px 10px rgba(15,23,42,.09); margin-bottom:24px; }
@@ -158,7 +170,7 @@
             $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
             $pedido = $req_pedido->fetch();
 
-            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, z.zona, c.colegio, c.sub_zona, c.responsable, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado WHERE pe.id='".$pedido["id"]."'";
+            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, z.zona, c.colegio, c.direccion, c.sub_zona, c.responsable, cal.calendario, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado LEFT JOIN calendarios cal ON c.id_calendario=cal.id WHERE pe.id='".$pedido["id"]."'";
             $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
             $pedido = $req_pedido->fetch();
 
@@ -174,7 +186,7 @@
             $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
             $pedido = $req_pedido->fetch();
 
-            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, z.zona, c.colegio, c.sub_zona, c.responsable, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos_e pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado WHERE pe.id='".$_GET["id_muestras_e"]."'";
+            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, z.zona, c.colegio, c.direccion, c.sub_zona, c.responsable, cal.calendario, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos_e pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado LEFT JOIN calendarios cal ON c.id_calendario=cal.id WHERE pe.id='".$_GET["id_muestras_e"]."'";
             $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
             $pedido = $req_pedido->fetch();
 
@@ -204,7 +216,7 @@
           $id_disp = isset($_GET["id_pedido"]) ? $_GET["id_pedido"] : ($_GET["id_muestras_e"] ?? '—');
         ?>
 
-        <!-- Tarjetas fila 1 -->
+        <!-- Tarjetas informativas -->
         <div class="mc-cards">
           <div class="mc-card">
             <div class="mc-card-icon blue"><i class="bi bi-box-seam"></i></div>
@@ -221,6 +233,13 @@
             </div>
           </div>
           <div class="mc-card">
+            <div class="mc-card-icon teal"><i class="bi bi-calendar2-week"></i></div>
+            <div>
+              <p class="mc-card-label">Calendario</p>
+              <p class="mc-card-val"><?= htmlspecialchars($pedido["calendario"] ?? '—') ?></p>
+            </div>
+          </div>
+          <div class="mc-card">
             <div class="mc-card-icon orange"><i class="bi bi-calendar3"></i></div>
             <div>
               <p class="mc-card-label">Fecha</p>
@@ -234,10 +253,6 @@
               <p class="mc-card-val"><?= htmlspecialchars($pedido["estado"]) ?></p>
             </div>
           </div>
-        </div>
-
-        <!-- Tarjetas fila 2 -->
-        <div class="mc-cards" style="margin-bottom:24px">
           <div class="mc-card">
             <div class="mc-card-icon purple"><i class="bi bi-person-fill"></i></div>
             <div>
@@ -259,6 +274,15 @@
               <p class="mc-card-val"><?= htmlspecialchars($responsable) ?></p>
             </div>
           </div>
+          <?php if (!empty($pedido["direccion"])): ?>
+          <div class="mc-card full-width">
+            <div class="mc-card-icon orange"><i class="bi bi-map"></i></div>
+            <div>
+              <p class="mc-card-label">Dirección</p>
+              <p class="mc-card-val"><?= htmlspecialchars($pedido["direccion"]) ?></p>
+            </div>
+          </div>
+          <?php endif; ?>
         </div>
 
         <!-- Tabla de libros -->
@@ -375,6 +399,17 @@
       }, function(){ form.submit(); });
     });
 
+    window.addEventListener('beforeprint', function () {
+      document.querySelectorAll('textarea').forEach(function (ta) {
+        ta._ph = ta.style.height;
+        ta.style.setProperty('height', ta.scrollHeight + 'px', 'important');
+      });
+    });
+    window.addEventListener('afterprint', function () {
+      document.querySelectorAll('textarea').forEach(function (ta) {
+        ta.style.height = ta._ph || '';
+      });
+    });
     $("#imprimir").click(function(){
       window.print();
     });

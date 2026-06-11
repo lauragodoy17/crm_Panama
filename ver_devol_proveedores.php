@@ -49,6 +49,19 @@ $total   = count($pedidos);
     .vdp-badge-realizada { background:#dcfce7; color:#15803d; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:600; }
     .vdp-badge-anulada   { background:#fee2e2; color:#dc2626; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:600; }
     .vdp-badge-otro      { background:#fef9c3; color:#92400e; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:600; }
+    @page { margin: 15px; size: landscape; }
+    @media print {
+      a, .left-side-bar, .header, .d-print-none { display: none !important; }
+      a[href]:after { content: none !important; }
+      body { font-size: 8px; }
+      .main-container, .pd-ltr-20, .table-responsive { overflow: visible !important; }
+      #vdp-table { width: 100% !important; table-layout: auto !important; font-size: 7.5px !important; }
+      #vdp-table th, #vdp-table td { padding: 3px 4px !important; }
+      #vdp-table thead th { background: #1e40af !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      #vdp-table thead, #vdp-table tfoot { display: table-row-group !important; }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -158,7 +171,6 @@ $total   = count($pedidos);
 <script>
 $(document).ready(function () {
   var table = $('#vdp-table').DataTable({
-    scrollX: true,
     autoWidth: false,
     order: [[0, 'desc']],
     language: {

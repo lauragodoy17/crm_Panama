@@ -158,21 +158,20 @@ $n_titulos = count($libros);
   <link rel="icon" type="image/png" sizes="16x16" href="vendors/images/favicon-16x16.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="src/plugins/datatables/css/dataTables.bootstrap4.min.css" />
-  <link rel="stylesheet" type="text/css" href="src/plugins/datatables/css/responsive.bootstrap4.min.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/icon-font.min.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
   <style>
     /* Print */
-    @page { margin: 20px; }
+    @page { margin: 15px; size: landscape; }
     @media print {
       .mc-actions, .breadcrumb, .d-print-none, .left-side-bar, .header { display: none !important; }
       a[href]:after { content: none !important; }
       body { font-size: 9px; }
-      .ag-table-wrap, .table-responsive { overflow: visible !important; width: 100% !important; height: auto !important; }
-      .main-container, .pd-ltr-20 { overflow: visible !important; }
-      .dataTables_scrollBody { overflow: visible !important; height: auto !important; }
+      #ag-table thead, #ag-table tfoot { display: table-row-group !important; }
+      .ag-table-wrap { overflow:visible !important; }
+      .main-container, .pd-ltr-20 { overflow:visible !important; }
+      #ag-table { width:100% !important; }
       table { page-break-inside: auto; }
       tr    { page-break-inside: avoid; }
     }
@@ -206,13 +205,13 @@ $n_titulos = count($libros);
     .ag-table-wrap { border-radius: 10px; overflow-x: auto; box-shadow: 0 2px 10px rgba(15,23,42,.09); margin-bottom: 24px; }
     #ag-table { width: 100%; font-size: .83rem; border-collapse: collapse; }
     #ag-table thead th {
-      background: #1e40af !important; color: #fff !important;
-      font-weight: 600; font-size: .80rem; padding: 11px 12px;
-      text-align: left; border: none; white-space: nowrap;
+      background: #f8fafc; color: #374151; font-weight: 600;
+      font-size: .79rem; padding: 11px 12px;
+      text-align: left; border: none; border-bottom: 2px solid #e2e8f0; white-space: nowrap;
     }
     #ag-table tbody tr              { background: #fff; }
-    #ag-table tbody tr:nth-child(even) { background: #eff6ff; }
-    #ag-table tbody tr:hover        { background: #dbeafe !important; }
+    #ag-table tbody tr:nth-child(even) { background: #f8fafc; }
+    #ag-table tbody tr:hover        { background: #eff6ff; }
     #ag-table tbody td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
     #ag-table tfoot td {
       padding: 10px 12px; background: #f8fafc; color: #374151;
@@ -310,8 +309,8 @@ $n_titulos = count($libros);
                 <th class="d-print-none">Materia</th>
                 <th>Grado</th>
                 <th>PVP</th>
-                <th>Desc.</th>
-                <th>Precio Fact.</th>
+                <th>Descuento</th>
+                <th>Precio facturación</th>
                 <th>Cantidad</th>
                 <th>Valor Venta</th>
                 <?php if ($show_plataforma): ?><th>Plataforma</th><?php endif; ?>
@@ -338,11 +337,16 @@ $n_titulos = count($libros);
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="7"></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td class="d-print-none"></td>
-                <td><b>Total:</b></td>
-                <td><b><?= $total_c ?></b></td>
-                <td><b>$ <?= number_format($total_v, 0, ',', '.') ?></b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="text-align:right;font-weight:700">Total</td>
+                <td style="text-align:center;font-weight:700"><?= $total_c ?></td>
+                <td style="font-weight:700">$ <?= number_format($total_v, 0, ',', '.') ?></td>
                 <?php if ($show_plataforma): ?><td></td><?php endif; ?>
               </tr>
             </tfoot>
@@ -374,32 +378,8 @@ $n_titulos = count($libros);
 <script src="vendors/scripts/script.min.js"></script>
 <script src="vendors/scripts/process.js"></script>
 <script src="vendors/scripts/layout-settings.js"></script>
-<script src="src/plugins/datatables/js/jquery.dataTables.min.js"></script>
-<script src="src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
-<script src="src/plugins/datatables/js/dataTables.responsive.min.js"></script>
-<script src="src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
 <script src="src/ink-alerts.js"></script>
 <script>
-$(document).ready(function () {
-  $('#ag-table').DataTable({
-    scrollX: true,
-    autoWidth: false,
-    paging: false,
-    order: [[0, 'asc']],
-    language: {
-      lengthMenu:   'Mostrar _MENU_ registros',
-      zeroRecords:  'No se encontraron resultados',
-      emptyTable:   'No hay libros para mostrar',
-      info:         'Mostrando _START_ a _END_ de _TOTAL_ registros',
-      infoEmpty:    'Sin registros disponibles',
-      infoFiltered: '(filtrado de _MAX_ registros)',
-      search:       '',
-      paginate: { first: '«', previous: '‹', next: '›', last: '»' }
-    },
-    initComplete: function () { $('.dataTables_filter').hide(); }
-  });
-});
-
 $('#imprimir').on('click', function () { window.print(); });
 </script>
 </body>

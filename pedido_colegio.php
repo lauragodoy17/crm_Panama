@@ -18,6 +18,7 @@ $stmt = $bdd->prepare(
   "SELECT pe.id, pe.fecha, pe.observaciones, pe.fecha_r, pe.cliente, pe.fac_rem, pe.dir_ent, pe.tipo AS petipo,
           z.codigo AS codzona, z.zona,
           c.colegio, c.sub_zona, c.responsable,
+          cal.calendario,
           u.nombres, u.apellidos, u.tipo,
           e.estado, e.id AS eid
    FROM pedidos pe
@@ -25,6 +26,7 @@ $stmt = $bdd->prepare(
    JOIN zonas z     ON z.codigo = c.cod_zona
    JOIN usuarios u  ON u.cod_zona = z.codigo
    JOIN estados_pedidos e ON e.id = pe.estado
+   LEFT JOIN calendarios cal ON c.id_calendario = cal.id
    WHERE pe.id = ?"
 );
 $stmt->execute([$id_pedido]);
@@ -148,8 +150,6 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
   <link rel="icon" type="image/png" sizes="16x16"  href="vendors/images/favicon-16x16.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="src/plugins/datatables/css/dataTables.bootstrap4.min.css" />
-  <link rel="stylesheet" type="text/css" href="src/plugins/datatables/css/responsive.bootstrap4.min.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/icon-font.min.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
@@ -160,37 +160,44 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
 
     /* Print */
-    @page { margin:20px; }
+    @page { margin: 15px; size: landscape; }
     @media print {
       .mc-actions, .breadcrumb, .d-print-none, .left-side-bar, .header { display:none !important; }
       a[href]:after { content:none !important; }
       body { font-size:9px; }
-      .mc-table-wrap, .table-responsive { overflow:visible !important; width:100% !important; height:auto !important; }
+      .mc-obs-wrap textarea { height:auto !important; min-height:0 !important; overflow:visible !important; white-space:pre-wrap !important; page-break-inside:avoid; }
+      #pc-table td input[type="number"] { border:none !important; background:transparent !important; width:auto !important; }
+      #pc-table thead, #pc-table tfoot { display: table-row-group !important; }
+      .mc-table-wrap { overflow:visible !important; }
       .main-container, .pd-ltr-20 { overflow:visible !important; }
-      .mc-obs-wrap textarea { height:auto !important; overflow:visible !important; }
-      table { page-break-inside:auto; }
-      tr    { page-break-inside:avoid; }
-      #pc-table td input[type="number"] { border:none !important; background:transparent !important; width:auto !important; font-size:9px; }
+      #pc-table { width:100% !important; }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; }
     }
 
-    /* ── Info cards ── */
+    /* ── Info table ── */
     .mc-cards {
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-      gap:14px;
-      margin-bottom:16px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: #e2e8f0;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.06);
     }
     .mc-card {
-      background:#fff; border-radius:10px; padding:14px 16px;
-      box-shadow:0 1px 6px rgba(15,23,42,.08);
-      display:flex; align-items:center; gap:14px;
+      background: #fff;
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 13px;
     }
-    .mc-card-link { text-decoration:none; color:inherit; display:flex; align-items:center; gap:14px; }
+    .mc-card-link { text-decoration:none; color:inherit; display:flex; align-items:center; gap:9px; width:100%; }
     .mc-card-link:hover .mc-card-val-link { color:#2563eb; }
     .mc-card-icon {
-      width:42px; height:42px; border-radius:10px;
+      width:30px; height:30px; border-radius:7px;
       display:flex; align-items:center; justify-content:center;
-      font-size:1.1rem; flex-shrink:0;
+      font-size:.85rem; flex-shrink:0;
     }
     .mc-card-icon.blue   { background:#dbeafe; color:#1d4ed8; }
     .mc-card-icon.green  { background:#dcfce7; color:#15803d; }
@@ -199,9 +206,17 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
     .mc-card-icon.teal   { background:#ccfbf1; color:#0d9488; }
     .mc-card-icon.amber  { background:#fef3c7; color:#b45309; }
     .mc-card-icon.red    { background:#fee2e2; color:#dc2626; }
-    .mc-card-label { font-size:.71rem; color:#64748b; margin:0 0 2px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
-    .mc-card-val   { font-size:.9rem; font-weight:700; color:#0f172a; margin:0; }
-    .mc-card-val-link { font-size:.9rem; font-weight:700; color:#2563eb; margin:0; }
+    .mc-card-label { font-size:.63rem; color:#94a3b8; margin:0 0 1px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+    .mc-card-val   { font-size:.82rem; font-weight:600; color:#0f172a; margin:0; }
+    .mc-card-val-link { font-size:.82rem; font-weight:600; color:#2563eb; margin:0; }
+    /* Celda ancho completo (dirección) */
+    .mc-card-full {
+      grid-column: 1 / -1;
+      background: #f8fafc;
+    }
+    .mc-card-full .mc-card-label { display:inline; margin:0 5px 0 0; }
+    .mc-card-full .mc-card-label::after { content:':'; }
+    .mc-card-full .mc-card-val   { display:inline; font-weight:500; font-size:.82rem; }
 
     /* Status badge */
     .pc-badge        { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; }
@@ -297,7 +312,7 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
 
       <center id="impre"></center>
 
-      <!-- Tarjetas fila 1: # Pedido, Colegio, Fecha, Estado -->
+      <!-- Tarjetas informativas -->
       <div class="mc-cards">
         <div class="mc-card">
           <div class="mc-card-icon blue"><i class="bi bi-receipt"></i></div>
@@ -311,6 +326,13 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
           <div>
             <p class="mc-card-label">Colegio</p>
             <p class="mc-card-val"><?= htmlspecialchars($pedido['colegio'] ?? '—') ?></p>
+          </div>
+        </div>
+        <div class="mc-card">
+          <div class="mc-card-icon teal"><i class="bi bi-calendar2-week"></i></div>
+          <div>
+            <p class="mc-card-label">Calendario</p>
+            <p class="mc-card-val"><?= htmlspecialchars($pedido['calendario'] ?? '—') ?></p>
           </div>
         </div>
         <div class="mc-card">
@@ -329,10 +351,6 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
             </p>
           </div>
         </div>
-      </div>
-
-      <!-- Tarjetas fila 2: Empresa, Zona, Responsable -->
-      <div class="mc-cards">
         <div class="mc-card">
           <div class="mc-card-icon purple"><i class="bi bi-person-fill"></i></div>
           <div>
@@ -354,10 +372,6 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
             <p class="mc-card-val"><?= $d_resp ?></p>
           </div>
         </div>
-      </div>
-
-      <!-- Tarjetas fila 3: Fecha recogida, Cliente, Factura/Remisión + condicionales -->
-      <div class="mc-cards" style="margin-bottom:24px">
         <div class="mc-card">
           <div class="mc-card-icon orange"><i class="bi bi-calendar-check"></i></div>
           <div>
@@ -388,15 +402,6 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
           </div>
         </div>
         <?php endif; ?>
-        <?php if (!empty($pedido['dir_ent'])): ?>
-        <div class="mc-card">
-          <div class="mc-card-icon blue"><i class="bi bi-house-door"></i></div>
-          <div>
-            <p class="mc-card-label">Dirección de entrega</p>
-            <p class="mc-card-val"><?= htmlspecialchars($pedido['dir_ent']) ?></p>
-          </div>
-        </div>
-        <?php endif; ?>
         <?php if ($op || $op_agp): ?>
         <div class="mc-card">
           <a href="op_pendiente.php?op=<?= $op ? $n_op['id'] : $n_op_agp['op'] ?>" target="_blank" class="mc-card-link">
@@ -408,6 +413,15 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
               </p>
             </div>
           </a>
+        </div>
+        <?php endif; ?>
+        <?php if (!empty($pedido['dir_ent'])): ?>
+        <div class="mc-card mc-card-full">
+          <div class="mc-card-icon blue"><i class="bi bi-house-door"></i></div>
+          <div>
+            <p class="mc-card-label">Dirección de entrega</p>
+            <p class="mc-card-val"><?= htmlspecialchars($pedido['dir_ent']) ?></p>
+          </div>
         </div>
         <?php endif; ?>
       </div>
@@ -467,9 +481,16 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="8" style="text-align:right">Total</td>
-                <td style="text-align:center"><?= $total_c ?></td>
-                <td>$ <?= number_format($total_v, 0, ',', '.') ?></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="d-print-none"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="text-align:right;font-weight:700">Total</td>
+                <td style="text-align:center;font-weight:700"><?= $total_c ?></td>
+                <td style="font-weight:700">$ <?= number_format($total_v, 0, ',', '.') ?></td>
                 <?php if ($show_plataforma): ?><td></td><?php endif; ?>
                 <td></td>
                 <td></td>
@@ -533,27 +554,7 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
 <script src="vendors/scripts/script.min.js"></script>
 <script src="vendors/scripts/process.js"></script>
 <script src="vendors/scripts/layout-settings.js"></script>
-<script src="src/plugins/datatables/js/jquery.dataTables.min.js"></script>
-<script src="src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
-<script src="src/plugins/datatables/js/dataTables.responsive.min.js"></script>
-<script src="src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
-<script src="src/plugins/datatables/js/natural.js"></script>
 <script>
-$(document).ready(function () {
-  $('#pc-table').DataTable({
-    paging:    false,
-    searching: false,
-    order:     [[4, 'asc']],
-    columnDefs: [{ type: 'natural', targets: 4 }],
-    language: {
-      zeroRecords: 'No hay libros en este pedido',
-      emptyTable:  'No hay información disponible',
-      info:        'Mostrando _START_ a _END_ de _TOTAL_',
-      infoEmpty:   'Sin registros'
-    }
-  });
-});
-
 function buildLibpVal(lpid) {
   return $('#c'+lpid).val() + '/' + lpid + '/' + $('#d'+lpid).val();
 }
@@ -570,6 +571,15 @@ $('#form_pedido').on('submit', function () {
 
 window.addEventListener('beforeprint', function () {
   $.ajax({ url:'ajax/fecha_impre.php', type:'POST', data:'feid=<?= date("Y-m-d H:i:s") ?>/<?= $id_pedido ?>' });
+  document.querySelectorAll('textarea').forEach(function (ta) {
+    ta._ph = ta.style.height;
+    ta.style.setProperty('height', ta.scrollHeight + 'px', 'important');
+  });
+});
+window.addEventListener('afterprint', function () {
+  document.querySelectorAll('textarea').forEach(function (ta) {
+    ta.style.height = ta._ph || '';
+  });
 });
 
 $('#imprimir').on('click', function () { window.print(); });

@@ -39,7 +39,6 @@ $libros = $req->fetchAll();
 if ($tipo == 1) {
     $sql = "SELECT id, estado FROM ordenes_pedidos WHERE id_devol_c='".$id_devol."' AND estado!=4";
 } else {
-    echo $_GET["id_devol_p"];
     $sql = "SELECT id, estado FROM ordenes_pedidos WHERE id_devol_p='".$id_devol."' AND estado!=4";
 }
 $req = $bdd->prepare($sql);
@@ -65,8 +64,8 @@ $total_c  = array_sum(array_column($libros, 'cantidad'));
 $is_admin = ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 2);
 $titulo   = ($tipo == 1) ? 'Devolución de muestras' : 'Devolución de proveedores';
 $tipo_lbl = ($tipo == 2) ? 'Proveedor' : 'Cliente';
-$back_url = ($tipo == 2) ? 'ver_devol_proveedores.php' : '#';
-$back_lbl = ($tipo == 2) ? 'Devoluciones proveedores' : 'Devoluciones';
+$back_url = ($tipo == 2) ? 'ver_devol_proveedores.php' : 'ver_devol_muestras.php';
+$back_lbl = ($tipo == 2) ? 'Devoluciones proveedores' : 'Devolución de muestras';
 
 $eid = intval($pedido['eid']);
 if (isset($n_op['estado']) && $n_op['estado'] == 2) {
@@ -105,6 +104,10 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
       a { display: none; }
       a[href]:after { content: none !important; }
       body { font-size: 9px; }
+      #vd-table thead, #vd-table tfoot { display: table-row-group !important; }
+      table { page-break-inside: auto; }
+      tr    { page-break-inside: avoid; }
+      textarea { overflow:visible !important; white-space:pre-wrap !important; }
     }
 
     input[type=number]::-webkit-inner-spin-button,
@@ -112,7 +115,7 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
     input[type=number] { -moz-appearance: textfield; }
     .dc { width: 70px !important; }
 
-    /* Info cards */
+    /* Info cards (legacy — usado por JS print) */
     .vd-info-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
     .vd-info-card {
       background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
@@ -121,6 +124,38 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
     }
     .vd-ic-label { display: block; font-size: .7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
     .vd-ic-value { display: block; font-size: .9rem; font-weight: 600; color: #0f172a; }
+
+    /* Info table */
+    .mc-cards {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: #e2e8f0;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.06);
+    }
+    .mc-card {
+      background: #fff;
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 13px;
+    }
+    .mc-card-icon {
+      width: 30px; height: 30px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; flex-shrink: 0;
+    }
+    .mc-card-icon.blue   { background:#dbeafe; color:#1d4ed8; }
+    .mc-card-icon.green  { background:#dcfce7; color:#15803d; }
+    .mc-card-icon.orange { background:#ffedd5; color:#c2410c; }
+    .mc-card-icon.purple { background:#ede9fe; color:#6d28d9; }
+    .mc-card-icon.teal   { background:#ccfbf1; color:#0d9488; }
+    .mc-card-icon.amber  { background:#fef3c7; color:#b45309; }
+    .mc-card-icon.red    { background:#fee2e2; color:#dc2626; }
+    .mc-card-label { font-size:.63rem; color:#94a3b8; margin:0 0 1px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+    .mc-card-val   { font-size:.82rem; font-weight:600; color:#0f172a; margin:0; }
 
     /* Estado badges */
     .vd-badge-yellow { display:inline-block; background:#fef3c7; color:#92400e; border-radius:20px; padding:3px 12px; font-size:12px; font-weight:600; }
@@ -199,32 +234,50 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
       </div>
 
       <!-- Info cards -->
-      <div class="vd-info-row">
-        <div class="vd-info-card">
-          <span class="vd-ic-label"><?= $titulo ?></span>
-          <span class="vd-ic-value"># <?= $id_devol ?></span>
+      <div class="mc-cards">
+        <div class="mc-card">
+          <div class="mc-card-icon blue"><i class="bi bi-arrow-return-left"></i></div>
+          <div>
+            <p class="mc-card-label"><?= $titulo ?></p>
+            <p class="mc-card-val"># <?= $id_devol ?></p>
+          </div>
         </div>
-        <div class="vd-info-card">
-          <span class="vd-ic-label">Fecha</span>
-          <span class="vd-ic-value"><?= htmlspecialchars($pedido['fecha']) ?></span>
+        <div class="mc-card">
+          <div class="mc-card-icon orange"><i class="bi bi-calendar3"></i></div>
+          <div>
+            <p class="mc-card-label">Fecha</p>
+            <p class="mc-card-val"><?= htmlspecialchars($pedido['fecha']) ?></p>
+          </div>
         </div>
         <?php if (!empty($pedido['codigo'])): ?>
-        <div class="vd-info-card">
-          <span class="vd-ic-label">Código</span>
-          <span class="vd-ic-value"><?= htmlspecialchars($pedido['codigo']) ?></span>
+        <div class="mc-card">
+          <div class="mc-card-icon teal"><i class="bi bi-upc-scan"></i></div>
+          <div>
+            <p class="mc-card-label">Código</p>
+            <p class="mc-card-val"><?= htmlspecialchars($pedido['codigo']) ?></p>
+          </div>
         </div>
         <?php endif; ?>
-        <div class="vd-info-card" style="flex:2 1 220px;">
-          <span class="vd-ic-label">Usuario</span>
-          <span class="vd-ic-value"><?= htmlspecialchars($pedido['nombres'].' '.$pedido['apellidos']) ?></span>
+        <div class="mc-card">
+          <div class="mc-card-icon purple"><i class="bi bi-person-fill"></i></div>
+          <div>
+            <p class="mc-card-label">Usuario</p>
+            <p class="mc-card-val"><?= htmlspecialchars($pedido['nombres'].' '.$pedido['apellidos']) ?></p>
+          </div>
         </div>
-        <div class="vd-info-card" style="flex:2 1 220px;">
-          <span class="vd-ic-label"><?= $tipo_lbl ?></span>
-          <span class="vd-ic-value"><?= htmlspecialchars($pedido['cliente']) ?></span>
+        <div class="mc-card">
+          <div class="mc-card-icon green"><i class="bi bi-person-lines-fill"></i></div>
+          <div>
+            <p class="mc-card-label"><?= $tipo_lbl ?></p>
+            <p class="mc-card-val"><?= htmlspecialchars($pedido['cliente']) ?></p>
+          </div>
         </div>
-        <div class="vd-info-card">
-          <span class="vd-ic-label">Estado</span>
-          <span class="<?= $estado_cls ?>"><?= htmlspecialchars($estado_display) ?></span>
+        <div class="mc-card">
+          <div class="mc-card-icon <?= ($estado_cls === 'vd-badge-green') ? 'green' : (($estado_cls === 'vd-badge-blue') ? 'blue' : (($estado_cls === 'vd-badge-red') ? 'red' : 'amber')) ?>"><i class="bi bi-flag-fill"></i></div>
+          <div>
+            <p class="mc-card-label">Estado</p>
+            <p class="mc-card-val"><span class="<?= $estado_cls ?>"><?= htmlspecialchars($estado_display) ?></span></p>
+          </div>
         </div>
       </div>
 
@@ -238,6 +291,7 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
           <a href="op_pendiente.php?op=<?= $n_op['id'] ?>" target="_blank" class="mc-btn mc-btn-blue d-print-none">
             <i class="bi bi-box-arrow-up-right"></i> OP # <?= $n_op['id'] ?>
           </a>
+          <span class="d-none d-print-inline" style="font-size:.95rem; font-weight:600; color:#0f172a;">OP # <?= $n_op['id'] ?></span>
         </div>
       </div>
       <?php endif; ?>
@@ -369,26 +423,6 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
             </table>
           </div>
         </div>
-        <script>
-        <?php foreach ($libros as $libro): ?>
-        $('#c<?= $libro["lpid"] ?>').on('keyup', function(){
-          var cant = $(this).val();
-          $('#l<?= $libro["lpid"] ?>').val(cant + '/' + <?= $libro["lpid"] ?>);
-        });
-        <?php if ($is_admin): ?>
-        (function(lpid, nombre){
-          $('#e' + lpid).on('click', function(){
-            inkConfirm({
-              type: 'danger',
-              title: '¿Eliminar libro?',
-              text: 'Se quitará "' + nombre + '" de esta devolución.',
-              btnOk: 'Sí, eliminar'
-            }, function(){ $('#' + lpid).remove(); });
-          });
-        })(<?= $libro["lpid"] ?>, <?= json_encode($libro["libro"]) ?>);
-        <?php endif; ?>
-        <?php endforeach; ?>
-        </script>
 
         <!-- Agregar libro hidden blocks -->
         <?php for ($i = 1; $i < 100; $i++): ?>
@@ -588,9 +622,21 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
     <?php endfor; ?>
   });
 
+  window.addEventListener('beforeprint', function () {
+    document.querySelectorAll('textarea').forEach(function (ta) {
+      ta._ph = ta.style.height;
+      ta.style.setProperty('height', ta.scrollHeight + 'px', 'important');
+    });
+  });
+  window.addEventListener('afterprint', function () {
+    document.querySelectorAll('textarea').forEach(function (ta) {
+      ta.style.height = ta._ph || '';
+    });
+  });
+
   <?php if ($is_admin): ?>
   window.addEventListener('beforeprint', function(){
-    $("#impre").html("<h4>Fecha recibido bodega: <?= date('Y-m-d H:i') ?></h4>");
+    $("#impre").html("<div class='vd-info-row' style='margin-bottom:16px;'><div class='vd-info-card' style='max-width:240px;'><span class='vd-ic-label'>Fecha recibido bodega</span><span class='vd-ic-value'><?= date('Y-m-d H:i') ?></span></div></div>");
     $("#entregado").html("<h4>Entregado por: ___________________________  </h4>");
     $("#recibido").html("<h4>Recibido por: ___________________________</h4>");
     $.ajax({
@@ -604,6 +650,25 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
     });
   });
   <?php endif; ?>
+
+  <?php foreach ($libros as $libro): ?>
+  $('#c<?= $libro["lpid"] ?>').on('keyup', function(){
+    var cant = $(this).val();
+    $('#l<?= $libro["lpid"] ?>').val(cant + '/' + <?= $libro["lpid"] ?>);
+  });
+  <?php if ($is_admin): ?>
+  (function(lpid, nombre){
+    $('#e' + lpid).on('click', function(){
+      inkConfirm({
+        type: 'danger',
+        title: '¿Eliminar libro?',
+        text: 'Se quitará "' + nombre + '" de esta devolución.',
+        btnOk: 'Sí, eliminar'
+      }, function(){ $(document.getElementById(lpid)).remove(); });
+    });
+  })(<?= $libro["lpid"] ?>, <?= json_encode($libro["libro"]) ?>);
+  <?php endif; ?>
+  <?php endforeach; ?>
 </script>
 </body>
 </html>
