@@ -58,7 +58,8 @@
 
 	foreach ($_POST["libro_e"] as $libros => $libro) {
 
-		list($id_libro,$cantidad,$descuento) = explode("/", $libro);
+		if (empty($libro)) continue;
+		list($id_libro,$cantidad,$descuento) = array_pad(explode("/", $libro), 3, 0);
 				
 		if ($cantidad > 0) {
 				
@@ -87,9 +88,9 @@
 
 	}
 
-	foreach ($_POST['pri_sec'] as $index => $id_libro) {
-    	$cantidad = $_POST['cantidad_pri_sec'][$index];
-    	$descuento = $_POST['descuento_pri_sec'][$index];
+	foreach (($_POST['pri_sec'] ?? []) as $index => $id_libro) {
+    	$cantidad  = $_POST['cantidad_pri_sec'][$index]  ?? 0;
+    	$descuento = $_POST['descuento_pri_sec'][$index] ?? 0;
 
     	if ($cantidad > 0) {
 				
