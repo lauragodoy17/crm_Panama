@@ -92,12 +92,6 @@
         <div class="row align-items-center">
           <div class="col-md-8 col-sm-12">
             <div class="title"><h4>Cargar proveedores</h4></div>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">Devoluciones</li>
-                <li class="breadcrumb-item active">Cargar proveedores</li>
-              </ol>
-            </nav>
           </div>
         </div>
       </div>

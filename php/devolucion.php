@@ -73,6 +73,7 @@
 
 
 
-	echo "<script>alert('Devolución de venta registrada');window.location='../colegios_devols.php?periodo=".$_POST["periodo"]."';</script>";
+	header("Location: ../colegios_devols.php?periodo=".$_POST["periodo"]."&ink_status=ok&ink_msg=".urlencode('Devolución de venta registrada correctamente'));
+	exit;
 	
 ?>

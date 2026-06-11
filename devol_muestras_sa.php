@@ -92,18 +92,6 @@
               ?>
               <p class="sm-page-desc">Registra la información de la devolución.</p>
             </div>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">Devoluciones</li>
-                <li class="breadcrumb-item active">
-                  <?php
-                    if ($_GET['tp'] == 1)     echo 'Muestras';
-                    elseif ($_GET['tp'] == 2) echo 'Proveedores';
-                    else                      echo 'Venta sin adopción';
-                  ?>
-                </li>
-              </ol>
-            </nav>
           </div>
         </div>
       </div>
