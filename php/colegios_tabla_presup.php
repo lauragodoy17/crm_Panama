@@ -202,31 +202,23 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $colegio) {
     $req_periodo->execute();
     $gp_periodo = $req_periodo->fetchAll();
 
-    // Armas el select de forma segura
-    $selectPeriodo = '<select id="periodo' . $colegio["id"] . '" name="periodo" style="width: 100px;">';
+    $selectPeriodo = '<select id="periodo' . $colegio["id"] . '" name="periodo" class="form-control form-control-sm dt-periodo-sel">';
     foreach ($gp_periodo as $periodo) {
         $selectPeriodo .= '<option value="' . $periodo["id"] . '">' . htmlspecialchars($periodo["periodo"]) . '</option>';
     }
     $selectPeriodo .= '</select>';
 
-    // Lo agregas como una nueva columna
-    $colegio['periodo'] = $selectPeriodo;
+    $colegio['periodo']     = $selectPeriodo;
     $colegio['departamento'] = $dep['departamento'];
-    $colegio['acciones'] ="";
-    $colegio['status'] =$sta['status'];
-    $colegio['presupuesto'] =$venta_ppto[$colegio["id"]];
-    /*$colegio['acciones'] = '
-        <button class="btn btn-sm btn-info" data-id='.$colegio['id'].' data-codigo='.$colegio['codigo'].'>
-            <i class="fa fa-pencil bigger-120"></i>
-        </button>';*/
+    $colegio['status']      = $sta['status'];
+    $colegio['presupuesto'] = $venta_ppto[$colegio["id"]];
 
+    $colegio['acciones'] = '<button class="btn-ir-presup" data-id="'.$colegio['id'].'" data-codigo="'.$colegio['codigo'].'" title="Ver presupuesto"><i class="bi bi-box-arrow-in-right"></i></button>';
     if ($_SESSION['tipo'] == 1) {
-         $colegio['acciones'].='<a class="btn btn-sm btn-danger eliminar" href="#" data-codigo='.$colegio['codigo'].'>
-            <i class="fa fa-trash-o bigger-120"></i>
-        </a>';
+        $colegio['acciones'] .= ' <a class="btn btn-sm btn-danger eliminar" href="#" data-codigo='.$colegio['codigo'].'><i class="fa fa-trash-o bigger-120"></i></a>';
     }
 
-    $colegio['colegio']='<a class="linkcole" id="'.$colegio["id"].'" href="colegio.php?codigo='.$colegio['codigo'].'&periodo='.$periodo2.'&tab=presupuesto" data-id='.$colegio['id'].' data-codigo='.$colegio['codigo'].'>'.$colegio['colegio'].'</a>';
+    $colegio['colegio'] = '<a class="linkcole" id="'.$colegio["id"].'" href="colegio.php?codigo='.$colegio['codigo'].'&periodo='.$periodo2.'&tab=presupuesto" data-id='.$colegio['id'].' data-codigo='.$colegio['codigo'].'>'.$colegio['colegio'].'</a>';
 
     $data[] = $colegio;
 }
