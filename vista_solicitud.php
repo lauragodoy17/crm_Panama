@@ -48,11 +48,12 @@
       font-size: 0.78rem;
       font-weight: 700;
     }
-    .vs-badge.entregado  { background:#dcfce7; color:#15803d; }
-    .vs-badge.pendiente  { background:#fef3c7; color:#92400e; }
-    .vs-badge.enviado    { background:#dbeafe; color:#1d4ed8; }
-    .vs-badge.aprobado   { background:#ede9fe; color:#6d28d9; }
-    .vs-badge.rechazado  { background:#fee2e2; color:#b91c1c; }
+    .vs-badge.pendiente  { background:#fef9c3; color:#854d0e; }
+    .vs-badge.aprobado   { background:#dcfce7; color:#166534; }
+    .vs-badge.entregado  { background:#dbeafe; color:#1e40af; }
+    .vs-badge.cobrado    { background:#dbeafe; color:#1e40af; }
+    .vs-badge.anulado    { background:#fee2e2; color:#991b1b; }
+    .vs-badge.rechazado  { background:#fee2e2; color:#991b1b; }
     .vs-badge.default    { background:#f1f5f9; color:#64748b; }
 
     /* ── Info cards ──────────────────────────────────────────── */
@@ -174,12 +175,13 @@
 
   // Badge estado
   $estado_lower = strtolower($solicitud["estado"]);
-  if (strpos($estado_lower, 'entregad') !== false)     $badge = 'entregado';
-  elseif (strpos($estado_lower, 'pendiente') !== false) $badge = 'pendiente';
-  elseif (strpos($estado_lower, 'enviado') !== false)   $badge = 'enviado';
-  elseif (strpos($estado_lower, 'aprobad') !== false)   $badge = 'aprobado';
-  elseif (strpos($estado_lower, 'rechazad') !== false)  $badge = 'rechazado';
-  else                                                   $badge = 'default';
+  if     (str_contains($estado_lower, 'solicit') || str_contains($estado_lower, 'pendient')) $badge = 'pendiente';
+  elseif (str_contains($estado_lower, 'aprob'))                                              $badge = 'aprobado';
+  elseif (str_contains($estado_lower, 'entreg'))                                             $badge = 'entregado';
+  elseif (str_contains($estado_lower, 'cobr'))                                               $badge = 'cobrado';
+  elseif (str_contains($estado_lower, 'anul') || str_contains($estado_lower, 'cerr'))        $badge = 'anulado';
+  elseif (str_contains($estado_lower, 'rechaz'))                                             $badge = 'rechazado';
+  else                                                                                        $badge = 'default';
 
   $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   $dt = date_create($solicitud["fecha"]);
