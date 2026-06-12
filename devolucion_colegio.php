@@ -157,6 +157,8 @@ if ($n_cole > 0) {
       margin-bottom: 20px;
       box-shadow: 0 1px 4px rgba(15,23,42,.06);
     }
+    @media (max-width: 767px) { .mc-cards { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 480px) { .mc-cards { grid-template-columns: repeat(2, 1fr); } }
     .mc-card {
       background: #fff;
       display: flex; align-items: center; gap: 9px;
@@ -448,7 +450,7 @@ if ($n_cole > 0) {
         $can_recibir = false;
         $can_proceso = false;
 
-        if ($n_op['estado'] == 2) {
+        if (isset($n_op['estado']) && $n_op['estado'] == 2) {
             echo '<span class="vd-badge-green" style="padding:10px 18px;font-size:.9rem;">Atendida</span>';
         } elseif ($eid == 1 && $is_admin) {
             $can_anular = $can_recibir = true;

@@ -137,6 +137,8 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
       margin-bottom: 20px;
       box-shadow: 0 1px 4px rgba(15,23,42,.06);
     }
+    @media (max-width: 767px) { .mc-cards { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 480px) { .mc-cards { grid-template-columns: repeat(2, 1fr); } }
     .mc-card {
       background: #fff;
       display: flex; align-items: center; gap: 9px;
