@@ -7,8 +7,8 @@ $tp = intval($_GET['tp'] ?? 2);
 $status_cfg = [
   1 => ['label' => 'Todas',       'icon' => 'bi-list-ul'],
   2 => ['label' => 'Solicitadas', 'icon' => 'bi-hourglass-split'],
-  3 => ['label' => 'Entregadas',  'icon' => 'bi-check-circle-fill'],
-  4 => ['label' => 'Cobradas',    'icon' => 'bi-cash-coin'],
+  3 => ['label' => 'Aprobadas',  'icon' => 'bi-check-circle-fill'],
+  4 => ['label' => 'Entregadas',    'icon' => 'bi-cash-coin'],
   5 => ['label' => 'Anuladas',    'icon' => 'bi-x-circle-fill'],
 ];
 $st = $status_cfg[$tp] ?? $status_cfg[2];
@@ -90,11 +90,15 @@ $solicitudes = $req->fetchAll();
 $total = count($solicitudes);
 
 $promotores_uniq = [];
+$estados_uniq    = [];
 foreach ($solicitudes as $s) {
   if ($s['promotor'] && !in_array($s['promotor'], $promotores_uniq))
     $promotores_uniq[] = $s['promotor'];
+  if ($s['estado'] && !in_array($s['estado'], $estados_uniq))
+    $estados_uniq[] = $s['estado'];
 }
 sort($promotores_uniq);
+sort($estados_uniq);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -148,12 +152,6 @@ sort($promotores_uniq);
             <div class="title">
               <h4><i class="bi bi-headset mr-2" style="color:<?= $ac['accent'] ?>"></i>Atenciones — <?= htmlspecialchars($st['label']) ?></h4>
             </div>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">Inicio</li>
-                <li class="breadcrumb-item active" aria-current="page">Atenciones a clientes</li>
-              </ol>
-            </nav>
           </div>
         </div>
       </div>
@@ -168,6 +166,14 @@ sort($promotores_uniq);
           <option value="">Todos los promotores</option>
           <?php foreach ($promotores_uniq as $p): ?>
           <option value="<?= htmlspecialchars($p) ?>"><?= htmlspecialchars($p) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <?php endif; ?>
+        <?php if ($tp == 1 && !empty($estados_uniq)): ?>
+        <select class="ft-select" id="la-estado">
+          <option value="">Todos los estados</option>
+          <?php foreach ($estados_uniq as $e): ?>
+          <option value="<?= htmlspecialchars($e) ?>"><?= htmlspecialchars($e) ?></option>
           <?php endforeach; ?>
         </select>
         <?php endif; ?>
@@ -186,10 +192,6 @@ sort($promotores_uniq);
       </div>
 
       <div class="modern-card">
-        <div class="card-head">
-          <h5><i class="bi <?= $st['icon'] ?> mr-2"></i><?= htmlspecialchars($st['label']) ?></h5>
-          <span id="la-count-badge"><?= $total ?> registros</span>
-        </div>
         <div class="table-responsive px-2 pb-2">
           <table class="table table-sm table-hover" id="la-table">
             <thead>
@@ -223,7 +225,7 @@ sort($promotores_uniq);
                 };
                 $fecha_raw = substr($s['fecha'], 0, 10);
               ?>
-              <tr data-fecha="<?= $fecha_raw ?>" data-promotor="<?= htmlspecialchars($s['promotor']) ?>">
+              <tr data-fecha="<?= $fecha_raw ?>" data-promotor="<?= htmlspecialchars($s['promotor']) ?>" data-estado="<?= htmlspecialchars($s['estado']) ?>">
                 <td><a href="vista_solicitud.php?id=<?= $s['id'] ?>" class="la-link vista_soli"><?= htmlspecialchars($s['conse']) ?></a></td>
                 <td><?= htmlspecialchars($s['fecha']) ?></td>
                 <td><?= htmlspecialchars($s['promotor']) ?></td>
@@ -285,10 +287,12 @@ $(document).ready(function () {
   $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
     if (settings.nTable.id !== 'la-table') return true;
     var promotor = $('#la-promotor').val();
+    var estado   = $('#la-estado').val();
     var desde    = $('#la-fecha-desde').val();
     var hasta    = $('#la-fecha-hasta').val();
     var $row     = $(table.api().row(dataIndex).node());
     if (promotor && $row.data('promotor') !== promotor) return false;
+    if (estado   && $row.data('estado')   !== estado)   return false;
     if (desde || hasta) {
       var fecha = $row.data('fecha') || '';
       if (desde && fecha < desde) return false;
@@ -297,7 +301,7 @@ $(document).ready(function () {
     return true;
   });
 
-  $('#la-promotor').on('change', function () {
+  $('#la-promotor, #la-estado').on('change', function () {
     table.api().draw();
   });
 
@@ -308,6 +312,7 @@ $(document).ready(function () {
   $('#la-btn-clear').on('click', function () {
     $('#la-search').val('');
     $('#la-promotor').val('');
+    $('#la-estado').val('');
     $('#la-fecha-desde, #la-fecha-hasta').val('');
     table.api().search('').draw();
   });
