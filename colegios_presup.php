@@ -19,6 +19,11 @@ require_once("conexion/bdd.php");
   <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
   <style>
     .dt-periodo-sel { min-width: 100px; }
+    @media (max-width: 575px) {
+      #cp-table_wrapper { overflow-x: auto; }
+      #cp-table { min-width: 750px; }
+      #cp-table td, #cp-table th { display: table-cell !important; }
+    }
   </style>
 </head>
 <body>
