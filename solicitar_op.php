@@ -234,13 +234,7 @@ $show_archivo = !isset($_GET['id_pedido']) && !isset($_GET['id_pedido_dist'])
       <div class="page-header">
         <div class="row">
           <div class="col-md-6 col-sm-12">
-            <div class="title"><h4>Solicitar OP</h4></div>
-            <nav aria-label="breadcrumb" role="navigation">
-              <ol class="breadcrumb">
-                <li class=”breadcrumb-item”>Órdenes de pedido</li>
-                <li class="breadcrumb-item active" aria-current="page">Solicitar</li>
-              </ol>
-            </nav>
+            <div class=”title”><h4>Solicitar OP</h4></div>
           </div>
         </div>
       </div>
