@@ -74,15 +74,21 @@ if ($tp != 1) {
     $sub_zonas_map[$sz['id']] = $sz['sub_zona'];
 }
 
-$zonas_uniq = [];
+$responsables_uniq = [];
+$empresas_uniq     = [];
 if ($tp != 1) {
   foreach ($pedidos as $p) {
-    $tipo_p = intval($p['tipo'] ?? 0);
-    $parts  = explode("/", $p['zona'] ?? '');
-    $z      = ($tipo_p == 3 || $tipo_p == 1) ? trim($parts[1] ?? $parts[0] ?? '') : trim($p['zona'] ?? '');
-    if ($z && !in_array($z, $zonas_uniq)) $zonas_uniq[] = $z;
+    $tipo_p  = intval($p['tipo'] ?? 0);
+    $parts   = explode("/", $p['zona'] ?? '');
+    $empresa = ($tipo_p == 3 || $tipo_p == 1) ? trim($parts[0] ?? '') : trim($p['zona'] ?? '');
+    $resp    = ($tipo_p == 3 || $tipo_p == 1)
+                 ? trim(($p['nombres'] ?? '').' '.($p['apellidos'] ?? ''))
+                 : trim($p['responsable'] ?? '');
+    if ($empresa && !in_array($empresa, $empresas_uniq))    $empresas_uniq[]     = $empresa;
+    if ($resp    && !in_array($resp,    $responsables_uniq)) $responsables_uniq[] = $resp;
   }
-  sort($zonas_uniq);
+  sort($empresas_uniq);
+  sort($responsables_uniq);
 }
 ?>
 <!DOCTYPE html>
@@ -188,13 +194,21 @@ if ($tp != 1) {
       <div class="filter-toolbar">
         <div class="ft-search">
           <i class="bi bi-search ft-search-icon"></i>
-          <input type="text" id="lm-search" placeholder="Buscar por colegio, usuario, zona...">
+          <input type="text" id="lm-search" placeholder="Buscar por colegio, responsable, empresa...">
         </div>
-        <?php if ($tp != 1 && !empty($zonas_uniq)): ?>
-        <select class="ft-select" id="lm-zona">
-          <option value="">Todas las zonas</option>
-          <?php foreach ($zonas_uniq as $z): ?>
-          <option value="<?= htmlspecialchars($z) ?>"><?= htmlspecialchars($z) ?></option>
+        <?php if ($tp != 1 && !empty($responsables_uniq)): ?>
+        <select class="ft-select" id="lm-responsable">
+          <option value="">Todos los responsables</option>
+          <?php foreach ($responsables_uniq as $r): ?>
+          <option value="<?= htmlspecialchars($r) ?>"><?= htmlspecialchars($r) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <?php endif; ?>
+        <?php if ($tp != 1 && !empty($empresas_uniq)): ?>
+        <select class="ft-select" id="lm-empresa">
+          <option value="">Todas las empresas</option>
+          <?php foreach ($empresas_uniq as $e): ?>
+          <option value="<?= htmlspecialchars($e) ?>"><?= htmlspecialchars($e) ?></option>
           <?php endforeach; ?>
         </select>
         <?php endif; ?>
@@ -269,18 +283,20 @@ if ($tp != 1) {
             </thead>
             <tbody>
               <?php foreach ($pedidos as $p):
-                $tipo_p = intval($p['tipo'] ?? 0);
+                $tipo_p   = intval($p['tipo'] ?? 0);
                 if ($tipo_p == 3 || $tipo_p == 1) {
-                  $parts   = explode("/", $p['zona'] ?? '');
-                  $empresa = htmlspecialchars(trim($parts[0] ?? ''));
-                  $n_zona  = htmlspecialchars(trim($parts[1] ?? ''));
-                  $resp    = htmlspecialchars(trim(($p['nombres'] ?? '').' '.($p['apellidos'] ?? '')));
-                  $zona_d  = trim($parts[1] ?? $parts[0] ?? '');
+                  $parts    = explode("/", $p['zona'] ?? '');
+                  $empresa  = htmlspecialchars(trim($parts[0] ?? ''));
+                  $n_zona   = htmlspecialchars(trim($parts[1] ?? ''));
+                  $resp     = htmlspecialchars(trim(($p['nombres'] ?? '').' '.($p['apellidos'] ?? '')));
+                  $raw_emp  = trim($parts[0] ?? '');
+                  $raw_resp = trim(($p['nombres'] ?? '').' '.($p['apellidos'] ?? ''));
                 } else {
-                  $empresa = htmlspecialchars($p['zona'] ?? '');
-                  $n_zona  = htmlspecialchars($sub_zonas_map[$p['sub_zona']] ?? '—');
-                  $resp    = htmlspecialchars($p['responsable'] ?? '—');
-                  $zona_d  = $p['zona'] ?? '';
+                  $empresa  = htmlspecialchars($p['zona'] ?? '');
+                  $n_zona   = htmlspecialchars($sub_zonas_map[$p['sub_zona']] ?? '—');
+                  $resp     = htmlspecialchars($p['responsable'] ?? '—');
+                  $raw_emp  = $p['zona'] ?? '';
+                  $raw_resp = $p['responsable'] ?? '';
                 }
                 $fecha_d = date('d/m/Y', strtotime($p['fecha']));
                 $fecha_r = substr($p['fecha'], 0, 10);
@@ -288,7 +304,7 @@ if ($tp != 1) {
                   ? "muestreo_colegio.php?id_pedido={$p['id']}"
                   : "muestreo_colegio_resto.php?id_pedido={$p['id']}&tp={$tp}";
               ?>
-              <tr data-date="<?= $fecha_r ?>" data-zona="<?= htmlspecialchars($zona_d) ?>">
+              <tr data-date="<?= $fecha_r ?>" data-responsable="<?= htmlspecialchars($raw_resp) ?>" data-empresa="<?= htmlspecialchars($raw_emp) ?>">
                 <td><?= $p['id'] ?></td>
                 <td><?= $fecha_d ?></td>
                 <td><?= $empresa ?></td>
@@ -329,17 +345,19 @@ $(document).ready(function () {
 
   $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
     if (settings.nTable.id !== 'lm-table') return true;
-    var zona  = $('#lm-zona').val();
-    var desde = $('#lm-fecha-desde').val();
-    var hasta = $('#lm-fecha-hasta').val();
-    if (zona && table) {
-      var rowZona = $(table.row(dataIndex).node()).data('zona') || '';
-      if (rowZona !== zona) return false;
-    }
-    if ((desde || hasta) && table) {
-      var raw = $(table.row(dataIndex).node()).data('date') || '';
-      if (desde && raw < desde) return false;
-      if (hasta && raw > hasta) return false;
+    var resp    = $('#lm-responsable').val();
+    var empresa = $('#lm-empresa').val();
+    var desde   = $('#lm-fecha-desde').val();
+    var hasta   = $('#lm-fecha-hasta').val();
+    if (table) {
+      var $row = $(table.row(dataIndex).node());
+      if (resp    && $row.data('responsable') !== resp)    return false;
+      if (empresa && $row.data('empresa')     !== empresa) return false;
+      if (desde || hasta) {
+        var raw = $row.data('date') || '';
+        if (desde && raw < desde) return false;
+        if (hasta && raw > hasta) return false;
+      }
     }
     return true;
   });
@@ -365,7 +383,7 @@ $(document).ready(function () {
   $('#lm-fecha-desde, #lm-fecha-hasta').on('change', function () { table.draw(); });
   $('#lm-btn-clear').on('click', function () {
     $('#lm-search').val('');
-    $('#lm-zona').val('');
+    $('#lm-responsable, #lm-empresa').val('');
     $('#lm-fecha-desde, #lm-fecha-hasta').val('');
     table.search('').draw();
   });
