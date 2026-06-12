@@ -474,7 +474,7 @@ $can_edit  = ($is_admin || $is_viewer || ($pedido['verify'] ?? 1) == 0);
                 <i class="bi bi-x-circle"></i> Anular
               </button>
               <button type="button" id="modificar" class="mc-btn mc-btn-blue">
-                <i class="bi bi-pencil"></i> Modificar
+                <i class="bi bi-pencil"></i> Guardar cambios
               </button>
               <button type="button" id="entregar" class="mc-btn mc-btn-green">
                 <i class="bi bi-truck"></i> Entregar

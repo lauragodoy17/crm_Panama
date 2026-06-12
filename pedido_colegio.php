@@ -537,7 +537,7 @@ $rechazar_label = (intval($pedido['eid'] ?? 0) == 1) ? 'Rechazar' : 'Anular';
                 <i class="bi bi-truck"></i> Entregar
               </button>
               <button type="button" id="modificar" class="mc-btn mc-btn-blue">
-                <i class="bi bi-pencil"></i> Modificar
+                <i class="bi bi-pencil"></i> Guardar cambios
               </button>
             <?php endif; ?>
           <?php endif; ?>
