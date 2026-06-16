@@ -130,7 +130,7 @@
 
 	}
 
-	header("Location: ".$_SERVER['HTTP_REFERER']);
+	header("Location: ../vista_solicitud.php?id=".$_GET["solicitud"]."&updated=1");
 
 	
 ?>

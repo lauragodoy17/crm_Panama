@@ -399,7 +399,7 @@
 
   <div class="vs-actions">
     <?php if ($solicitud["idestado"] == 2 && in_array($_SESSION['tipo'], [1,2,7,9])): ?>
-      <button class="btn btn-primary btn-sm" id="entregar"><i class="bi bi-truck"></i> Entregar</button>
+      <button type="button" class="btn btn-primary btn-sm vs-confirm-btn" id="entregar" data-tipo="entregar"><i class="bi bi-truck"></i> Entregar</button>
     <?php endif; ?>
 
     <?php if (in_array($solicitud["idestado"], [2,4]) && in_array($_SESSION['tipo'], [1,2,7,9])): ?>
@@ -418,10 +418,12 @@
 
     <?php if (in_array($_SESSION['tipo'], [1]) || $_SESSION['id']==19): ?>
       <?php if ($solicitud["idestado"] == 1): ?>
-        <a class="btn btn-success btn-sm" href="php/accion_solicitudes.php?solicitud=<?= $solicitud["id"] ?>&aprobar=1&cod_colegio=<?= $solicitud["codigo"] ?>&periodo=<?= $solicitud["id_periodo"] ?>">
+        <a class="btn btn-success btn-sm vs-confirm-link" data-tipo="aprobar"
+           href="php/accion_solicitudes.php?solicitud=<?= $solicitud["id"] ?>&aprobar=1&cod_colegio=<?= $solicitud["codigo"] ?>&periodo=<?= $solicitud["id_periodo"] ?>">
           <i class="bi bi-check-circle"></i> Aprobar
         </a>
-        <a class="btn btn-danger btn-sm" href="php/accion_solicitudes.php?solicitud=<?= $solicitud["id"] ?>&rechazar=1&cod_colegio=<?= $solicitud["codigo"] ?>&periodo=<?= $solicitud["id_periodo"] ?>">
+        <a class="btn btn-danger btn-sm vs-confirm-link" data-tipo="rechazar"
+           href="php/accion_solicitudes.php?solicitud=<?= $solicitud["id"] ?>&rechazar=1&cod_colegio=<?= $solicitud["codigo"] ?>&periodo=<?= $solicitud["id_periodo"] ?>">
           <i class="bi bi-x-circle"></i> Rechazar
         </a>
       <?php endif; ?>
@@ -463,14 +465,73 @@
 
 </div></div></div>
 
+<!-- Modal de confirmación -->
+<div class="modal fade" id="vs-modal-confirm" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content" style="border-radius:14px;border:none;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+      <div class="modal-body text-center" style="padding:32px 28px">
+        <div id="mc-icon" style="width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px;"></div>
+        <h5 id="mc-title" style="font-weight:700;color:#0f172a;margin-bottom:8px;font-size:1rem;"></h5>
+        <p  id="mc-msg"   style="color:#64748b;font-size:.85rem;margin-bottom:22px;"></p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button type="button" class="btn btn-light btn-sm" data-dismiss="modal" style="font-weight:600;padding:7px 22px;">Cancelar</button>
+          <button type="button" id="mc-confirm" class="btn btn-sm" style="font-weight:600;padding:7px 22px;">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="vendors/scripts/core.js"></script>
 <script src="vendors/scripts/script.min.js"></script>
 <script src="vendors/scripts/process.js"></script>
 <script src="vendors/scripts/layout-settings.js"></script>
 <script>
-  $("#entregar").click(function(){
-    $("#form_a").attr("action", "php/entregar_solicitud.php");
+  var _pendingAction = null;
+
+  var _modalCfg = {
+    aprobar:  { bg: '#dcfce7', color: '#16a34a', icon: '&#10003;', title: '¿Aprobar solicitud?',         msg: 'Esta acción cambiará el estado a Aprobado y notificará al promotor.' },
+    rechazar: { bg: '#fee2e2', color: '#dc2626', icon: '&#10007;', title: '¿Rechazar solicitud?',         msg: 'Esta acción cambiará el estado a Rechazado.' },
+    entregar: { bg: '#dbeafe', color: '#1d4ed8', icon: '&#128666;', title: '¿Marcar como entregada?',    msg: 'Se registrarán los datos de entrega ingresados.' }
+  };
+
+  function abrirModal(tipo, accion) {
+    var c = _modalCfg[tipo];
+    $('#mc-icon').css({ background: c.bg, color: c.color }).html(c.icon);
+    $('#mc-title').text(c.title);
+    $('#mc-msg').text(c.msg);
+    $('#mc-confirm').css({ background: c.color, color: '#fff', border: 'none' });
+    _pendingAction = accion;
+    $('#vs-modal-confirm').modal('show');
+  }
+
+  // Links Aprobar / Rechazar
+  $(document).on('click', '.vs-confirm-link', function (e) {
+    e.preventDefault();
+    var href = $(this).attr('href');
+    var tipo = $(this).data('tipo');
+    abrirModal(tipo, function () { window.location.href = href; });
   });
+
+  // Botón Entregar
+  $(document).on('click', '.vs-confirm-btn', function (e) {
+    e.preventDefault();
+    abrirModal('entregar', function () {
+      $('#form_a').attr('action', 'php/entregar_solicitud.php').submit();
+    });
+  });
+
+  // Ejecutar acción al confirmar
+  $('#mc-confirm').on('click', function () {
+    $('#vs-modal-confirm').modal('hide');
+    if (_pendingAction) { _pendingAction(); _pendingAction = null; }
+  });
+
+  <?php if (!empty($_GET['updated'])): ?>
+  if (window.opener && !window.opener.closed) {
+    window.opener.location.reload();
+  }
+  <?php endif; ?>
 </script>
 </body>
 </html>

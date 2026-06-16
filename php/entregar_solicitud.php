@@ -38,6 +38,6 @@
 	$req->execute();
 	
 
-	header('Location: ../vista_solicitud.php?id='.$_POST["solicitud"].'');
+	header('Location: ../vista_solicitud.php?id='.$_POST["solicitud"].'&updated=1');
 	
 ?>
