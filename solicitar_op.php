@@ -35,8 +35,8 @@ if (isset($_GET['id_devol_c'])) {
   $pedido = $req_pedido->fetch();
 }
 if (isset($_GET['id_devol_p'])) {
-  $sql_pedido = "SELECT pe.fecha,pe.observaciones, c.cliente
-                 FROM devoluciones_prov pe JOIN clientes c ON pe.persona=c.id
+  $sql_pedido = "SELECT pe.fecha, pe.observaciones, p.proveedor AS cliente
+                 FROM devoluciones_prov pe JOIN proveedores p ON pe.persona = p.id
                  WHERE pe.id='".$_GET['id_devol_p']."'";
   $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
   $pedido = $req_pedido->fetch();
@@ -354,7 +354,7 @@ $show_archivo = !isset($_GET['id_pedido']) && !isset($_GET['id_pedido_dist'])
           </div>
           <div class="mc-card">
             <div class="mc-card-icon green"><i class="bi bi-person-vcard"></i></div>
-            <div class="mc-card-text"><p class="mc-card-label">Cliente</p><p class="mc-card-val"><?= htmlspecialchars($pedido['cliente']) ?></p></div>
+            <div class="mc-card-text"><p class="mc-card-label">Proveedor</p><p class="mc-card-val"><?= htmlspecialchars($pedido['cliente']) ?></p></div>
           </div>
           <div class="mc-card">
             <div class="mc-card-icon orange"><i class="bi bi-calendar3"></i></div>

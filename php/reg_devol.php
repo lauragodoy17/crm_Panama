@@ -1,174 +1,140 @@
-<?php 
-	require_once("../php/aut.php");
-	require_once('../conexion/bdd.php');
+<?php
+require_once("../php/aut.php");
+require_once("../conexion/bdd.php");
 
-	header("Content-Type:text/html;charset=utf-8");	
-	if ($_SESSION["tipo"]==1 || $_SESSION["tipo"] ==2 || $_SESSION["id"] ==19) {
+header("Content-Type:text/html;charset=utf-8");
 
-		$dir_subida = $_SERVER['DOCUMENT_ROOT'] .'/promotores/adjuntos/';
-		$nombre_archivo=uniqid()."_".$_FILES['archivo']['name'];
-		$fichero_subido = $dir_subida . basename($nombre_archivo);
-		$estado=2;
+$error          = null;
+$redirect       = '../devol_muestras_sa.php?tp=' . intval($_POST['tp'] ?? 1);
+$nombre_archivo = '';
+$tp             = intval($_POST['tp'] ?? 1);
 
-	}else{
-		$nombre_archivo="";
-		$estado=1;
-	}
+$bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+try {
+    // Subida de archivo (solo admins)
+    if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["id"] == 19) {
+        $estado = 2;
+        if (!empty($_FILES['archivo']['tmp_name']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
+            $dir_subida     = $_SERVER['DOCUMENT_ROOT'] . '/promotores/adjuntos/';
+            $nombre_archivo = uniqid() . '_' . basename($_FILES['archivo']['name']);
+            if (!move_uploaded_file($_FILES['archivo']['tmp_name'], $dir_subida . $nombre_archivo)) {
+                throw new Exception("No se pudo subir el archivo adjunto.");
+            }
+        }
+    } else {
+        $estado = 1;
+    }
 
-	if (move_uploaded_file($_FILES['archivo']['tmp_name'], $fichero_subido)) {
-		echo "archivo subido";
-	}
+    // Tabla según tipo
+    $table_cod = $tp == 1 ? 'devoluciones' : ($tp == 2 ? 'devoluciones_prov' : 'devoluciones_v');
 
-	do {
-	         $caracteres = "1234567890"; //posibles caracteres a usar
-	         $numerodeletras=10; //numero de letras para generar el texto
-	         $cod_pedido =""; //variable para almacenar la cadena generada
-	         for($i=0;$i<$numerodeletras;$i++)
-	         {
-	            $cod_pedido .=substr($caracteres,rand(0,strlen($caracteres)),1); /*Extraemos 1 caracter de los caracteres 
-	            entre el rango 0 a Numero de letras que tiene la cadena */
-	         }
+    // Generar código único
+    do {
+        $cod_pedido = '';
+        for ($i = 0; $i < 10; $i++) $cod_pedido .= rand(0, 9);
+        $ck = $bdd->prepare("SELECT codigo FROM $table_cod WHERE codigo = ?");
+        $ck->execute([$cod_pedido]);
+    } while ($ck->fetch());
 
-	         if ($_POST["tp"]==1) {
-	         	$sql = "SELECT codigo FROM devoluciones";
-	         }elseif ($_POST["tp"]==2){
-	         	$sql = "SELECT codigo FROM devoluciones_prov";
-	         }else{
-	         	$sql = "SELECT codigo FROM devoluciones_v";
-	         }
-	        
+    // Insertar libros normales
+    foreach ($_POST['libro_e'] ?? [] as $libro) {
+        if (empty($libro) || strpos($libro, '/') === false) continue;
+        $parts    = explode('/', $libro, 2);
+        $id_libro = $parts[0] ?? '';
+        $cantidad = $parts[1] ?? 0;
+        if ($cantidad <= 0 || trim($id_libro) === '') continue;
+        $tbl = ($tp == 3) ? 'libros_devol_v' : 'libros_devol';
+        $bdd->prepare("INSERT INTO $tbl(cod_pedido, id_libro, cantidad) VALUES(?, ?, ?)")
+            ->execute([$cod_pedido, $id_libro, $cantidad]);
+    }
 
-			$req = $bdd->prepare($sql);
-			$req->execute();
-			$codigos = $req->fetchAll();
+    // Insertar libros primaria/secundaria
+    foreach ($_POST['pri_sec'] ?? [] as $index => $id_libro) {
+        $cantidad = $_POST['cantidad_pri_sec'][$index] ?? 0;
+        if ($cantidad <= 0) continue;
+        $tbl = ($tp == 3) ? 'libros_devol_v' : 'libros_devol';
+        $bdd->prepare("INSERT INTO $tbl(cod_pedido, id_libro, cantidad) VALUES(?, ?, ?)")
+            ->execute([$cod_pedido, $id_libro, $cantidad]);
+    }
 
-	         foreach($codigos as $codigo) {
-				if ($cod_pedido !="") {
-					if (($codigo["codigo"]==$cod_pedido)) $cod_pedido="";
-				}
-			}
-	   
-	 } while ($cod_pedido=="");
+    // Insertar encabezado
+    $obs = str_replace(["'", '"'], '', $_POST['observaciones'] ?? '');
+    if ($tp == 1) {
+        $bdd->prepare("INSERT INTO devoluciones(codigo, tipo, id_periodo, persona, id_usuario, observaciones, archivo, estado) VALUES(?, '1', '1', ?, ?, ?, ?, ?)")
+            ->execute([$cod_pedido, $_POST['cliente'] ?? '', $_SESSION['id'], $obs, $nombre_archivo, $estado]);
+    } elseif ($tp == 2) {
+        $bdd->prepare("INSERT INTO devoluciones_prov(codigo, tipo, id_periodo, persona, id_usuario, observaciones, archivo, estado) VALUES(?, '2', '1', ?, ?, ?, ?, ?)")
+            ->execute([$cod_pedido, $_POST['persona'] ?? '', $_SESSION['id'], $obs, $nombre_archivo, $estado]);
+    } else {
+        $bdd->prepare("INSERT INTO devoluciones_v(codigo, id_usuario, observaciones, cliente, tipo, estado) VALUES(?, ?, ?, ?, '1', '1')")
+            ->execute([$cod_pedido, $_SESSION['id'], $obs, $_POST['cliente'] ?? '']);
+    }
 
+    // ID generado para redirect
+    $sr = $bdd->prepare("SELECT id, tipo FROM $table_cod WHERE codigo = ?");
+    $sr->execute([$cod_pedido]);
+    $pedido = $sr->fetch();
 
-	foreach ($_POST["libro_e"] as $libros => $libro) {
+    if ($tp == 3) {
+        $redirect = '../devolucion_colegio.php?id_pedido=' . $pedido['id'];
+    } else {
+        $redirect = '../vista_devol.php?id_devol=' . $pedido['id'] . '&tipo=' . $pedido['tipo'];
+    }
 
-		list($id_libro,$cantidad) = explode("/", $libro);
-			
-		if ($libro !=0) {
-
-			if ($cantidad > 0) {
-			
-				if ($_POST['tp']==3) {
-					$sql_p = "INSERT INTO libros_devol_v(cod_pedido,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
-					
-				}
-
-				else{
-					$sql_p = "INSERT INTO libros_devol(cod_pedido,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
-				}
-						
-				$query_p = $bdd->prepare( $sql_p );
-				if ($query_p == false) {
-					print_r($bdd->errorInfo());
-					die ('Erreur prepare');
-				}
-				$sth_p = $query_p->execute();
-				if ($sth_p == false) {
-					print_r($query_p->errorInfo());
-					die ('Erreur execute');
-				}
-
-			}
-		
-		}
-
-	}
-
-	foreach ($_POST['pri_sec'] as $index => $id_libro) {
-    	$cantidad = $_POST['cantidad_pri_sec'][$index];
-
-    	if ($cantidad > 0) {
-				
-			$sql_g = "SELECT id_grado FROM libros WHERE id='".$id_libro."'";
-			$req_g = $bdd->prepare($sql_g);
-			$req_g->execute();
-
-			$grado = $req_g->fetch();
-
-				if ($_POST['tp']==3) {
-					$sql_p = "INSERT INTO libros_devol_v(cod_pedido,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
-				}else{
-					$sql_p = "INSERT INTO libros_devol(cod_pedido,id_libro,cantidad) VALUES('".$cod_pedido."','".$id_libro."','".$cantidad."')";
-				}
-
-				$query_p = $bdd->prepare( $sql_p );
-				if ($query_p == false) {
-					print_r($bdd->errorInfo());
-					die ('Erreur prepare');
-				}
-				$sth_p = $query_p->execute();
-				if ($sth_p == false) {
-					print_r($query_p->errorInfo());
-					die ('Erreur execute');
-				}		
-
-		}
-	}
-
-	$_POST["observaciones"] = str_replace(["'", '"'], "", $_POST["observaciones"]);
-	if ($_POST["tp"]==1) {
-		$sql_p2 = "INSERT INTO devoluciones(codigo,tipo,id_periodo,persona,id_usuario,observaciones,archivo,estado) VALUES('".$cod_pedido."','1','1','".$_POST["cliente"]."','".$_SESSION["id"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$estado."')";
-	}
-
-	elseif ($_POST["tp"]==2) {
-		$sql_p2 = "INSERT INTO devoluciones_prov(codigo,tipo,id_periodo,persona,id_usuario,observaciones,archivo,estado) VALUES('".$cod_pedido."','2','1','".$_POST["persona"]."','".$_SESSION["id"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$estado."')";
-	}
-
-	else{
-		$sql_p2 = "INSERT INTO devoluciones_v(codigo,id_usuario,observaciones,cliente,tipo,estado) VALUES('".$cod_pedido."','".$_SESSION["id"]."','".$_POST["observaciones"]."','".$_POST["cliente"]."','1','1')";
-
-	}
-
-	
-				
-				
-		$query_p2 = $bdd->prepare( $sql_p2 );
-		if ($query_p2 == false) {
-			print_r($bdd->errorInfo());
-			die ('Erreur prepare');
-		}
-		$sth_p2 = $query_p2->execute();
-		if ($sth_p2 == false) {
-			print_r($query_p2->errorInfo());
-			die ('Erreur execute');
-		}
-
-
-	if ($_POST["tp"]==1) {
-		$sql = "SELECT id,tipo FROM devoluciones WHERE codigo='".$cod_pedido."'";
-		$req = $bdd->prepare($sql);
-		$req->execute();
-		$pedido = $req->fetch();
-		echo "<script>alert('Devolución registrada');window.location='../vista_devol.php?id_devol=".$pedido["id"]."&tipo=".$pedido["tipo"]."';</script>";
-	}
-
-	elseif ($_POST["tp"]==2) {
-		$sql = "SELECT id,tipo FROM devoluciones_prov WHERE codigo='".$cod_pedido."'";
-		$req = $bdd->prepare($sql);
-		$req->execute();
-		$pedido = $req->fetch();
-		echo "<script>alert('Devolución registrada');window.location='../vista_devol.php?id_devol=".$pedido["id"]."&tipo=".$pedido["tipo"]."';</script>";
-	}
-	else{	
-		$sql = "SELECT id,tipo FROM devoluciones_v WHERE codigo='".$cod_pedido."'";
-		$req = $bdd->prepare($sql);
-		$req->execute();
-		$pedido = $req->fetch();
-		echo "<script>alert('Devolución registrada');window.location='../devolucion_colegio.php?id_pedido=".$pedido["id"]."';</script>";
-	}
-
-
-	
-	
+} catch (Exception $e) {
+    $error = 'Error al registrar la devolución: ' . $e->getMessage();
+}
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Inkpulse - Registrar devolución</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .alert-card { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,.10); padding: 40px 48px; text-align: center; max-width: 440px; width: 90%; }
+    .icon-wrap { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; }
+    .icon-ok  { background: #dcfce7; color: #16a34a; }
+    .icon-err { background: #fee2e2; color: #dc2626; }
+    h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; }
+    p  { font-size: .9rem; color: #64748b; line-height: 1.5; }
+    .btn { display: inline-block; margin-top: 24px; padding: 10px 28px; border-radius: 8px; font-size: .9rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+    .btn-ok  { background: #16a34a; color: #fff; }
+    .btn-err { background: #dc2626; color: #fff; }
+    .countdown { font-size: .78rem; color: #94a3b8; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<?php if (!$error): ?>
+  <div class="alert-card">
+    <div class="icon-wrap icon-ok">&#10003;</div>
+    <h2>¡Devolución registrada!</h2>
+    <p>La devolución fue guardada correctamente.</p>
+    <p class="countdown" id="msg">Redirigiendo en 3 segundos...</p>
+    <a href="<?= htmlspecialchars($redirect) ?>" class="btn btn-ok">Ver devolución</a>
+  </div>
+  <script>
+    var dest = <?= json_encode($redirect) ?>;
+    var s = 3;
+    var t = setInterval(function () {
+      s--;
+      document.getElementById('msg').textContent = 'Redirigiendo en ' + s + ' segundo' + (s !== 1 ? 's' : '') + '...';
+      if (s <= 0) { clearInterval(t); window.location.href = dest; }
+    }, 1000);
+  </script>
+
+<?php else: ?>
+  <div class="alert-card">
+    <div class="icon-wrap icon-err">&#10007;</div>
+    <h2>Error al registrar</h2>
+    <p><?= htmlspecialchars($error) ?></p>
+    <a href="javascript:history.back()" class="btn btn-err">Volver e intentar de nuevo</a>
+  </div>
+<?php endif; ?>
+
+</body>
+</html>

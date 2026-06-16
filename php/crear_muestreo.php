@@ -88,7 +88,7 @@
 
 	}
 
-	foreach ($_POST['pri_sec'] as $index => $id_libro) {
+	foreach ($_POST['pri_sec'] ?? [] as $index => $id_libro) {
     	$cantidad = $_POST['cantidad_pri_sec'][$index];
 
     	if ($cantidad > 0) {
