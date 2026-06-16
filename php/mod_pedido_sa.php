@@ -1,197 +1,158 @@
 <?php
-  require_once("../php/aut.php");
-  include("../conexion/bdd.php");
+require_once("../php/aut.php");
+require_once("../conexion/bdd.php");
 
-  use PHPMailer\PHPMailer\PHPMailer;
-  use PHPMailer\PHPMailer\SMTP;
-  use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-  require '../lib/PHPMailer/src/Exception.php';
-  require '../lib/PHPMailer/src/PHPMailer.php';
-  require '../lib/PHPMailer/src/SMTP.php';
+require '../lib/PHPMailer/src/Exception.php';
+require '../lib/PHPMailer/src/PHPMailer.php';
+require '../lib/PHPMailer/src/SMTP.php';
 
-  $sql = "SELECT id FROM libros_pedidos2 WHERE cod_pedido='".$_POST['codigo']."'";
+header("Content-Type:text/html;charset=utf-8");
 
-  $req = $bdd->prepare($sql);
-  $req->execute();
-  $libs= $req->fetchAll();
+$error     = null;
+$id_pedido = intval($_POST['pedido'] ?? 0);
+$codigo    = $_POST['codigo']       ?? '';
+$tp        = $_POST['tp']           ?? '2';
+$redirect  = '../pedido_colegio_sa.php?id_pedido=' . $id_pedido . '&tp=' . $tp;
 
-  foreach($libs as $lib) {
-
-    $libsp[]=$lib["id"];
-  }
-
-  $resultados = array_diff($libsp, $_POST['lpid']);
-
-  foreach($resultados as $resultado) {
-
-    $sql = "DELETE FROM `libros_pedidos2` WHERE id='".$resultado."'";
-
-    $req = $bdd->prepare($sql);
-    $req->execute();
-
-  }
-
-  foreach ($_POST["libro_e"] as $libros => $libro) {
-
-    list($id_libro,$cantidad,$descuento) = explode("/", $libro);
-      
-    if ($libro !=0) {
-      
-      $sql_p = "INSERT INTO libros_pedidos2(cod_pedido,id_libro,cantidad,descuento) VALUES('".$_POST['codigo']."','".$id_libro."','".$cantidad."','".$descuento."')";
-        
-        
-      $query_p = $bdd->prepare( $sql_p );
-      if ($query_p == false) {
-        print_r($bdd->errorInfo());
-        die ('Erreur prepare');
-      }
-      $sth_p = $query_p->execute();
-      if ($sth_p == false) {
-        print_r($query_p->errorInfo());
-        die ('Erreur execute');
-      }
-
-    }
-    
-
-  }
-
-  foreach ($_POST["lib_p"] as $lib_p) {
-    
-    list($cant,$lib,$desc) =explode("/", $lib_p);
-
-    $sql_e = "UPDATE libros_pedidos2 SET cantidad_aprob='".$cant."', descuento_aprob='".$desc."' WHERE id='".$lib."'";
-
-    $query_e = $bdd->prepare( $sql_e );
-    if ($query_e == false) {
-      print_r($bdd->errorInfo());
-      die ('Erreur prepare');
-    }
-    $sth_e = $query_e->execute();
-    if ($sth_e == false) {
-      print_r($query_e->errorInfo());
-      die ('Erreur execute');
+$bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+try {
+    // Eliminar libros que ya no están en el formulario
+    $req = $bdd->prepare("SELECT id FROM libros_pedidos2 WHERE cod_pedido = ?");
+    $req->execute([$codigo]);
+    $libsp    = array_column($req->fetchAll(), 'id');
+    $ids_post = array_map('intval', $_POST['lpid'] ?? []);
+    foreach (array_diff($libsp, $ids_post) as $id_elim) {
+        $bdd->prepare("DELETE FROM libros_pedidos2 WHERE id = ?")->execute([$id_elim]);
     }
 
-  }
-
-  
-
-
-  if ($_SESSION["tipo"] ==6 || $_SESSION["tipo"] ==7 || $_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==4 || $_SESSION["tipo"] ==2) {
-
-    $sql_e = "UPDATE pedidos2 SET observaciones='".$_POST["observaciones"]."', verify='1' WHERE id='".$_POST["pedido"]."'";
-
-    $query_e = $bdd->prepare( $sql_e );
-    if ($query_e == false) {
-      print_r($bdd->errorInfo());
-      die ('Erreur prepare');
+    // Insertar nuevos libros
+    foreach ($_POST['libro_e'] ?? [] as $libro) {
+        if (empty($libro) || strpos($libro, '/') === false) continue;
+        $parts    = explode('/', $libro, 3);
+        $id_libro = $parts[0] ?? '';
+        $cantidad = $parts[1] ?? '';
+        $descuento = $parts[2] ?? '';
+        if (trim($id_libro) === '') continue;
+        $bdd->prepare("INSERT INTO libros_pedidos2(cod_pedido, id_libro, cantidad, descuento) VALUES(?, ?, ?, ?)")
+            ->execute([$codigo, $id_libro, $cantidad, $descuento]);
     }
 
-    $sth_e = $query_e->execute();
-    if ($sth_e == false) {
-      print_r($query_e->errorInfo());
-      die ('Erreur execute');
+    // Actualizar cantidades/descuentos aprobados
+    foreach ($_POST['lib_p'] ?? [] as $lib_p) {
+        if (trim($lib_p) === '') continue;
+        $parts = explode('/', $lib_p, 3);
+        $cant  = $parts[0] ?? '';
+        $lib   = $parts[1] ?? '';
+        $desc  = $parts[2] ?? '';
+        if (trim($lib) === '') continue;
+        $bdd->prepare("UPDATE libros_pedidos2 SET cantidad_aprob = ?, descuento_aprob = ? WHERE id = ?")
+            ->execute([$cant, $desc, $lib]);
     }
 
-    $mail = new PHPMailer(true);
+    $obs    = $_POST['observaciones'] ?? '';
+    $salida = $_POST['salida']       ?? '';
 
-    try {
+    // Solo activa confirm+email cuando el botón fue "Confirmar", no "Guardar cambios"
+    if ($salida === 'confirmar') {
+        $bdd->prepare("UPDATE pedidos2 SET observaciones = ?, verify = '1' WHERE id = ?")
+            ->execute([$obs, $id_pedido]);
 
-      //Server settings
-      //$mail->SMTPDebug = SMTP::DEBUG_LOWLEVEL;                      // OFF verbose debug output
-      $mail->isSMTP();                                            // Send using SMTP
-      $mail->Host       = 'somoseureka.com.co';                    // Set the SMTP server to send through
-      $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-      $mail->SMTPAutoTLS = false; 
-      $mail->Username   = 'crm@somoseureka.com.co';                     // SMTP username
-      $mail->Password   = 'cRm14356$';                              // SMTP password
-      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-      $mail->Port       = 587;  
-      $mail->SMTPOptions = [
-      'ssl' => [
-        'verify_peer' => false,
-        'verify_peer_name' => false,
-        'allow_self_signed' => true
-      ]
-    ];                                  // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_S above                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+        // Obtener nombre del promotor
+        $sq = $bdd->prepare("SELECT CONCAT(nombres, ' ', apellidos) AS promotor FROM usuarios WHERE id = ?");
+        $sq->execute([$_SESSION['id']]);
+        $promo = $sq->fetch();
 
-      //Recipients
-      $mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka');
-      $mail->addAddress("felipe.vargas@somoseureka.com.co", 'felipe.vargas@somoseureka.com.co');     // Add a recipient
-          
-      $mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
-      $mail->addCC("comercial@somoseureka.com.co");
-      //$mail->addCC("oltoledo@hotmail.com");
-      //$mail->addBCC('comercial@somoseureka.com.co');
+        // Enviar email (no bloquear si falla)
+        try {
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host        = 'somoseureka.com.co';
+            $mail->SMTPAuth    = true;
+            $mail->SMTPAutoTLS = false;
+            $mail->Username    = 'crm@somoseureka.com.co';
+            $mail->Password    = 'cRm14356$';
+            $mail->SMTPSecure  = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port        = 587;
+            $mail->SMTPOptions = ['ssl' => ['verify_peer'=>false,'verify_peer_name'=>false,'allow_self_signed'=>true]];
+            $mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka');
+            $mail->addAddress('felipe.vargas@somoseureka.com.co');
+            $mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
+            $mail->addCC('comercial@somoseureka.com.co');
+            $mail->isHTML(true);
+            $mail->CharSet = 'UTF-8';
+            $mail->Subject = 'Solicitud de pedido sin adopción #' . $id_pedido;
+            $mail->Body    = '<p style="font-size:17px;">El usuario: ' . htmlspecialchars($promo['promotor'] ?? '') .
+                             ' hizo la solicitud de pedido sin adopción #' . $id_pedido .
+                             '. Haz clic <a href="https://crm.somoseureka.com.co/pedido_colegio_sa.php?id_pedido_dist=' . $id_pedido . '&tp=2">aquí</a> para revisarlo.</p>';
+            $mail->AltBody = 'Solicitud de pedido sin adopción #' . $id_pedido;
+            $mail->send();
+        } catch (Exception $e) {
+            // El email falló pero el pedido ya se guardó; no es error fatal
+        }
 
-          
-      // Content
-      $mail->isHTML(true);
-
-      $sql = "SELECT id FROM pedidos2 WHERE codigo='".$_POST['codigo']."'";
-
-      $req = $bdd->prepare($sql);
-      $req->execute();
-      $pedido = $req->fetch();
-                                        // Set email format to HTML
-      $mail->Subject = 'Solicitud de pedido sin adopción #'.$pedido["id"].'';
-
-      $sq_l2 = "SELECT CONCAT(nombres, ' ', apellidos) AS promotor FROM usuarios WHERE id='".$_SESSION["id"]."'";
-                            
-      $req_l2 = $bdd->prepare($sq_l2);
-      $req_l2->execute();
-      $promo = $req_l2->fetch();
-
-      $mail->Body    = '<p style="font-size: 17px;">El usuario: '.$promo["promotor"].' hizo la solicitud de pedido sin adopción #'.$pedido["id"].' para: '.$_POST["colegio"].'. Haz clic <a href="https://crm.somoseureka.com.co/pedido_colegio_sa.php?id_pedido_dist='.$pedido['id'].'&tp=2">aquí</a> para revisarlo<p>';
-
-      $mail->AltBody = 'probandosss';
-
-      $mail->CharSet = 'UTF-8';
-
-      $mail->send();
-        //echo "<script>alert('We have sent a message to your registered email. Check your Inbox or check your Spam Mail folder.');window.location='../index.php';</script>";
-    } catch (Exception $e) {
-
-      echo "An error has occurred please try again: {$mail->ErrorInfo}";
+        $redirect = '../pedido_colegio_sa.php?id_pedido=' . $id_pedido . '&tp=2';
+    } else {
+        $bdd->prepare("UPDATE pedidos2 SET observaciones = ? WHERE id = ?")
+            ->execute([$obs, $id_pedido]);
     }
 
-    
-    
-    echo "<script>alert('Pedido Solicitado');window.location='../pedido_colegio_sa.php?id_pedido=".$_POST["pedido"]."&tp=2';</script>";
-    
-  }else{
-
-    $sql_e = "UPDATE pedidos2 SET observaciones='".$_POST["observaciones"]."' WHERE id='".$_POST["pedido"]."'";
-
-    $query_e = $bdd->prepare( $sql_e );
-    if ($query_e == false) {
-      print_r($bdd->errorInfo());
-      die ('Erreur prepare');
-    }
-
-    $sth_e = $query_e->execute();
-    if ($sth_e == false) {
-      print_r($query_e->errorInfo());
-      die ('Erreur execute');
-    }
-
-    $tp = $_POST['tp'] ?? '';
-    if ($_POST['salida']=="pendiente") {
-
-      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'&tp='.$tp);
-    }elseif ($_POST['salida']=="aprobado") {
-      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'&tp='.$tp);
-    }else{
-      header('Location: ../pedido_colegio_sa.php?id_pedido='.$_POST["pedido"].'&tp='.$tp);
-    }
-
-  }
-
-
-  
-
-  
-
+} catch (Exception $e) {
+    $error = 'Error al guardar el pedido: ' . $e->getMessage();
+}
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Inkpulse - Confirmar pedido SA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .alert-card { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,.10); padding: 40px 48px; text-align: center; max-width: 440px; width: 90%; }
+    .icon-wrap { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; }
+    .icon-ok  { background: #dcfce7; color: #16a34a; }
+    .icon-err { background: #fee2e2; color: #dc2626; }
+    h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; }
+    p  { font-size: .9rem; color: #64748b; line-height: 1.5; }
+    .btn { display: inline-block; margin-top: 24px; padding: 10px 28px; border-radius: 8px; font-size: .9rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+    .btn-ok  { background: #16a34a; color: #fff; }
+    .btn-err { background: #dc2626; color: #fff; }
+    .countdown { font-size: .78rem; color: #94a3b8; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<?php if (!$error): ?>
+  <div class="alert-card">
+    <div class="icon-wrap icon-ok">&#10003;</div>
+    <h2><?= ($_POST['salida'] ?? '') === 'confirmar' ? '¡Pedido confirmado!' : '¡Cambios guardados!' ?></h2>
+    <p>El pedido SA #<?= $id_pedido ?> fue <?= ($_POST['salida'] ?? '') === 'confirmar' ? 'confirmado' : 'actualizado' ?> correctamente.</p>
+    <p class="countdown" id="msg">Redirigiendo en 3 segundos...</p>
+    <a href="<?= htmlspecialchars($redirect) ?>" class="btn btn-ok">Ver pedido</a>
+  </div>
+  <script>
+    var dest = <?= json_encode($redirect) ?>;
+    var s = 3;
+    var t = setInterval(function () {
+      s--;
+      document.getElementById('msg').textContent = 'Redirigiendo en ' + s + ' segundo' + (s !== 1 ? 's' : '') + '...';
+      if (s <= 0) { clearInterval(t); window.location.href = dest; }
+    }, 1000);
+  </script>
+
+<?php else: ?>
+  <div class="alert-card">
+    <div class="icon-wrap icon-err">&#10007;</div>
+    <h2>Error al guardar</h2>
+    <p><?= htmlspecialchars($error) ?></p>
+    <a href="javascript:history.back()" class="btn btn-err">Volver e intentar de nuevo</a>
+  </div>
+<?php endif; ?>
+
+</body>
+</html>

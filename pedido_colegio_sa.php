@@ -190,6 +190,22 @@ $can_edit  = ($is_admin || $is_viewer || ($pedido['verify'] ?? 1) == 0);
 
     .libro-block { border-top:1px solid #e2e8f0; margin-top:16px; padding-top:16px; }
     .libro-num { font-size:.78rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+    .libro-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .libro-header .libro-num { margin-bottom:0; }
+    .btn-remove-book {
+      display:inline-flex; align-items:center; gap:4px;
+      background:#fee2e2; color:#dc2626; border:none;
+      border-radius:6px; padding:4px 10px; font-size:.76rem;
+      font-weight:600; cursor:pointer; transition:background .15s;
+    }
+    .btn-remove-book:hover { background:#fca5a5; }
+    .btn-save-book {
+      display:inline-flex; align-items:center; gap:4px;
+      background:#dcfce7; color:#15803d; border:none;
+      border-radius:6px; padding:4px 10px; font-size:.76rem;
+      font-weight:600; cursor:pointer; transition:background .15s;
+    }
+    .btn-save-book:hover { background:#bbf7d0; }
 
     /* Actions */
     .mc-actions { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:4px; padding-bottom:10px; }
@@ -412,7 +428,15 @@ $can_edit  = ($is_admin || $is_viewer || ($pedido['verify'] ?? 1) == 0);
         </button>
         <?php for ($i = 1; $i < 100; $i++): ?>
         <div id="agg_l<?= $i ?>" class="d-none libro-block mb-3">
-          <p class="libro-num">Libro #<?= $i ?>:</p>
+          <div class="libro-header">
+            <p class="libro-num">Libro #<?= $i ?>:</p>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn-save-book"><i class="bi bi-floppy"></i> Guardar</button>
+              <button type="button" class="btn-remove-book" data-idx="<?= $i ?>">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </button>
+            </div>
+          </div>
           <div class="row">
             <div class="form-group col-sm-3">
               <label id="l_materia<?= $i ?>" for="materia<?= $i ?>" class="control-label">Materia <small style="color:red;">*</small></label>
@@ -551,10 +575,12 @@ $('#entregar').on('click', function () {
 });
 
 $('#modificar').on('click', function () {
+  $('input[name="salida"]').val('guardar');
   $('#form_pedido').attr('action', 'php/mod_pedido_sa.php').submit();
 });
 
 $('#confirmar').on('click', function () {
+  $('input[name="salida"]').val('confirmar');
   $('#form_pedido').attr('action', 'php/mod_pedido_sa.php').submit();
 });
 
@@ -584,6 +610,26 @@ $('#agregar_libro').on('click', function () {
     $('#libro_e<?= $i ?>').val(l+'/'+c+'/'+d);
   });
   <?php endfor; ?>
+});
+
+$(document).on('click', '.btn-remove-book', function () {
+  var idx = $(this).data('idx');
+  $('#agg_l'      + idx).addClass('d-none');
+  $('#materia'    + idx).val('');
+  $('#libro'      + idx).html('');
+  $('#descuento'  + idx).val('');
+  $('#cantidad'   + idx).val('');
+  $('#libro_e'    + idx).val('');
+  $('#ls_pri_sec' + idx).html('');
+  $('#l_cantidad' + idx).removeClass('d-none');
+  $('#cantidad'   + idx).removeClass('d-none');
+  $('#l_descuento'+ idx).removeClass('d-none');
+  $('#descuento'  + idx).removeClass('d-none');
+});
+
+$(document).on('click', '.btn-save-book', function () {
+  $('input[name="salida"]').val('guardar');
+  $('#form_pedido').attr('action', 'php/mod_pedido_sa.php').submit();
 });
 </script>
 </body>
