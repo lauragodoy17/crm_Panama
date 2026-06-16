@@ -1,135 +1,132 @@
 <?php
+require_once("../php/aut.php");
+require_once('../conexion/bdd.php');
 
-	require_once("../php/aut.php");
-	require_once('../conexion/bdd.php');
+header("Content-Type:text/html;charset=utf-8");
 
-	use PHPMailer\PHPMailer\PHPMailer;
-	use PHPMailer\PHPMailer\SMTP;
-	use PHPMailer\PHPMailer\Exception;
+$error = null;
+$opd_id = null;
 
-	require '../lib/PHPMailer/src/Exception.php';
-	require '../lib/PHPMailer/src/PHPMailer.php';
-	require '../lib/PHPMailer/src/SMTP.php';
+// Subida de archivo
+$dir_subida     = $_SERVER['DOCUMENT_ROOT'] . '/adjuntos_opd/';
+$nombre_archivo = '';
+if (!empty($_FILES['archivo']['name'])) {
+    $nombre_archivo = uniqid() . "_" . $_FILES['archivo']['name'];
+    $fichero_subido = $dir_subida . basename($nombre_archivo);
+    if (!move_uploaded_file($_FILES['archivo']['tmp_name'], $fichero_subido)) {
+        $nombre_archivo = '';
+    }
+}
 
-	header("Content-Type:text/html;charset=utf-8");	
-	
-	$dir_subida = $_SERVER['DOCUMENT_ROOT'] .'/adjuntos_opd/';
-	$nombre_archivo=uniqid()."_".$_FILES['archivo']['name'];
-	$fichero_subido = $dir_subida . basename($nombre_archivo);
-	if (move_uploaded_file($_FILES['archivo']['tmp_name'], $fichero_subido)) {
-		echo "archivo subido";
-	}else{
-		$nombre_archivo="";
-	}
+// Insertar orden
+$observaciones = str_replace(['"', "'"], '', $_POST["observaciones"] ?? '');
 
-	/*$sql = "SELECT MAX(conse) as conse FROM ordenes_produccion";
-    $req = $bdd->prepare($sql);
-    $req->execute();
-	$conse = $req->fetch();
+$sql_p2 = "INSERT INTO ordenes_produccion(usuario,solicitante,cliente,descripcion,observaciones,adjunto,fecha_ent_s,año)
+            VALUES(?,?,?,?,?,?,?,?)";
+$query_p2 = $bdd->prepare($sql_p2);
+$ok = $query_p2->execute([
+    $_SESSION["id"],
+    $_POST["solicitante"] ?? '',
+    $_POST["cliente"]     ?? '',
+    $_POST["descrip"]     ?? '',
+    $observaciones,
+    $nombre_archivo,
+    $_POST["fecha_ent_s"] ?? '',
+    date("y")
+]);
 
-	$conse["conse"]++;*/
-	$_POST["observaciones"] = str_replace(['"', "'"], '', $_POST["observaciones"]);
-	$sql_p2 = "INSERT INTO ordenes_produccion(usuario,solicitante,cliente,descripcion,observaciones,adjunto,fecha_ent_s,año) VALUES('".$_SESSION["id"]."','".$_POST["solicitante"]."','".$_POST["cliente"]."','".$_POST["descrip"]."','".$_POST["observaciones"]."','".$nombre_archivo."','".$_POST["fecha_ent_s"]."','".date("y")."')";
-				
-				
-	$query_p2 = $bdd->prepare( $sql_p2 );
-	if ($query_p2 == false) {
-		print_r($bdd->errorInfo());
-		die ('Erreur prepare');
-	}
-	$sth_p2 = $query_p2->execute();
-	if ($sth_p2 == false) {
-		print_r($query_p2->errorInfo());
-		die ('Erreur execute');
-	}
+if (!$ok) {
+    $error = "No se pudo guardar la orden de producción.";
+}
 
+if (!$error) {
+    // Obtener id recién insertado
+    $pedido = $bdd->query("SELECT id FROM ordenes_produccion ORDER BY id DESC LIMIT 1")->fetch();
+    $opd_id = $pedido['id'];
 
-	$sql = "SELECT id FROM ordenes_produccion ORDER BY id DESC";
+    // Insertar materiales
+    foreach ($_POST["libro_e"] as $libro_raw) {
+        if (trim($libro_raw) === '') continue;
 
-	$req = $bdd->prepare($sql);
-	$req->execute();
-	$pedido = $req->fetch();
+        $parts    = explode("/", $libro_raw, 3);
+        $nombre   = $parts[0] ?? '';
+        $cantidad = $parts[1] ?? '';
+        $enca     = $parts[2] ?? '';
 
+        if (trim($nombre) === '') continue;
 
-	foreach ($_POST["libro_e"] as $libros => $libro) {
+        $nombre = str_replace(['"', "'"], '', $nombre);
+        $sql_p  = "INSERT INTO libros_opd(opid,libro,encaratulado,cantidad) VALUES(?,?,?,?)";
+        $query_p = $bdd->prepare($sql_p);
+        $ok_lib  = $query_p->execute([$opd_id, $nombre, $enca, $cantidad]);
 
-		list($libro,$cantidad,$enca) = explode("/", $libro);
-			
-		if ($libro !="") {
-			
-			$libro = str_replace(['"', "'"], '', $libro);
-			$sql_p = "INSERT INTO libros_opd(opid,libro,encaratulado,cantidad) VALUES('".$pedido["id"]."','".$libro."','".$enca."','".$cantidad."')";
-				
-				
-			$query_p = $bdd->prepare( $sql_p );
-			if ($query_p == false) {
-				print_r($bdd->errorInfo());
-				die ('Erreur prepare');
-			}
-			$sth_p = $query_p->execute();
-			if ($sth_p == false) {
-				print_r($query_p->errorInfo());
-				die ('Erreur execute');
-			}
-
-		}
-		
-
-	}
-
-	
-
-	
-
-		/*$mail = new PHPMailer(true);
-
-		try {
-
-			//Server settings
-			//$mail->SMTPDebug = SMTP::DEBUG_LOWLEVEL;                      // OFF verbose debug output
-			$mail->isSMTP();                                            // Send using SMTP
-		    $mail->Host       = 'mail.somoseureka.com.co';                    // Set the SMTP server to send through
-		    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-		    $mail->SMTPAutoTLS = false; 
-		    $mail->Username   = 'crm@somoseureka.com.co';                     // SMTP username
-		    $mail->Password   = 'cRm14356$';                              // SMTP password
-			//$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-			$mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_S	above                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
-
-			//Recipients
-			$mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka');
-			$mail->addAddress("comercial@somoseureka.com.co", 'comercial@somoseureka.com.co');     // Add a recipient
-				  
-			$mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
-			$mail->addCC("arte@somoseureka.com.co");
-			$mail->addBCC("taller@somoseureka.com.co");
-
-				  
-			// Content
-			$mail->isHTML(true);
-
-			                                  // Set email format to HTML
-			$mail->Subject = 'Solicitud de producción digital #25-'.$conse["conse"].'';
-
-			
-
-			$mail->Body    = '<p style="font-size: 17px;"> Se ha creado la solicitud de producción digital #25-'.$conse["conse"].' . Haz clic <a href="https://crm.somoseureka.com.co/opd_solicitada.php?opd='.$pedido['id'].' ">aquí</a> para revisarla<p>';
-
-			$mail->AltBody = 'probandosss';
-
-			$mail->CharSet = 'UTF-8';
-
-			$mail->send();
-				//echo "<script>alert('We have sent a message to your registered email. Check your Inbox or check your Spam Mail folder.');window.location='../index.php';</script>";
-		} catch (Exception $e) {
-
-			echo "An error has occurred please try again: {$mail->ErrorInfo}";
-		}*/
-			
-
-
-		
-	header("Location: ../opd_solicitada.php?opd=".$pedido['id']."");
-	
-	
+        if (!$ok_lib) {
+            $error = "La orden se guardó pero ocurrió un error al registrar uno de los materiales.";
+            break;
+        }
+    }
+}
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Inkpulse - Orden de producción</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .alert-card {
+      background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,.10);
+      padding: 40px 48px; text-align: center; max-width: 440px; width: 90%;
+    }
+    .icon-wrap {
+      width: 64px; height: 64px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 28px;
+    }
+    .icon-ok  { background: #dcfce7; color: #16a34a; }
+    .icon-err { background: #fee2e2; color: #dc2626; }
+    h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; }
+    p  { font-size: .9rem; color: #64748b; line-height: 1.5; }
+    .btn {
+      display: inline-block; margin-top: 24px; padding: 10px 28px;
+      border-radius: 8px; font-size: .9rem; font-weight: 600;
+      text-decoration: none; cursor: pointer; border: none;
+    }
+    .btn-ok  { background: #16a34a; color: #fff; }
+    .btn-err { background: #dc2626; color: #fff; }
+    .countdown { font-size: .78rem; color: #94a3b8; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<?php if (!$error): ?>
+  <div class="alert-card">
+    <div class="icon-wrap icon-ok">&#10003;</div>
+    <h2>¡Orden registrada con éxito!</h2>
+    <p>La orden de producción #<?= htmlspecialchars($opd_id) ?> fue creada correctamente.</p>
+    <p class="countdown" id="msg">Redirigiendo en 3 segundos...</p>
+    <a href="../opd_solicitada.php?opd=<?= $opd_id ?>" class="btn btn-ok">Ver orden</a>
+  </div>
+  <script>
+    var s = 3;
+    var t = setInterval(function () {
+      s--;
+      document.getElementById('msg').textContent = 'Redirigiendo en ' + s + ' segundo' + (s !== 1 ? 's' : '') + '...';
+      if (s <= 0) { clearInterval(t); window.location.href = '../opd_solicitada.php?opd=<?= $opd_id ?>'; }
+    }, 1000);
+  </script>
+
+<?php else: ?>
+  <div class="alert-card">
+    <div class="icon-wrap icon-err">&#10007;</div>
+    <h2>Error al guardar</h2>
+    <p><?= htmlspecialchars($error) ?></p>
+    <a href="javascript:history.back()" class="btn btn-err">Volver e intentar de nuevo</a>
+  </div>
+<?php endif; ?>
+
+</body>
+</html>

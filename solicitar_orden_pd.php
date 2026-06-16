@@ -1,341 +1,259 @@
 <?php require_once("php/aut.php"); ?>
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <!-- Basic Page Info -->
-    <meta charset="utf-8" />
-    <title>Inkpulse - Solicitar Orden de producción</title>
-    <!-- Site favicon -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="vendors/images/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="vendors/images/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="vendors/images/favicon-16x16.png"
-    />
+<head>
+  <meta charset="utf-8" />
+  <title>Inkpulse - Solicitar Orden de producción</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="vendors/images/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="vendors/images/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="vendors/images/favicon-16x16.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="src/plugins/select2/dist/css/select2.min.css" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/icon-font.min.css" />
+  <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
+  <style>
+    input[type=number] { -moz-appearance: textfield; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .sec-label {
+      font-size: .78rem; font-weight: 700; color: #64748b;
+      text-transform: uppercase; letter-spacing: .05em;
+      margin: 0 0 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;
+    }
+    .material-block {
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 8px; padding: 16px 20px; margin-bottom: 12px;
+    }
+    .material-block .mat-title {
+      font-size: .78rem; font-weight: 700; color: #7c3aed;
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;
+    }
+    .add-material-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #f1f5f9; color: #475569;
+      border: 1.5px dashed #94a3b8; border-radius: 8px;
+      padding: 8px 18px; font-size: .84rem; font-weight: 600;
+      cursor: pointer; transition: background .15s; text-decoration: none;
+    }
+    .add-material-btn:hover { background: #e2e8f0; color: #1e293b; text-decoration: none; }
+    .req { color: #dc2626; }
+    .mat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .mat-header .mat-title { margin-bottom: 0; }
+    .btn-remove-mat {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #fee2e2; color: #dc2626; border: none;
+      border-radius: 6px; padding: 4px 10px; font-size: .76rem;
+      font-weight: 600; cursor: pointer; transition: background .15s;
+    }
+    .btn-remove-mat:hover { background: #fca5a5; }
+  </style>
+</head>
+<body>
 
-    <!-- Mobile Specific Metas -->
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
+<?php include("template/nav_side.php"); ?>
+<div class="main-container">
+  <div class="pd-ltr-20 xs-pd-20-10">
+    <div class="min-height-200px">
 
-    <!-- Google Font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <!-- CSS -->
-    <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="vendors/styles/icon-font.min.css"
-    />
-    <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
-
-    <style>
-      input[type=number] { -moz-appearance:textfield; }
-      input[type=number]::-webkit-inner-spin-button, 
-      input[type=number]::-webkit-outer-spin-button { 
-          -webkit-appearance: none; 
-          margin: 0; 
-      }
-      .custom-select2 {
-        width:  auto !important;
-      }
-    </style>
-  </head>
-  <body>
-    
-    <?php include("template/nav_side.php"); ?>
-    <div class="main-container">
-      <div class="pd-ltr-20 xs-pd-20-10">
-        <div class="min-height-200px">
-          <div class="page-header">
-            <div class="row">
-              <div class="col-md-6 col-sm-12">
-                <div class="title">
-                 
-                    <h4>Solicitar orden de producción</h4>
-                 
-                </div>
-                <nav aria-label="breadcrumb" role="navigation">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                      Orden de producción
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                     
-                        Solicitar
-                      
-                    </li>
-                  </ol>
-                </nav>
-              </div>
-              
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-sm-12">
+            <div class="title">
+              <h4><i class="bi bi-file-earmark-plus mr-2" style="color:#7c3aed"></i>Solicitar orden de producción</h4>
             </div>
-          </div>
-          <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-            
-            <form action="php/orden_produccion.php" method="POST" id="formul" enctype="multipart/form-data">
-
-              <div class="row">
-                <div class="col-sm-3">
-                  <label  for="solicitante" class="control-label">Solicitante<small style="color:red;"> *</small></label>
-                  <input type="text" class="form-control" name="solicitante" id="solicitante" required>
-                </div>
-
-
-                <div class="col-sm-4">
-                  
-                  <div class="form-group" for="cliente">
-                    <label>Cliente</label>
-                    <select class="form-control custom-select2" name="cliente" id="cliente" style="width: 100%;">
-                      <option selected="selected" value="">Seleccionar</option>
-                        <?php 
-
-                          $sql = "SELECT * FROM clientes";
-
-                          $req = $bdd->prepare($sql);
-                          $req->execute();
-
-                          $clientes = $req->fetchAll();
-
-                          foreach ($clientes as $cliente) {
-                                        
-                            echo '<option value="'.$cliente["id"].'">'.$cliente["cliente"].'</option>';
-                          }
-
-                        ?>
-                    </select>
-                  </div>
-
-                </div>
-
-                <div class="col-sm-3">
-                  
-                  <div class="form-group" for="descrip">
-                    <label>Descripción pedido <small style="color:red;"> *</small></label>
-                    <select class="form-control" name="descrip" id="descrip" style="width: 100%;" required>
-                      <option selected="selected" value="">Seleccionar</option>
-                      <option value="1">Libro estudiante</option>
-                      <option value="2">Guía</option>
-                      <option value="3">Otro</option>
-                      
-                    </select>
-                  </div>
-
-                </div>
-
-              
-              </div>
-
-              <div class="row">
-                
-                <div class="col-sm-4">
-                
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="archivo"> Archivo Adjunto</label>
-
-                    <input type="file" name="archivo" id="archivo" placeholder="Adjunto" class="form-control" />
-                      
-                  </div>
-                </div>
-
-                <div class="col-sm-4 ">
-                  <label for="fecha_ent_s">Fecha de entrega solicitada:<small style="color:red;"> *</small></label>
-                  <div class="input-group">
-                  <input type="text" class="form-control date-picker" name="fecha_ent_s" id="fecha_ent_s" type="text" data-date-format="yyyy-mm-dd" required="" autocomplete="off" />
-                    <span class="input-group-addon">
-                        <i class="fa fa-calendar bigger-110"></i>
-                    </span>
-                  </div>
-                </div>
-
-
-              </div>
-
-              
-
-              <br>
-            
-            <div class="otro_l">
-
-              <h4>Material #1:</h4>
-              <div class="row">
-                
-                
-                <div class="form-group col-sm-6">
-                  <label id="l_titulo" for="titulo" class="control-label">Título<small style="color:red;"> *</small></label>
-                  <input type="text" class="form-control" name="titulo" id="titulo">
-                </div>
-
-                <div class="form-group col-sm-6">
-                  <label id="l_cantidad" for="cantidad" class="control-label">Cantidad<small style="color:red;"> *</small></label>
-                  <input type="number" class="form-control" name="cantidad" id="cantidad">
-                </div>
-              </div>
-              
-              <input type="hidden" name="libro_e[]" id="libro_e">
-
-              <?php for ($i=1; $i < 100; $i++) { ?>
-
-                <div id="agg_l<?php echo $i;?>" class="d-none">
-                  <h4>Material #<?php echo $i+1;?>:</h4>
-                  <div class="row">
-                    <div class="form-group col-sm-6">
-                      <label id="l_titulo<?php echo $i;?>" for="titulo<?php echo $i;?>" class="control-label">Título<small style="color:red;"> *</small></label>
-                      <input type="text" class="form-control" name="titulo" id="titulo<?php echo $i;?>">
-                    </div>
-
-                    <div class="form-group col-sm-6">
-                      <label id="l_cantidad<?php echo $i;?>" for="cantidad<?php echo $i;?>" class="control-label">Cantidad<small style="color:red;"> *</small></label>
-                      <input type="number" class="form-control" name="cantidad" id="cantidad<?php echo $i;?>">
-                    </div>                  
-                  </div>
-              
-              
-                <input type="hidden" name="libro_e[]" id="libro_e<?php echo $i;?>">
-              </div>
-
-              <?php } ?>
-
-              
-
-        
-          <a id="agregar_libro" style="cursor: pointer;">Agregar otro +</a><br>
-
-          <center>
-            <div class="col-sm-3 col-sm-offset-2">
-              
-
-              <label for="observaciones">Observaciones:</label><br>
-              <textarea name="observaciones" id="observaciones" cols="100" rows="9"></textarea><br><br>
-              <button class="btn btn-primary">Solicitar</button></center>
-            </div>
-
-
-          </form>
-            
           </div>
         </div>
-        <?php include("template/footer.php"); ?>
+      </div>
+
+      <div class="modern-card" style="padding: 24px 28px">
+        <form action="php/orden_produccion.php" method="POST" id="formul" enctype="multipart/form-data">
+
+          <p class="sec-label">Datos generales</p>
+
+          <div class="row">
+            <div class="col-md-3 col-sm-6">
+              <div class="form-group">
+                <label for="solicitante">Solicitante <span class="req">*</span></label>
+                <input type="text" class="form-control" name="solicitante" id="solicitante" required>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+              <div class="form-group">
+                <label for="cliente">Cliente</label>
+                <select class="form-control" name="cliente" id="cliente" style="width:100%">
+                  <option value="">Seleccionar</option>
+                  <?php
+                    $req = $bdd->query("SELECT id, cliente FROM clientes ORDER BY cliente");
+                    foreach ($req->fetchAll() as $c):
+                  ?>
+                  <option value="<?= htmlspecialchars($c['id']) ?>"><?= htmlspecialchars($c['cliente']) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="form-group">
+                <label for="descrip">Descripción pedido <span class="req">*</span></label>
+                <select class="form-control" name="descrip" id="descrip" required>
+                  <option value="">Seleccionar</option>
+                  <option value="1">Libro estudiante</option>
+                  <option value="2">Guía</option>
+                  <option value="3">Otro</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 col-sm-6">
+              <div class="form-group">
+                <label for="archivo">Archivo adjunto</label>
+                <input type="file" name="archivo" id="archivo" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="form-group">
+                <label for="fecha_ent_s">Fecha de entrega solicitada <span class="req">*</span></label>
+                <div class="input-group">
+                  <input type="text" class="form-control date-picker" name="fecha_ent_s" id="fecha_ent_s" data-date-format="yyyy-mm-dd" required autocomplete="off">
+                  <span class="input-group-addon"><i class="fa fa-calendar bigger-110"></i></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border-color:#e2e8f0; margin: 20px 0 24px">
+
+          <p class="sec-label">Materiales</p>
+
+          <div id="materiales-container">
+
+            <div class="material-block" id="mat-0">
+              <p class="mat-title">Material #1</p>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="titulo">Título <span class="req">*</span></label>
+                    <input type="text" class="form-control" name="titulo" id="titulo">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="cantidad">Cantidad <span class="req">*</span></label>
+                    <input type="number" class="form-control" name="cantidad" id="cantidad">
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="libro_e[]" id="libro_e">
+            </div>
+
+            <?php for ($i = 1; $i < 100; $i++): ?>
+            <div id="agg_l<?= $i ?>" class="material-block d-none">
+              <div class="mat-header">
+                <p class="mat-title">Material #<?= $i + 1 ?></p>
+                <button type="button" class="btn-remove-mat" data-idx="<?= $i ?>">
+                  <i class="bi bi-x-circle"></i> Eliminar
+                </button>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="titulo<?= $i ?>">Título <span class="req">*</span></label>
+                    <input type="text" class="form-control" name="titulo" id="titulo<?= $i ?>">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="cantidad<?= $i ?>">Cantidad <span class="req">*</span></label>
+                    <input type="number" class="form-control" name="cantidad" id="cantidad<?= $i ?>">
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="libro_e[]" id="libro_e<?= $i ?>">
+            </div>
+            <?php endfor; ?>
+
+          </div>
+
+          <a id="agregar_libro" class="add-material-btn mb-4 d-inline-flex">
+            <i class="bi bi-plus-circle"></i> Agregar material
+          </a>
+
+          <hr style="border-color:#e2e8f0; margin: 24px 0 20px">
+
+          <div class="row">
+            <div class="col-md-8">
+              <div class="form-group">
+                <label for="observaciones">Observaciones</label>
+                <textarea name="observaciones" id="observaciones" class="form-control" rows="5"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-send mr-1"></i> Solicitar
+          </button>
+
+        </form>
+      </div>
+
     </div>
+    <?php include("template/footer.php"); ?>
+  </div>
+</div>
 
-    
-    <!-- js -->
-    <script src="vendors/scripts/core.js"></script>
-    <script src="vendors/scripts/script.min.js"></script>
-    <script src="vendors/scripts/process.js"></script>
-    <script src="vendors/scripts/layout-settings.js"></script>
+<script src="vendors/scripts/core.js"></script>
+<script src="vendors/scripts/script.min.js"></script>
+<script src="vendors/scripts/process.js"></script>
+<script src="vendors/scripts/layout-settings.js"></script>
+<script src="src/plugins/select2/dist/js/select2.min.js"></script>
+<script>
+  $('#cliente').select2({
+    placeholder: 'Seleccionar cliente',
+    allowClear: true,
+    width: '100%',
+    language: { noResults: function () { return 'Sin resultados'; } }
+  });
+</script>
+<script>
+  function syncLibro(idx) {
+    var suffix = idx === 0 ? '' : idx;
+    var cant   = $('#cantidad' + suffix).val();
+    var titulo = $('#titulo'   + suffix).val();
+    $('#libro_e' + suffix).val(titulo + '/' + cant);
+  }
 
-    <script>
-      $('#cantidad').keyup(function(){
-        var cant =$('#cantidad').val();
-        var titulo=$('#titulo').val();
-        $('#libro_e').val(titulo+'/'+cant);
+  $('#cantidad, #titulo').on('keyup', function () { syncLibro(0); });
 
-      })
+  var m = 1;
 
-      $('#titulo').keyup(function(){
-        var cant =$('#cantidad').val();
-        var titulo=$('#titulo').val();
-        $('#libro_e').val(titulo+'/'+cant);
+  $('#agregar_libro').on('click', function () {
+    if (m >= 99) { $(this).addClass('d-none'); return; }
+    $('#agg_l' + m).removeClass('d-none');
+    (function (idx) {
+      $('#cantidad' + idx + ', #titulo' + idx).on('keyup', function () { syncLibro(idx); });
+    })(m);
+    m++;
+  });
 
-      })
+  $(document).on('click', '.btn-remove-mat', function () {
+    var idx = $(this).data('idx');
+    $('#agg_l' + idx).addClass('d-none');
+    $('#titulo'   + idx).val('');
+    $('#cantidad' + idx).val('');
+    $('#libro_e'  + idx).val('');
+  });
 
-
-    var m = 1;
-    
-    $("#agregar_libro").click(function(){
-      if (m>98) {
-        $("#agregar_libro").addClass("d-none");
-      }
-    
-      $("#agg_l"+m).removeClass("d-none")
-
-      m++;
-
-      <?php for ($i=1; $i < 100; $i++) { ?>
-
-
-        $('#cantidad<?php echo $i; ?>').keyup(function(){
-
-          var cant =$('#cantidad<?php echo $i; ?>').val();
-          var titulo=$('#titulo<?php echo $i; ?>').val();
-          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant);
-
-        })
-
-        $('#titulo<?php echo $i; ?>').keyup(function(){
-
-          var cant =$('#cantidad<?php echo $i; ?>').val();
-          var titulo=$('#titulo<?php echo $i; ?>').val();
-          $('#libro_e<?php echo $i; ?>').val(titulo+'/'+cant);
-
-        })
-      
-
-      <?php } ?>
-
-      
-
-    
-
-
-      
-  })
-
-      /*$("#solicitar").click(function(){
-        
-                if (confirm("¿Está seguro de realizar el pedido? Por favor verificar")) {
-
-                  if ($("#colegio").val()!="") {
-
-                    $("#formul").submit();
-                  }else{
-                    alert("Falta colegio");
-                  }
-
-                    
-                }
-
-          })*/
-
-    // Tamaño maximo del archivo
-      const maxSize = 6000000; 
-
-      // Obtener referencia al elemento
-      const $miInput = document.querySelector("#archivo");
-
-      $miInput.addEventListener("change", function () {
-          // si no hay archivos, regresamos
-          if (this.files.length <= 0) return;
-
-          // Validamos el primer archivo únicamente
-          const archivo = this.files[0];
-          if (archivo.size > maxSize) {
-              const tamanioEnMb = maxSize / 1000000;
-              alert(`El tamaño máximo es ${tamanioEnMb} MB`);
-              // Limpiar
-              $miInput.value = "";
-          } else {
-              // Validación pasada. Envía el formulario o haz lo que tengas que hacer
-          }
-      });
-
-    </script>
-    
-  </body>
+  const maxSize = 6000000;
+  document.querySelector('#archivo').addEventListener('change', function () {
+    if (!this.files.length) return;
+    if (this.files[0].size > maxSize) {
+      alert('El tamaño máximo es ' + (maxSize / 1000000) + ' MB');
+      this.value = '';
+    }
+  });
+</script>
+</body>
 </html>
