@@ -207,6 +207,24 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
       background: none; padding: 0; margin: 12px 0 20px; text-decoration: none;
     }
     .vd-add-btn:hover { color: #1e40af; }
+    .vd-book-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+    }
+    .vd-book-header .vd-book-label { margin-bottom: 0; }
+    .btn-remove-book {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #fee2e2; color: #dc2626; border: none;
+      border-radius: 6px; padding: 4px 10px; font-size: .76rem;
+      font-weight: 600; cursor: pointer; transition: background .15s;
+    }
+    .btn-remove-book:hover { background: #fca5a5; }
+    .btn-save-book {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #dcfce7; color: #15803d; border: none;
+      border-radius: 6px; padding: 4px 10px; font-size: .76rem;
+      font-weight: 600; cursor: pointer; transition: background .15s;
+    }
+    .btn-save-book:hover { background: #bbf7d0; }
 
     /* Print signature area */
     .vd-print-sigs { display: none; }
@@ -429,7 +447,15 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
         <!-- Agregar libro hidden blocks -->
         <?php for ($i = 1; $i < 100; $i++): ?>
         <div id="agg_l<?= $i ?>" class="d-none vd-book-block">
-          <p class="vd-book-label"><i class="bi bi-bookmark-fill"></i> Libro #<?= $i ?>:</p>
+          <div class="vd-book-header">
+            <p class="vd-book-label"><i class="bi bi-bookmark-fill"></i> Libro #<?= $i ?>:</p>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn-save-book"><i class="bi bi-floppy"></i> Guardar</button>
+              <button type="button" class="btn-remove-book" data-idx="<?= $i ?>">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </button>
+            </div>
+          </div>
           <div class="row">
             <div class="form-group col-sm-4 col-12">
               <label id="l_materia<?= $i ?>" for="materia<?= $i ?>" class="control-label">
@@ -652,6 +678,19 @@ if (isset($n_op['estado']) && $n_op['estado'] == 2) {
     });
   });
   <?php endif; ?>
+
+  $(document).on('click', '.btn-remove-book', function () {
+    var idx = $(this).data('idx');
+    $('#agg_l' + idx).addClass('d-none');
+    $('#materia' + idx).val('');
+    $('#libro' + idx).html('');
+    $('#cantidad' + idx).val('');
+    $('#libro_e' + idx).val('');
+  });
+
+  $(document).on('click', '.btn-save-book', function () {
+    $('#form_pedido').submit();
+  });
 
   <?php foreach ($libros as $libro): ?>
   $('#c<?= $libro["lpid"] ?>').on('keyup', function(){

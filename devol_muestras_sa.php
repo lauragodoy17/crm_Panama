@@ -63,6 +63,25 @@
     }
     .sm-add-btn:hover { color:#2d4cda; }
 
+    .sm-book-header {
+      display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;
+    }
+    .sm-book-header .sm-book-label { margin-bottom:0; }
+    .btn-remove-book {
+      display:inline-flex; align-items:center; gap:4px;
+      background:#fee2e2; color:#dc2626; border:none;
+      border-radius:6px; padding:4px 10px; font-size:.76rem;
+      font-weight:600; cursor:pointer; transition:background .15s;
+    }
+    .btn-remove-book:hover { background:#fca5a5; }
+    .btn-save-book {
+      display:inline-flex; align-items:center; gap:4px;
+      background:#dcfce7; color:#15803d; border:none;
+      border-radius:6px; padding:4px 10px; font-size:.76rem;
+      font-weight:600; cursor:pointer; transition:background .15s;
+    }
+    .btn-save-book:hover { background:#bbf7d0; }
+
     .sm-divider { border:none; border-top:1px solid #e5e7eb; margin:4px 0 20px; }
 
     .sm-footer {
@@ -190,7 +209,15 @@
               <!-- Libros adicionales -->
               <?php for ($i = 1; $i < 100; $i++): ?>
               <div id="agg_l<?= $i ?>" class="d-none sm-book-block">
-                <p class="sm-book-label"><i class="bi bi-bookmark-fill"></i> Libro #<?= $i + 1 ?></p>
+                <div class="sm-book-header">
+                  <p class="sm-book-label"><i class="bi bi-bookmark-fill"></i> Libro #<?= $i + 1 ?></p>
+                  <div style="display:flex;gap:6px;">
+                    <button type="button" class="btn-save-book"><i class="bi bi-floppy"></i> Guardar</button>
+                    <button type="button" class="btn-remove-book" data-idx="<?= $i ?>">
+                      <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                  </div>
+                </div>
                 <div class="row">
                   <div class="form-group col-sm-4 col-12">
                     <label id="l_materia<?= $i ?>" for="materia<?= $i ?>" class="control-label">Materia <small style="color:red;">*</small></label>
@@ -307,6 +334,22 @@
       if (grado != 15 || grado != 16) $('#libro_e<?= $i ?>').val($('#libro<?= $i ?>').val() + '/' + $(this).val());
     });
     <?php endfor; ?>
+  });
+
+  $(document).on('click', '.btn-remove-book', function () {
+    var idx = $(this).data('idx');
+    $('#agg_l' + idx).addClass('d-none');
+    $('#materia' + idx).val('');
+    $('#libro' + idx).html('');
+    $('#cantidad' + idx).val('');
+    $('#libro_e' + idx).val('');
+    $('#ls_pri_sec' + idx).html('');
+    $('#l_cantidad' + idx).removeClass('d-none');
+    $('#cantidad' + idx).removeClass('d-none');
+  });
+
+  $(document).on('click', '.btn-save-book', function () {
+    $('#miFormulario').submit();
   });
 </script>
 
