@@ -100,11 +100,6 @@
                   <div class="cc-step-circle" id="sc2">2</div>
                   <div class="cc-step-label">Ubicación y contacto</div>
                 </div>
-                <div class="cc-line" id="ln2"></div>
-                <div class="cc-step" id="st3">
-                  <div class="cc-step-circle" id="sc3">3</div>
-                  <div class="cc-step-label">Clasificación</div>
-                </div>
               </div>
 
               <form name="crear_colegio" id="form-crear" action="php/crear_colegio.php" method="POST">
@@ -161,7 +156,7 @@
                     <div class="col-sm-6">
                       <div class="form-group">
                         <label for="ciudad_select">Ciudad <small style="color:red">*</small></label>
-                        <select id="ciudad_select" class="form-control">
+                        <select id="ciudad_select" class="form-control" style="width:100%">
                           <option value="">Primero seleccione un departamento</option>
                         </select>
                         <input type="text" id="ciudad_nueva" class="form-control mt-2 d-none" placeholder="Escriba el nombre de la ciudad" />
@@ -169,36 +164,9 @@
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- ══ PASO 2: Ubicación y contacto ══ -->
-                <div class="cc-step-content" id="step2">
-                  <div class="cc-card-title"><i class="bi bi-geo-alt"></i> Ubicación y contacto</div>
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <div class="form-group">
-                        <label for="direccion">Dirección <small style="color:red">*</small></label>
-                        <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Ej: Calle 10 # 5-23" />
-                      </div>
-                    </div>
-                    <div class="col-sm-4">
-                      <div class="form-group">
-                        <label for="barrio">Barrio</label>
-                        <input type="text" name="barrio" id="barrio" class="form-control" placeholder="Barrio" />
-                      </div>
-                    </div>
-                    <div class="col-sm-3">
-                      <div class="form-group">
-                        <label for="telefono">Teléfono <small style="color:red">*</small></label>
-                        <input type="tel" name="telefono" id="telefono" class="form-control" placeholder="Ej: 601 234 5678" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- ══ PASO 3: Clasificación ══ -->
-                <div class="cc-step-content" id="step3">
-                  <div class="cc-card-title"><i class="bi bi-diagram-3"></i> Clasificación</div>
+                  <hr class="my-3">
+                  <div class="cc-card-title" style="font-size:14px"><i class="bi bi-diagram-3"></i> Clasificación</div>
                   <div class="row">
                     <div class="col-sm-4">
                       <div class="form-group">
@@ -228,6 +196,31 @@
                       <div class="form-group">
                         <label for="responsable">Responsable <small style="color:red">*</small></label>
                         <input type="text" name="responsable" id="responsable" class="form-control" placeholder="Responsable" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ══ PASO 2: Ubicación y contacto ══ -->
+                <div class="cc-step-content" id="step2">
+                  <div class="cc-card-title"><i class="bi bi-geo-alt"></i> Ubicación y contacto</div>
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <div class="form-group">
+                        <label for="direccion">Dirección <small style="color:red">*</small></label>
+                        <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Ej: Calle 10 # 5-23" />
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="barrio">Barrio</label>
+                        <input type="text" name="barrio" id="barrio" class="form-control" placeholder="Barrio" />
+                      </div>
+                    </div>
+                    <div class="col-sm-3">
+                      <div class="form-group">
+                        <label for="telefono">Teléfono <small style="color:red">*</small></label>
+                        <input type="tel" name="telefono" id="telefono" class="form-control" placeholder="Ej: 601 234 5678" />
                       </div>
                     </div>
                   </div>
@@ -302,7 +295,7 @@
   $(function () {
 
     var currentStep = 1;
-    var totalSteps  = 3;
+    var totalSteps  = 2;
 
     // ── Navegar pasos ────────────────────────────────────────────────────────
     function goTo(step) {
@@ -362,14 +355,12 @@
         if (!$('#calendario').val())       { alert('Selecciona un calendario.'); return false; }
         if (!$('#departamento').val())     { alert('Selecciona un departamento.'); return false; }
         if (!$('#ciudad_hidden').val().trim()) { alert('Selecciona o escribe una ciudad.'); return false; }
+        if (!$('#empresa').val())          { alert('Selecciona una empresa.'); return false; }
+        if (!$('#zona').val())             { alert('Selecciona una zona.'); return false; }
       }
       if (paso === 2) {
         if (!$('#direccion').val().trim()) { alert('La dirección es obligatoria.'); $('#direccion').focus(); return false; }
         if (!$('#telefono').val().trim())  { alert('El teléfono es obligatorio.'); $('#telefono').focus(); return false; }
-      }
-      if (paso === 3) {
-        if (!$('#empresa').val())  { alert('Selecciona una empresa.'); return false; }
-        if (!$('#zona').val())     { alert('Selecciona una zona.'); return false; }
       }
       return true;
     }
@@ -456,17 +447,36 @@
       }
     });
 
+    // ── Select2 en ciudad ────────────────────────────────────────────────────
+    function initCiudadSelect2() {
+      if ($('#ciudad_select').hasClass('select2-hidden-accessible')) {
+        $('#ciudad_select').select2('destroy');
+      }
+      $('#ciudad_select').select2({ width: '100%', placeholder: 'Seleccionar ciudad...' });
+    }
+    initCiudadSelect2();
+
     // ── Ciudad dinámica ──────────────────────────────────────────────────────
     $('#departamento').on('change', function () {
       var depto = $(this).val();
-      $('#ciudad_select').html('<option value="">Cargando...</option>');
       $('#ciudad_nueva').addClass('d-none').val('').removeAttr('required');
       $('#ciudad_hidden').val('');
-      if (!depto) { $('#ciudad_select').html('<option value="">Primero seleccione un departamento</option>'); return; }
+      if (!depto) {
+        $('#ciudad_select').html('<option value="">Primero seleccione un departamento</option>');
+        initCiudadSelect2();
+        return;
+      }
+      $('#ciudad_select').html('<option value="">Cargando...</option>');
       $.ajax({
         url: 'ajax/buscar_ciudades.php', type: 'POST', data: { departamento: depto },
-        success: function (resp) { $('#ciudad_select').html(resp); },
-        error:   function ()     { $('#ciudad_select').html('<option value="">Error al cargar ciudades</option>'); }
+        success: function (resp) {
+          $('#ciudad_select').html(resp);
+          initCiudadSelect2();
+        },
+        error: function () {
+          $('#ciudad_select').html('<option value="">Error al cargar ciudades</option>');
+          initCiudadSelect2();
+        }
       });
     });
 
