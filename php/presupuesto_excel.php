@@ -300,7 +300,8 @@ foreach($adopciones as $adopcion) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$adopcion[libro]");
 
 	if ($go["id_grado_otro"] == 0) {
-
+		$effective_grado = $adopcion["id_grado"];
+		$grade_label_map[$effective_grado] = $adopcion["grado"];
 		$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$adopcion[grado]");
 		if ($adopcion["id_grado"] < 4) {
 			$p_pre[]=$tasa_compra;
@@ -311,12 +312,12 @@ foreach($adopciones as $adopcion) {
 		}
 
 	}else{
-
+		$effective_grado = $go["id_grado_otro"];
 		$sql_go1 = "SELECT grado FROM grados WHERE id='".$go["id_grado_otro"]."'";
 		$req_go1 = $bdd->prepare($sql_go1);
 		$req_go1->execute();
 		$go1 = $req_go1->fetch();
-
+		$grade_label_map[$effective_grado] = $go1["grado"];
 		$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$go1[grado]");
 		if ($go["id_grado_otro"] < 4) {
 			$p_pre[]=$tasa_compra;
@@ -368,13 +369,21 @@ foreach($adopciones as $adopcion) {
 		}else{
 			$t_paralelos[]=$gp["paralelos"];
 		}
-		
+
 		$t_compradores[]=$comp_activos;
 		$t_venta_bruta[]=$venta_bruta;
 		$t_venta_estimada[]=$venta_estimada;
 		$t_venta_ajustada[]=$venta_ajustada;
 		$t_venta_real[]=$venta_real;
 		$t_diferencia[]=$diferencia;
+		$t_alumnos_g[$effective_grado][] = $gp["alumnos"];
+		$t_compradores_g[$effective_grado][] = $comp_activos;
+		$t_descuento_g[$effective_grado][] = $descuento;
+		$t_precio_fact_g[$effective_grado][] = $precio_fact;
+		$t_venta_bruta_g[$effective_grado][] = $venta_bruta;
+		$t_venta_estimada_g[$effective_grado][] = $venta_estimada;
+		$t_venta_ajustada_g[$effective_grado][] = $venta_ajustada;
+		$t_precio_fact_total[] = $precio_fact;
 	}
 	
 	
@@ -395,8 +404,6 @@ if (isset($p_sec)) {
 	$p_sec=0;
 }
 
-  
-    
 $objSpreadsheet->getActiveSheet()->SetCellValue("G5", "Potencial compra preescolar %");
 $objSpreadsheet->getActiveSheet()->getStyle('J5')->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->SetCellValue("J5", "$p_pre");
@@ -418,7 +425,74 @@ $t_venta_estimada=array_sum($t_venta_estimada);
 $t_venta_real=array_sum($t_venta_real);
 $t_diferencia=array_sum($t_diferencia);
 
+// Totales por grado (antes del sort para que queden intercalados con los libros de cada grado)
+$grade_order = [1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+foreach ($grade_order as $gid) {
+	if (!isset($t_alumnos_g[$gid])) continue;
+	$conta++;
+	$sg_alumnos        = array_sum($t_alumnos_g[$gid]);
+	$sg_compradores    = array_sum($t_compradores_g[$gid]);
+	$sg_descuento      = round(array_sum($t_descuento_g[$gid]) / count($t_descuento_g[$gid]), 2);
+	$sg_precio_fact    = number_format(array_sum($t_precio_fact_g[$gid]), 0, ",", ".");
+	$sg_venta_bruta    = number_format(array_sum($t_venta_bruta_g[$gid]), 0, ",", ".");
+	$sg_venta_estimada = number_format(array_sum($t_venta_estimada_g[$gid]), 0, ",", ".");
+	$sg_venta_ajustada = number_format(array_sum($t_venta_ajustada_g[$gid]), 0, ",", ".");
+	$glabel = isset($grade_label_map[$gid]) ? $grade_label_map[$gid] : '';
 
+	$objSpreadsheet->getActiveSheet()->getStyle('A'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('B'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('D'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('F'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('H'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('I'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('J'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('K'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('M'.$conta)->applyFromArray($estilo_borde);
+	$objSpreadsheet->getActiveSheet()->getStyle('A'.$conta.':M'.$conta)->applyFromArray($estilo_negrita);
+
+	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $glabel);
+	$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", $sg_alumnos);
+	$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", $sg_compradores);
+	$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", $sg_descuento);
+	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$$sg_venta_bruta");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$$sg_precio_fact");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$$sg_venta_estimada");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$$sg_venta_ajustada");
+}
+
+// Ordenar todas las filas de datos por grado (columna B), con TOTAL GRADO al final de cada grupo
+$sheet = $objSpreadsheet->getActiveSheet();
+$highestColumn = $sheet->getHighestColumn();
+$highestRow = $conta;
+$dataArray = [];
+for ($row = 12; $row <= $highestRow; $row++) {
+	$rowData = [];
+	for ($col = 'A'; $col <= $highestColumn; $col++) {
+		$rowData[$col] = $sheet->getCell($col . $row)->getValue();
+	}
+	$dataArray[] = $rowData;
+}
+usort($dataArray, function ($a, $b) {
+	$cmp = strnatcmp((string) ($a['B'] ?? ''), (string) ($b['B'] ?? ''));
+	if ($cmp !== 0) return $cmp;
+	// Dentro del mismo grado, TOTAL GRADO va al final
+	$aIsTotal = ($a['A'] === 'TOTAL GRADO') ? 1 : 0;
+	$bIsTotal = ($b['A'] === 'TOTAL GRADO') ? 1 : 0;
+	return $aIsTotal - $bIsTotal;
+});
+$rowIndex = 12;
+foreach ($dataArray as $rowData) {
+	$colIndex = 'A';
+	foreach ($rowData as $value) {
+		$sheet->setCellValue($colIndex . $rowIndex, $value);
+		$colIndex++;
+	}
+	$rowIndex++;
+}
+
+// TOTAL VENTA al final (después del sort, para que siempre quede en la última fila)
+$conta++;
 $objSpreadsheet->getActiveSheet()->getStyle('A'.$conta)->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('B'.$conta)->applyFromArray($estilo_borde);
 $objSpreadsheet->getActiveSheet()->getStyle('C'.$conta)->applyFromArray($estilo_borde);
@@ -442,18 +516,19 @@ $t_venta_ajustada=number_format($t_venta_ajustada,0,",", ".");
 $t_venta_real=number_format($t_venta_real,0,",", ".");
 $t_diferencia=number_format($t_diferencia,0,",", ".");
 
+$t_precio_fact_total_fmt = number_format(array_sum($t_precio_fact_total ?? []), 0, ",", ".");
+
 $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL VENTA");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_paralelos");
 $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$t_alumnos");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$t_compradores");
+$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$descuento_pactado");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$$t_venta_bruta");
+$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$$t_precio_fact_total_fmt");
 $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$$t_venta_estimada");
 $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$$t_venta_ajustada");
 /*$objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$$t_venta_real");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$$t_diferencia");*/
-
-
-
 
 $conta1=$conta + 2;
 $conta2=$conta1 + 1;
