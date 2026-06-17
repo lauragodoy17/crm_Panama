@@ -13,6 +13,14 @@
 	$req_periodo = $bdd->prepare($sql_periodo);
 	$req_periodo->execute();
 	$gp_periodo = $req_periodo->fetch();
+
+	$sql_hp = "SELECT id FROM presupuestos WHERE id_periodo='".$gp_periodo["id"]."' AND id_colegio='".$_GET["colegio"]."'";
+	$req_hp = $bdd->prepare($sql_hp);
+	$req_hp->execute();
+	$num_hp = $req_hp->rowCount();
+
+	$show_guardar = ($num_hp >= 1 && $_SESSION["tipo"] != 4) &&
+		(!($_SESSION['tipo'] == 3 && $_SESSION["zona"] != '5656') || $_GET["f_cierre"] > date("Y-m-d"));
 ?>
 
 <style>
@@ -256,14 +264,25 @@
     border-top: 1px solid #e2e8f0;
   }
 
-  /* ── Filtro de libros ─────────────────────────────────────── */
+  /* ── Filtro de libros (sticky) ───────────────────────────── */
   .ad-filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
-    margin-bottom: 16px;
     flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(15,23,42,.07);
   }
+  .ad-filter-left  { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .ad-filter-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .ad-filter-bar span {
     font-size: 12.5px;
     font-weight: 600;
@@ -304,9 +323,6 @@
       <p class="ad-subtitle">Gestiona las adopciones y el seguimiento de venta real</p>
     </div>
     <div class="ad-actions">
-      <a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_adopciones" type="button">
-        <i class="bi bi-plus-circle"></i> Añadir libros
-      </a>
       <a class="btn btn-success btn-sm" href="php/adopcion_excel.php?cole=<?= htmlspecialchars($_GET['colegio']) ?>&periodo=<?= htmlspecialchars($_GET['periodo']) ?>">
         <i class="bi bi-file-earmark-excel"></i> Exportar Excel
       </a>
@@ -356,15 +372,27 @@
   </div>
 
 
-  <!-- Filtro de libros -->
+  <!-- Filtro de libros + acciones (sticky) -->
   <div class="ad-filter-bar">
-    <span><i class="bi bi-funnel"></i> Ver:</span>
-    <button class="ad-filter-btn active" data-filter="todos">
-      Todos los libros <span class="ad-filter-count" id="ad-count-todos">—</span>
-    </button>
-    <button class="ad-filter-btn" data-filter="adoptados">
-      <i class="bi bi-bookmark-check-fill"></i> Solo adoptados <span class="ad-filter-count" id="ad-count-adoptados">—</span>
-    </button>
+    <div class="ad-filter-left">
+      <span><i class="bi bi-funnel"></i> Ver:</span>
+      <button class="ad-filter-btn active" data-filter="todos">
+        Todos los libros <span class="ad-filter-count" id="ad-count-todos">—</span>
+      </button>
+      <button class="ad-filter-btn" data-filter="adoptados">
+        <i class="bi bi-bookmark-check-fill"></i> Solo adoptados <span class="ad-filter-count" id="ad-count-adoptados">—</span>
+      </button>
+    </div>
+    <div class="ad-filter-right">
+      <a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_adopciones">
+        <i class="bi bi-plus-circle"></i> Añadir libros
+      </a>
+      <?php if ($show_guardar): ?>
+      <button type="submit" form="form_definicion" class="btn btn-success btn-sm miBoton">
+        <i class="bi bi-floppy"></i> Guardar cambios
+      </button>
+      <?php endif; ?>
+    </div>
   </div>
 
   <style>
@@ -563,12 +591,6 @@
         $req = $bdd->prepare($sql);
         $req->execute();
         $libros_p = $req->fetchAll();
-
-        $sql_hp = "SELECT id FROM presupuestos WHERE id_periodo='".$gp_periodo["id"]."' AND id_colegio='".$_GET["colegio"]."'";
-
-        $req_hp = $bdd->prepare($sql_hp);
-        $req_hp->execute();
-        $num_hp= $req_hp->rowCount();
 
         $sql_exist_d = "SELECT DISTINCT id_libro_eureka FROM areas_objetivas WHERE id_colegio='".$_GET["colegio"]."' AND id_periodo='".$gp_periodo["id"]."'";
         $req_exist_d = $bdd->prepare($sql_exist_d);
@@ -1506,21 +1528,6 @@
                                 </div>';
 
                           echo '</div>';
-
-                          // Botón guardar
-                          if ($num_hp >= 1) {
-                              echo '<div class="ad-footer-actions">';
-                              if ($_SESSION["tipo"] != 4) {
-                                  if ($_SESSION['tipo'] == 3 && $_SESSION["zona"] != '5656') {
-                                      if ($_GET["f_cierre"] > date("Y-m-d")) {
-                                          echo '<button class="btn btn-primary px-5 miBoton"><i class="bi bi-floppy"></i> Guardar cambios</button>';
-                                      }
-                                  } else {
-                                      echo '<button class="btn btn-primary px-5 miBoton"><i class="bi bi-floppy"></i> Guardar cambios</button>';
-                                  }
-                              }
-                              echo '</div>';
-                          }
 
                           echo '</div>'; // .ad-footer-form
                           echo '</form>';
