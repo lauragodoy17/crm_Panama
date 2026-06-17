@@ -295,6 +295,13 @@ if ($show_resp_filter) {
           </div>
         </div>
         <div class="dp-row">
+          <span class="dp-icon" style="background:#e0f2fe;color:#0284c7"><i class="bi bi-calendar-range"></i></span>
+          <div class="dp-field">
+            <span class="dp-label">Periodo</span>
+            <span class="dp-val" id="dp-periodo">—</span>
+          </div>
+        </div>
+        <div class="dp-row">
           <span class="dp-icon" style="background:#dcfce7;color:#16a34a"><i class="bi bi-currency-dollar"></i></span>
           <div class="dp-field">
             <span class="dp-label">Venta potencial (presupuesto)</span>
@@ -473,7 +480,7 @@ if ($show_resp_filter) {
         });
 
         // ── Panel de detalle ──────────────────────────────
-        function abrirPanel(codigo, periodo) {
+        function abrirPanel(codigo, periodo, periodoTexto) {
             $.getJSON('ajax/detalle_colegio.php', { codigo: codigo, periodo: periodo }, function(d) {
                 if (d.error) return;
 
@@ -489,6 +496,7 @@ if ($show_resp_filter) {
                 $('#dp-telefono').text(d.telefono || '—');
                 $('#dp-segmento').text(d.segmento || '—');
                 $('#dp-status').text(d.status || '—');
+                $('#dp-periodo').text(periodoTexto || '—');
 
                 var val = parseFloat(d.valor_potencial) || 0;
                 $('#dp-valor').text(val > 0 ? '$ ' + val.toLocaleString('es-CO') : '—');
@@ -502,9 +510,11 @@ if ($show_resp_filter) {
         }
 
         $('#dataTables-example').on('click', '.btn-ver-detalle', function() {
-            var id     = $(this).data('id');
-            var periodo = $('#periodo' + id).val();
-            abrirPanel($(this).data('codigo'), periodo);
+            var id           = $(this).data('id');
+            var $sel         = $('#periodo' + id);
+            var periodo      = $sel.val();
+            var periodoTexto = $sel.find('option:selected').text();
+            abrirPanel($(this).data('codigo'), periodo, periodoTexto);
         });
 
         $('#dp-close, #panel-overlay').on('click', function() {
