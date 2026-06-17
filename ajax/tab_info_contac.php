@@ -65,6 +65,7 @@ function ic_initials($n, $a) {
   .ic-add-more:hover { text-decoration:underline; }
   .ic-modal .btn-primary  { background:#4361ee; border-color:#4361ee; border-radius:7px; padding:7px 20px; font-weight:600; }
   .ic-modal .btn-light    { border-radius:7px; }
+  .ic-badge-warning { background:#fff3cd; color:#856404; }
 </style>
 
 <div class="ic-wrap pd-20">
@@ -112,7 +113,11 @@ function ic_initials($n, $a) {
         <div class="ic-info">
           <div class="ic-name">
             <?= htmlspecialchars($adm['nombre'].' '.$adm['apellido']) ?>
+            <?php if (!$adm['cargo'] || $cargo_nombre === '—'): ?>
+            <span class="ic-badge ic-badge-warning"><i class="bi bi-exclamation-triangle-fill"></i> Cargo incompleto</span>
+            <?php else: ?>
             <span class="ic-badge ic-badge-cargo"><?= htmlspecialchars($cargo_nombre) ?></span>
+            <?php endif; ?>
           </div>
           <div class="ic-meta">
             <?php if ($adm['email']): ?>
@@ -232,7 +237,11 @@ function ic_initials($n, $a) {
         <div class="ic-info">
           <div class="ic-name">
             <?= htmlspecialchars($profe['nombre'].' '.$profe['apellido']) ?>
+            <?php if (!$profe['area']): ?>
+            <span class="ic-badge ic-badge-warning"><i class="bi bi-exclamation-triangle-fill"></i> Información incompleta</span>
+            <?php else: ?>
             <span class="ic-badge ic-badge-area"><?= htmlspecialchars($area_nombre) ?></span>
+            <?php endif; ?>
           </div>
           <div class="ic-meta">
             <?php if ($profe['email']): ?>
