@@ -23,6 +23,12 @@
                      WHERE id_colegio='".$_GET['colegio']."' AND id_periodo='".$_GET['periodo']."' AND estado=4";
   $req_entregadas = $bdd->prepare($sql_entregadas); $req_entregadas->execute();
   $cnt_entregadas = (int)$req_entregadas->fetchColumn();
+
+  $sql_sin_legal = "SELECT COUNT(*) as cnt FROM solicitudes_recursos s
+                    WHERE s.id_colegio='".$_GET['colegio']."' AND s.id_periodo='".$_GET['periodo']."'
+                    AND COALESCE((SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id), 0) = 0";
+  $req_sin_legal = $bdd->prepare($sql_sin_legal); $req_sin_legal->execute();
+  $cnt_sin_legal = (int)$req_sin_legal->fetchColumn();
 ?>
 
 <style>
@@ -68,8 +74,11 @@
   .at-card-icon.blue   { background: #dbeafe; color: #1d4ed8; }
   .at-card-icon.orange { background: #ffedd5; color: #c2410c; }
   .at-card-icon.green  { background: #dcfce7; color: #15803d; }
+  .at-card-icon.amber  { background: #fef3c7; color: #b45309; }
+  .at-card.has-pending { border-left: 3px solid #f59e0b; }
   .at-card-label { font-size: 0.74rem; color: #64748b; margin: 0 0 2px 0; }
-  .at-card-val   { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin: 0; }
+  .at-card-val   { font-size: 1rem; font-weight: 700; color: #0f172a; margin: 0; word-break: break-all; }
+  .at-card > div:last-child { min-width: 0; }
 
   /* ── Tabla ───────────────────────────────────────────────── */
   .at-table-wrap {
@@ -176,6 +185,24 @@
     display: block;
     min-height: 500px;
   }
+
+  /* ── Badge de legalización ──────────────────────────────── */
+  .at-legal-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; white-space: nowrap;
+  }
+  .at-legal-badge.ok      { background: #dcfce7; color: #15803d; }
+  .at-legal-badge.pending { background: #fef3c7; color: #92400e; }
+
+  /* ── Botón filtro sin legalizar ─────────────────────────── */
+  .at-filter-legal {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 13px; border-radius: 20px; border: 1.5px solid #f59e0b;
+    background: #fff; color: #b45309; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: all .15s; white-space: nowrap;
+  }
+  .at-filter-legal:hover,
+  .at-filter-legal.active { background: #f59e0b; border-color: #f59e0b; color: #fff; }
 </style>
 
 <div class="at-wrap">
@@ -199,7 +226,7 @@
       <div class="at-card-icon purple"><i class="bi bi-cash-stack"></i></div>
       <div>
         <p class="at-card-label">Recurso entregado</p>
-        <p class="at-card-val">$ <?= number_format($total['total'] ?? 0, 0, ',', '.') ?></p>
+        <p class="at-card-val">$&nbsp;<?= number_format($total['total'] ?? 0, 0, ',', '.') ?></p>
       </div>
     </div>
     <div class="at-card">
@@ -223,7 +250,26 @@
         <p class="at-card-val"><?= $cnt_entregadas ?></p>
       </div>
     </div>
+    <div class="at-card <?= $cnt_sin_legal > 0 ? 'has-pending' : '' ?>">
+      <div class="at-card-icon amber"><i class="bi bi-exclamation-circle-fill"></i></div>
+      <div>
+        <p class="at-card-label">Sin legalizar</p>
+        <p class="at-card-val"><?= $cnt_sin_legal ?></p>
+      </div>
+    </div>
   </div>
+
+  <?php if ($cnt_sin_legal > 0): ?>
+  <div style="margin-bottom:16px;padding:10px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <span style="font-size:.83rem;font-weight:600;color:#92400e;">
+      <i class="bi bi-exclamation-triangle-fill" style="margin-right:6px"></i>
+      <?= $cnt_sin_legal ?> solicitud<?= $cnt_sin_legal > 1 ? 'es' : '' ?> sin legalizar en este periodo
+    </span>
+    <button class="at-filter-legal" id="at-filter-legal">
+      <i class="bi bi-funnel-fill"></i> Ver solo sin legalizar
+    </button>
+  </div>
+  <?php endif; ?>
 
   <!-- Modal nueva solicitud -->
   <style>
@@ -541,6 +587,7 @@
           <th>Fecha de entrega</th>
           <th>Valor de la solicitud</th>
           <th>Estado</th>
+          <th>Legalización</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -548,7 +595,8 @@
         <?php
           $sql = "SELECT e.estado, e.id as id_estado, s.id, s.fecha,
                          CONCAT(t.nombre, ' ', t.apellido) as solicitante,
-                         c.cargo, s.fecha_entrega, s.conse
+                         c.cargo, s.fecha_entrega, s.conse,
+                         (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza
                   FROM solicitudes_recursos s
                   JOIN estados_pedidos e  ON e.id = s.estado
                   LEFT JOIN trabajadores_colegios t ON s.solicitante = t.id
@@ -574,13 +622,21 @@
             elseif (strpos($estado_lower, 'rechazad') !== false)  $badge = 'rechazado';
             else                                                   $badge = 'default';
         ?>
-        <tr>
+        <?php $es_legal = $sol['total_legaliza'] > 0; ?>
+        <tr data-legal="<?= $es_legal ? '1' : '0' ?>">
           <td><a href="vista_solicitud.php?id=<?= $sol['id'] ?>" class="at-link vista_soli"><?= htmlspecialchars($num) ?></a></td>
           <td><?= htmlspecialchars($sol['fecha']) ?></td>
           <td><?= htmlspecialchars($sol['solicitante'].' ('.$sol['cargo'].')') ?></td>
           <td><?= htmlspecialchars($sol['fecha_entrega']) ?></td>
           <td>$ <?= number_format($tot2['total'], 0, ',', '.') ?></td>
           <td><span class="at-badge <?= $badge ?>"><?= htmlspecialchars($sol['estado']) ?></span></td>
+          <td>
+            <?php if ($es_legal): ?>
+              <span class="at-legal-badge ok"><i class="bi bi-check-circle-fill"></i> Legalizada</span>
+            <?php else: ?>
+              <span class="at-legal-badge pending"><i class="bi bi-exclamation-circle-fill"></i> Sin legalizar</span>
+            <?php endif; ?>
+          </td>
           <td>
             <a href="vista_solicitud.php?id=<?= $sol['id'] ?>" class="btn btn-sm btn-outline-primary vista_soli" style="font-size:.75rem">
               <i class="bi bi-eye"></i> Ver resumen
@@ -719,6 +775,25 @@
   $('#at-panel-close').on('click', function() {
     $('#at-panel').fadeOut(200, function() {
       $('#at-iframe').attr('src', '');
+    });
+  });
+
+  // ── Filtro sin legalizar ─────────────────────────────────────
+  var atLegalFilter = 'all';
+  $('#at-filter-legal').on('click', function() {
+    if (atLegalFilter === 'all') {
+      atLegalFilter = '0';
+      $(this).addClass('active').html('<i class="bi bi-x-circle"></i> Mostrando sin legalizar');
+    } else {
+      atLegalFilter = 'all';
+      $(this).removeClass('active').html('<i class="bi bi-funnel-fill"></i> Ver solo sin legalizar');
+    }
+    $('#tabla-atenciones tbody tr').each(function() {
+      if (atLegalFilter === 'all') {
+        $(this).show();
+      } else {
+        $(this).toggle($(this).data('legal') == atLegalFilter);
+      }
     });
   });
 </script>

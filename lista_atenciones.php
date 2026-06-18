@@ -24,7 +24,9 @@ $ac = $ac_map[$tp] ?? ['hdr' => '#374151', 'even' => '#f8fafc', 'hover' => '#f1f
 
 if ($tp == 1) {
   $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
-          s.fecha_entrega, s.conse, s.contab, c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          s.fecha_entrega, s.conse, s.contab, s.archivo,
+          (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -34,7 +36,9 @@ if ($tp == 1) {
           ORDER BY s.id DESC";
 } elseif ($tp == 2) {
   $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
-          s.fecha_entrega, s.conse, s.contab, c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          s.fecha_entrega, s.conse, s.contab, s.archivo,
+          (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -44,7 +48,9 @@ if ($tp == 1) {
           WHERE s.estado=1 ORDER BY s.id DESC";
 } elseif ($tp == 3) {
   $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
-          s.fecha_entrega, s.conse, s.contab, c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          s.fecha_entrega, s.conse, s.contab, s.archivo,
+          (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -54,7 +60,9 @@ if ($tp == 1) {
           WHERE s.estado=2 ORDER BY s.id DESC";
 } elseif ($tp == 4) {
   $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
-          s.fecha_entrega, s.conse, s.contab, c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          s.fecha_entrega, s.conse, s.contab, s.archivo,
+          (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -64,7 +72,9 @@ if ($tp == 1) {
           WHERE s.estado=4 ORDER BY s.id DESC";
 } elseif ($tp == 5) {
   $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
-          s.fecha_entrega, s.conse, s.contab, c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          s.fecha_entrega, s.conse, s.contab, s.archivo,
+          (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -74,7 +84,9 @@ if ($tp == 1) {
           WHERE s.estado=3 ORDER BY s.id DESC";
 } else {
   $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
-          s.fecha_entrega, s.conse, s.contab, c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          s.fecha_entrega, s.conse, s.contab, s.archivo,
+          (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -91,11 +103,14 @@ $total = count($solicitudes);
 
 $promotores_uniq = [];
 $estados_uniq    = [];
+$cnt_no_legal    = 0;
+$cnt_legal       = 0;
 foreach ($solicitudes as $s) {
   if ($s['promotor'] && !in_array($s['promotor'], $promotores_uniq))
     $promotores_uniq[] = $s['promotor'];
   if ($s['estado'] && !in_array($s['estado'], $estados_uniq))
     $estados_uniq[] = $s['estado'];
+  if ($s['total_legaliza'] > 0) $cnt_legal++; else $cnt_no_legal++;
 }
 sort($promotores_uniq);
 sort($estados_uniq);
@@ -132,6 +147,41 @@ sort($estados_uniq);
     #la-count-badge { background: <?= $ac['accent'] ?>; color:#fff; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:20px; }
     .ft-date-range { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
     .ft-date-label { font-size:.78rem; font-weight:600; color:#64748b; white-space:nowrap; }
+
+    /* ── Tarjeta legalización ────────────────────────────────── */
+    .la-legal-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 6px rgba(15,23,42,.08);
+      border-left: 4px solid #f59e0b;
+    }
+    .la-legal-stats { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+    .la-legal-stat  { display: flex; align-items: center; gap: 10px; }
+    .la-legal-icon  { width:38px; height:38px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+    .la-legal-icon.warning { background:#fef3c7; color:#b45309; }
+    .la-legal-icon.success { background:#dcfce7; color:#15803d; }
+    .la-legal-num   { display:block; font-size:1.25rem; font-weight:800; color:#0f172a; line-height:1; }
+    .la-legal-lbl   { display:block; font-size:.72rem; font-weight:600; color:#64748b; margin-top:2px; }
+    .la-legal-sep   { width:1px; height:36px; background:#e2e8f0; }
+    .la-legal-filters { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-left:auto; }
+    .la-lf-label    { font-size:.78rem; font-weight:600; color:#64748b; white-space:nowrap; }
+    .la-lf-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 14px; border-radius: 20px; border: 1.5px solid #e2e8f0;
+      background: #fff; color: #64748b; font-size: 12.5px; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+    }
+    .la-lf-btn:hover { border-color: <?= $ac['accent'] ?>; color: <?= $ac['accent'] ?>; }
+    .la-lf-btn.active { background: <?= $ac['accent'] ?>; border-color: <?= $ac['accent'] ?>; color: #fff; }
+    .la-lf-btn.lf-warn.active  { background:#f59e0b; border-color:#f59e0b; color:#fff; }
+    .la-lf-btn.lf-ok.active    { background:#16a34a; border-color:#16a34a; color:#fff; }
+
     @media (max-width: 575px) {
       #la-table_wrapper { overflow-x: auto; }
       #la-table { min-width: 700px; }
@@ -153,6 +203,33 @@ sort($estados_uniq);
               <h4><i class="bi bi-headset mr-2" style="color:<?= $ac['accent'] ?>"></i>Atenciones — <?= htmlspecialchars($st['label']) ?></h4>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta legalización -->
+      <div class="la-legal-bar">
+        <div class="la-legal-stats">
+          <div class="la-legal-stat">
+            <div class="la-legal-icon warning"><i class="bi bi-exclamation-circle-fill"></i></div>
+            <div>
+              <span class="la-legal-num"><?= $cnt_no_legal ?></span>
+              <span class="la-legal-lbl">Sin legalizar</span>
+            </div>
+          </div>
+          <div class="la-legal-sep"></div>
+          <div class="la-legal-stat">
+            <div class="la-legal-icon success"><i class="bi bi-check-circle-fill"></i></div>
+            <div>
+              <span class="la-legal-num"><?= $cnt_legal ?></span>
+              <span class="la-legal-lbl">Legalizadas</span>
+            </div>
+          </div>
+        </div>
+        <div class="la-legal-filters">
+          <span class="la-lf-label"><i class="bi bi-filter"></i> Legalización:</span>
+          <button class="la-lf-btn active"   data-legal="all"><i class="bi bi-list-ul"></i> Todas</button>
+          <button class="la-lf-btn lf-ok"    data-legal="1"><i class="bi bi-check-circle-fill"></i> Legalizadas</button>
+          <button class="la-lf-btn lf-warn"  data-legal="0"><i class="bi bi-exclamation-circle-fill"></i> Sin legalizar</button>
         </div>
       </div>
 
@@ -225,7 +302,8 @@ sort($estados_uniq);
                 };
                 $fecha_raw = substr($s['fecha'], 0, 10);
               ?>
-              <tr data-fecha="<?= $fecha_raw ?>" data-promotor="<?= htmlspecialchars($s['promotor']) ?>" data-estado="<?= htmlspecialchars($s['estado']) ?>">
+              <?php $fila_legal = ($s['total_legaliza'] > 0) ? '1' : '0'; ?>
+              <tr data-fecha="<?= $fecha_raw ?>" data-promotor="<?= htmlspecialchars($s['promotor']) ?>" data-estado="<?= htmlspecialchars($s['estado']) ?>" data-legal="<?= $fila_legal ?>">
                 <td><a href="vista_solicitud.php?id=<?= $s['id'] ?>" class="la-link vista_soli"><?= htmlspecialchars($s['conse']) ?></a></td>
                 <td><?= htmlspecialchars($s['fecha']) ?></td>
                 <td><?= htmlspecialchars($s['promotor']) ?></td>
@@ -284,6 +362,8 @@ $(document).ready(function () {
     }
   });
 
+  var legalFilter = 'all';
+
   $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
     if (settings.nTable.id !== 'la-table') return true;
     var promotor = $('#la-promotor').val();
@@ -298,6 +378,7 @@ $(document).ready(function () {
       if (desde && fecha < desde) return false;
       if (hasta && fecha > hasta) return false;
     }
+    if (legalFilter !== 'all' && String($row.data('legal')) !== legalFilter) return false;
     return true;
   });
 
@@ -314,7 +395,17 @@ $(document).ready(function () {
     $('#la-promotor').val('');
     $('#la-estado').val('');
     $('#la-fecha-desde, #la-fecha-hasta').val('');
+    legalFilter = 'all';
+    $('.la-lf-btn').removeClass('active');
+    $('.la-lf-btn[data-legal="all"]').addClass('active');
     table.api().search('').draw();
+  });
+
+  $('.la-lf-btn').on('click', function () {
+    legalFilter = $(this).data('legal').toString();
+    $('.la-lf-btn').removeClass('active');
+    $(this).addClass('active');
+    table.api().draw();
   });
 
   $(document).on('click', '.vista_soli', function (e) {
