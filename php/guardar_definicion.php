@@ -147,6 +147,20 @@
 				
 	}
 
+	// Manejo del archivo de adopción
+	$archivo_path = '';
+	if (isset($_FILES['archivo_adopcion']) && $_FILES['archivo_adopcion']['error'] === UPLOAD_ERR_OK) {
+		$uploads_dir = dirname(__DIR__) . '/uploads/adopciones/';
+		if (!is_dir($uploads_dir)) {
+			mkdir($uploads_dir, 0755, true);
+		}
+		$ext      = strtolower(pathinfo($_FILES['archivo_adopcion']['name'], PATHINFO_EXTENSION));
+		$filename = 'adop_' . intval($_POST['id_colegio']) . '_' . intval($_POST['periodo']) . '_' . time() . '.' . $ext;
+		if (move_uploaded_file($_FILES['archivo_adopcion']['tmp_name'], $uploads_dir . $filename)) {
+			$archivo_path = 'uploads/adopciones/' . $filename;
+		}
+	}
+
 	$sql_rec = "SELECT id FROM recursos WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."'";
 
 	$req_rec = $bdd->prepare($sql_rec);
@@ -155,11 +169,12 @@
 
 	if ($num < 1 ) {
 
-		$sql_e = "INSERT INTO recursos(id_periodo,id_colegio,recurso,valor_recurso, reintegro, valor_reintegro,id_canal,descripcion_canal,venta_real,fecha,observaciones) VALUES ('".$_POST["periodo"]."', '".$_POST["id_colegio"]."', '".$_POST["recurso"]."','".$_POST["valor_recurso"]."', '".$_POST["reintegro"]."','".$_POST["valor_reintegro"]."','".$_POST["canal"]."','".$_POST["descripcion"]."','".$_POST["venta_real"]."','".date("Y-m-d")."','".$_POST["observaciones"]."')";
+		$sql_e = "INSERT INTO recursos(id_periodo,id_colegio,recurso,valor_recurso, reintegro, valor_reintegro,id_canal,descripcion_canal,venta_real,fecha,observaciones,archivo) VALUES ('".$_POST["periodo"]."', '".$_POST["id_colegio"]."', '".$_POST["recurso"]."','".$_POST["valor_recurso"]."', '".$_POST["reintegro"]."','".$_POST["valor_reintegro"]."','".$_POST["canal"]."','".$_POST["descripcion"]."','".$_POST["venta_real"]."','".date("Y-m-d")."','".$_POST["observaciones"]."','".$archivo_path."')";
 
 	}else {
 
-		$sql_e = "UPDATE recursos SET recurso='".$_POST["recurso"]."', valor_recurso='".$_POST["valor_recurso"]."', reintegro='".$_POST["reintegro"]."', valor_reintegro='".$_POST["valor_reintegro"]."', id_canal='".$_POST["canal"]."', descripcion_canal='".$_POST["descripcion"]."',venta_real='".$_POST["venta_real"]."' , fecha='".date("Y-m-d")."', observaciones='".$_POST["observaciones"]."' WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
+		$arch_set = $archivo_path !== '' ? ", archivo='".$archivo_path."'" : '';
+		$sql_e = "UPDATE recursos SET recurso='".$_POST["recurso"]."', valor_recurso='".$_POST["valor_recurso"]."', reintegro='".$_POST["reintegro"]."', valor_reintegro='".$_POST["valor_reintegro"]."', id_canal='".$_POST["canal"]."', descripcion_canal='".$_POST["descripcion"]."',venta_real='".$_POST["venta_real"]."' , fecha='".date("Y-m-d")."', observaciones='".$_POST["observaciones"]."'".$arch_set." WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
 	}
 
 	

@@ -218,6 +218,26 @@
   }
   .ad-footer-form .form-label-sm i { color: #6366f1; font-size: 0.88rem; }
 
+  /* Campo de archivo */
+  .ad-footer-form .ad-file-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    background: #f8fafc;
+    transition: border-color .15s, background .15s;
+    color: #64748b;
+    font-size: 0.83rem;
+    font-weight: 500;
+  }
+  .ad-footer-form .ad-file-label:hover { border-color: #6366f1; background: #eef2ff; color: #4f46e5; }
+  .ad-footer-form .ad-file-label.has-file { border-color: #16a34a; background: #f0fdf4; color: #15803d; }
+  .ad-footer-form input[type="file"] { display: none; }
+  .ad-file-name { font-size: 0.79rem; color: #6366f1; margin-top: 5px; font-weight: 600; word-break: break-all; }
+
   /* Controles del footer con borde más visible */
   .ad-footer-form select.form-control,
   .ad-footer-form textarea.form-control {
@@ -597,7 +617,7 @@
         $req_exist_d->execute();
         $ids_exist_adop = array_map('intval', array_column($req_exist_d->fetchAll(PDO::FETCH_ASSOC), 'id_libro_eureka'));
 
-		echo "<form action='php/guardar_definicion.php' class='miFormulario' method='POST' id='form_definicion' name='f2'>";
+		echo "<form action='php/guardar_definicion.php' class='miFormulario' method='POST' id='form_definicion' name='f2' enctype='multipart/form-data'>";
                               
             echo "<div class='ad-table-wrap mt-2'>
                 <table id='dataTables-adop'>
@@ -1517,9 +1537,34 @@
                           }
                           echo '</select></div>';
 
+                          // Documento de adopción
+                          $arch_existente = ($count > 0 && !empty($recursos['archivo'])) ? $recursos['archivo'] : '';
+                          $arch_label_class = $arch_existente ? ' has-file' : '';
+                          $arch_icon_text   = $arch_existente
+                              ? '<i class="bi bi-check-circle-fill" style="font-size:1.2rem;"></i><span id="ad-file-text">Documento cargado — clic para reemplazar</span>'
+                              : '<i class="bi bi-cloud-upload" style="font-size:1.2rem;"></i><span id="ad-file-text">Haz clic para seleccionar un archivo</span>';
+                          $arch_name_html = $arch_existente
+                              ? '<p class="ad-file-name" id="ad-file-name">'.htmlspecialchars(basename($arch_existente)).'</p>'
+                              : '<p class="ad-file-name" id="ad-file-name"></p>';
+                          $arch_req_badge = $arch_existente ? '' : ' <span style="color:#dc2626">*</span>';
+
+                          echo '<div class="col-sm-4">
+                                  <span class="ad-footer-form form-label-sm">
+                                    <i class="bi bi-paperclip"></i> Acuerdo de adopción'.$arch_req_badge.'
+                                  </span>
+                                  <label class="ad-file-label'.$arch_label_class.'" id="ad-file-label" for="archivo_adopcion">
+                                    '.$arch_icon_text.'
+                                  </label>
+                                  <input type="file" name="archivo_adopcion" id="archivo_adopcion"
+                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                                  '.$arch_name_html.'
+                                </div>';
+                          // Pasar al JS si ya existe archivo guardado
+                          echo '<script>var adArchivoGuardado = '.($arch_existente ? 'true' : 'false').';</script>';
+
                           // Observaciones
                           $obs_val = ($count > 0) ? htmlspecialchars($recursos["observaciones"]) : '';
-                          echo '<div class="col-sm-9">
+                          echo '<div class="col-sm-5">
                                   <span class="ad-footer-form form-label-sm">
                                     <i class="bi bi-chat-left-text"></i> Observaciones
                                   </span>
@@ -1895,6 +1940,37 @@
         if (errMsg) {
             e.preventDefault();
             adToast(errMsg, 'error');
+            return false;
+        }
+    });
+
+    // ── Campo de archivo: mostrar nombre seleccionado ────────────
+    $('#archivo_adopcion').on('change', function() {
+        var $label = $('#ad-file-label');
+        var $name  = $('#ad-file-name');
+        if (this.files && this.files.length > 0) {
+            var fname = this.files[0].name;
+            $('#ad-file-text').text('Archivo seleccionado');
+            $name.text(fname);
+            $label.addClass('has-file');
+        } else {
+            $('#ad-file-text').text('Haz clic para seleccionar un archivo');
+            $name.text('');
+            $label.removeClass('has-file');
+        }
+    });
+
+    // ── Validar archivo antes de guardar adopciones ──────────────
+    $('#form_definicion').on('submit', function(e) {
+        var archivo = $('#archivo_adopcion')[0];
+        var tieneNuevo = archivo && archivo.files.length > 0;
+        if (!adArchivoGuardado && !tieneNuevo) {
+            e.preventDefault();
+            adToast('Debes adjuntar el acuerdo de adopción antes de guardar.', 'error');
+            $('#ad-file-label').css({'border-color':'#dc2626','background':'#fef2f2'});
+            setTimeout(function(){
+                $('#ad-file-label').css({'border-color':'','background':''});
+            }, 2500);
             return false;
         }
     });

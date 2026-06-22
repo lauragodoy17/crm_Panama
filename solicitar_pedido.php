@@ -18,6 +18,17 @@ $cole_info    = $bdd->query("SELECT colegio FROM colegios WHERE id={$id_colegio}
 $periodo_info = $bdd->query("SELECT periodo FROM periodos WHERE id={$periodo_id}")->fetch();
 $clientes_all = $bdd->query("SELECT id, cliente FROM clientes ORDER BY cliente ASC")->fetchAll();
 $tipos_doc    = $bdd->query("SELECT id, tipo, descrip FROM tipo_doc WHERE act=1")->fetchAll();
+
+// Verificar si existe documento de adopción cargado
+$tiene_archivo = false;
+try {
+    $stmt_arch = $bdd->prepare("SELECT archivo FROM recursos WHERE id_colegio=? AND id_periodo=?");
+    $stmt_arch->execute([$id_colegio, $periodo_id]);
+    $rec_arch   = $stmt_arch->fetch();
+    $tiene_archivo = !empty($rec_arch['archivo']);
+} catch (Exception $e) {
+    $tiene_archivo = false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -159,6 +170,15 @@ $tipos_doc    = $bdd->query("SELECT id, tipo, descrip FROM tipo_doc WHERE act=1"
     }
     .sp-btn-add:hover { background: #eff6ff; }
 
+    /* Alerta sin archivo */
+    .sop-no-arch {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 10px;
+      padding: 14px 18px; margin-bottom: 16px; font-size: .875rem; color: #92400e;
+    }
+    .sop-no-arch i { font-size: 1.2rem; color: #f97316; flex-shrink: 0; margin-top: 1px; }
+    .sop-no-arch strong { color: #7c2d12; }
+
     /* Submit */
     .sop-actions { display: flex; justify-content: center; padding-top: 8px; }
     .sop-btn-save {
@@ -219,6 +239,13 @@ $tipos_doc    = $bdd->query("SELECT id, tipo, descrip FROM tipo_doc WHERE act=1"
               <div><p class="mc-card-label">Títulos disponibles</p><p class="mc-card-val"><?= count($libros) ?></p></div>
             </div>
           </div>
+
+          <?php if (!$tiene_archivo): ?>
+          <div class="sop-no-arch">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Para solicitar el pedido debes adjuntar primero el acuerdo de adopción en la pestaña <strong>Adopciones</strong> del colegio.</span>
+          </div>
+          <?php endif; ?>
 
           <hr class="sop-divider" />
 
@@ -360,7 +387,8 @@ $tipos_doc    = $bdd->query("SELECT id, tipo, descrip FROM tipo_doc WHERE act=1"
             <input type="hidden" name="periodo"    value="<?= $periodo_id ?>">
 
             <div class="sop-actions">
-              <button type="submit" class="sop-btn-save" id="solicitar">
+              <button type="submit" class="sop-btn-save" id="solicitar"
+                <?= !$tiene_archivo ? 'disabled style="opacity:.45;cursor:not-allowed;pointer-events:none"' : '' ?>>
                 <i class="bi bi-floppy2-fill"></i> Solicitar pedido
               </button>
             </div>
