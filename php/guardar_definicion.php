@@ -147,9 +147,9 @@
 				
 	}
 
-	// Manejo del archivo de adopción
+	// Manejo del archivo de adopción (solo para tipos 1, 3, 10)
 	$archivo_path = '';
-	if (isset($_FILES['archivo_adopcion']) && $_FILES['archivo_adopcion']['error'] === UPLOAD_ERR_OK) {
+	if (in_array($_SESSION['tipo'], [1, 3, 10]) && isset($_FILES['archivo_adopcion']) && $_FILES['archivo_adopcion']['error'] === UPLOAD_ERR_OK) {
 		$uploads_dir = dirname(__DIR__) . '/uploads/adopciones/';
 		if (!is_dir($uploads_dir)) {
 			mkdir($uploads_dir, 0755, true);

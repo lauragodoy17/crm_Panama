@@ -19,15 +19,17 @@ $periodo_info = $bdd->query("SELECT periodo FROM periodos WHERE id={$periodo_id}
 $clientes_all = $bdd->query("SELECT id, cliente FROM clientes ORDER BY cliente ASC")->fetchAll();
 $tipos_doc    = $bdd->query("SELECT id, tipo, descrip FROM tipo_doc WHERE act=1")->fetchAll();
 
-// Verificar si existe documento de adopción cargado
-$tiene_archivo = false;
-try {
-    $stmt_arch = $bdd->prepare("SELECT archivo FROM recursos WHERE id_colegio=? AND id_periodo=?");
-    $stmt_arch->execute([$id_colegio, $periodo_id]);
-    $rec_arch   = $stmt_arch->fetch();
-    $tiene_archivo = !empty($rec_arch['archivo']);
-} catch (Exception $e) {
-    $tiene_archivo = false;
+// Verificar si existe documento de adopción cargado (solo aplica para tipos 1, 3, 10)
+$tiene_archivo = true;
+if (in_array($_SESSION['tipo'], [1, 3, 10])) {
+    try {
+        $stmt_arch = $bdd->prepare("SELECT archivo FROM recursos WHERE id_colegio=? AND id_periodo=?");
+        $stmt_arch->execute([$id_colegio, $periodo_id]);
+        $rec_arch   = $stmt_arch->fetch();
+        $tiene_archivo = !empty($rec_arch['archivo']);
+    } catch (Exception $e) {
+        $tiene_archivo = false;
+    }
 }
 ?>
 <!DOCTYPE html>

@@ -1537,30 +1537,33 @@
                           }
                           echo '</select></div>';
 
-                          // Documento de adopción
-                          $arch_existente = ($count > 0 && !empty($recursos['archivo'])) ? $recursos['archivo'] : '';
-                          $arch_label_class = $arch_existente ? ' has-file' : '';
-                          $arch_icon_text   = $arch_existente
-                              ? '<i class="bi bi-check-circle-fill" style="font-size:1.2rem;"></i><span id="ad-file-text">Documento cargado — clic para reemplazar</span>'
-                              : '<i class="bi bi-cloud-upload" style="font-size:1.2rem;"></i><span id="ad-file-text">Haz clic para seleccionar un archivo</span>';
-                          $arch_name_html = $arch_existente
-                              ? '<p class="ad-file-name" id="ad-file-name">'.htmlspecialchars(basename($arch_existente)).'</p>'
-                              : '<p class="ad-file-name" id="ad-file-name"></p>';
-                          $arch_req_badge = $arch_existente ? '' : ' <span style="color:#dc2626">*</span>';
+                          // Documento de adopción (solo para tipos 1, 3, 10)
+                          if (in_array($_SESSION['tipo'], [1, 3, 10])) {
+                              $arch_existente = ($count > 0 && !empty($recursos['archivo'])) ? $recursos['archivo'] : '';
+                              $arch_label_class = $arch_existente ? ' has-file' : '';
+                              $arch_icon_text   = $arch_existente
+                                  ? '<i class="bi bi-check-circle-fill" style="font-size:1.2rem;"></i><span id="ad-file-text">Documento cargado — clic para reemplazar</span>'
+                                  : '<i class="bi bi-cloud-upload" style="font-size:1.2rem;"></i><span id="ad-file-text">Haz clic para seleccionar un archivo</span>';
+                              $arch_name_html = $arch_existente
+                                  ? '<p class="ad-file-name" id="ad-file-name">'.htmlspecialchars(basename($arch_existente)).'</p>'
+                                  : '<p class="ad-file-name" id="ad-file-name"></p>';
+                              $arch_req_badge = $arch_existente ? '' : ' <span style="color:#dc2626">*</span>';
 
-                          echo '<div class="col-sm-4">
-                                  <span class="ad-footer-form form-label-sm">
-                                    <i class="bi bi-paperclip"></i> Acuerdo de adopción'.$arch_req_badge.'
-                                  </span>
-                                  <label class="ad-file-label'.$arch_label_class.'" id="ad-file-label" for="archivo_adopcion">
-                                    '.$arch_icon_text.'
-                                  </label>
-                                  <input type="file" name="archivo_adopcion" id="archivo_adopcion"
-                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
-                                  '.$arch_name_html.'
-                                </div>';
-                          // Pasar al JS si ya existe archivo guardado
-                          echo '<script>var adArchivoGuardado = '.($arch_existente ? 'true' : 'false').';</script>';
+                              echo '<div class="col-sm-4">
+                                      <span class="ad-footer-form form-label-sm">
+                                        <i class="bi bi-paperclip"></i> Acuerdo de adopción'.$arch_req_badge.'
+                                      </span>
+                                      <label class="ad-file-label'.$arch_label_class.'" id="ad-file-label" for="archivo_adopcion">
+                                        '.$arch_icon_text.'
+                                      </label>
+                                      <input type="file" name="archivo_adopcion" id="archivo_adopcion"
+                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                                      '.$arch_name_html.'
+                                    </div>';
+                              echo '<script>var adArchivoGuardado = '.($arch_existente ? 'true' : 'false').';</script>';
+                          } else {
+                              echo '<script>var adArchivoGuardado = true;</script>';
+                          }
 
                           // Observaciones
                           $obs_val = ($count > 0) ? htmlspecialchars($recursos["observaciones"]) : '';
