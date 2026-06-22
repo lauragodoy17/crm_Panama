@@ -92,6 +92,12 @@
         <div class="row align-items-center">
           <div class="col-md-8 col-sm-12">
             <div class="title"><h4>Cargar clientes</h4></div>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="lista_op.php">OP</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Cargar clientes</li>
+              </ol>
+            </nav>
           </div>
         </div>
       </div>

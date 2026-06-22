@@ -195,6 +195,12 @@ $ent1 = $ent2 = $ent3 = [];
                 <i class="bi bi-file-earmark-text mr-2" style="color:#6d28d9"></i>
                 OPD <?= htmlspecialchars($pedido['año'] . ' - ' . $opd) ?>
               </h4>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="ver_opds.php">OPD's</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">OPD <?= htmlspecialchars($pedido['año'] . ' - ' . $opd) ?></li>
+                </ol>
+              </nav>
             </div>
             <?php if ($cumplida): ?>
               <span class="pc-badge pc-badge-green d-print-none"><i class="bi bi-check-circle-fill"></i> Cumplida <?= htmlspecialchars($pedido['fecha_cumplida']) ?></span>

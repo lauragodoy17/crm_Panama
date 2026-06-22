@@ -173,9 +173,13 @@
                 </div>
                 <nav aria-label="breadcrumb" role="navigation">
                   <ol class="breadcrumb">
-                    <li class="breadcrumb-item">OP</li>
+                    <?php
+                      $tp_back = [1=>2, 2=>3, 4=>4];
+                      $tp_link = $tp_back[$op['estado']] ?? 1;
+                    ?>
+                    <li class="breadcrumb-item"><a href="lista_op.php?tp=<?= $tp_link ?>">OP</a></li>
                     <li class="breadcrumb-item active" aria-current="page">
-                      <?= $op['estado']!=2 ? 'Pendiente' : 'Atendida' ?>
+                      <?= $es['label'] ?>
                     </li>
                   </ol>
                 </nav>
