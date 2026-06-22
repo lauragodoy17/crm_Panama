@@ -12,10 +12,6 @@
   <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/icon-font.min.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
-  <style>
-    .ft-date-range { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .ft-date-label { font-size: .82rem; font-weight: 600; color: #64748b; white-space: nowrap; }
-  </style>
 </head>
 <body>
 
@@ -26,47 +22,49 @@
 
       <div class="page-header">
         <div class="row align-items-center">
-          <div class="col-sm-12">
-            <div class="title">
-              <h4><i class="bi bi-file-earmark-arrow-down mr-2" style="color:#16a34a"></i>Reporte Órdenes de Producción</h4>
-            </div>
+          <div class="col-md-8 col-sm-12">
+            <div class="title"><h4>Reporte Órdenes de Producción</h4></div>
           </div>
         </div>
       </div>
 
-      <div class="modern-card" style="padding: 28px 32px">
-        <p style="font-size:.82rem; color:#64748b; margin-bottom:20px;">
-          Selecciona el rango de fechas para exportar las órdenes de producción en formato Excel.
-        </p>
-        <form action="php/opd_excel.php" method="POST">
-          <div class="row align-items-end">
-            <div class="col-md-3 col-sm-6">
-              <div class="form-group">
-                <label class="control-label" for="desde">Desde <span style="color:#dc2626">*</span></label>
+      <div class="sm-section">
+        <div class="sm-section-head">
+          <span class="sm-sec-icon green"><i class="bi bi-file-earmark-arrow-down"></i></span>
+          <span class="sm-section-title">Parámetros del reporte</span>
+        </div>
+        <div class="sm-section-body">
+          <p style="font-size:13px; color:#6b7280; margin-bottom:18px;">
+            Selecciona el rango de fechas para exportar las órdenes de producción en formato Excel.
+          </p>
+          <form action="php/opd_excel.php" method="POST">
+            <div class="row">
+              <div class="col-md-3 col-12 mb-3">
+                <label class="control-label">Desde <span style="color:#dc2626">*</span></label>
                 <div class="input-group">
-                  <input type="text" class="form-control date-picker" name="desde" id="desde" data-date-format="yyyy-mm-dd" required autocomplete="off">
-                  <span class="input-group-addon"><i class="fa fa-calendar bigger-110"></i></span>
+                  <input type="text" class="form-control date-picker" name="desde" data-date-format="yyyy-mm-dd" required autocomplete="off" placeholder="Seleccionar fecha" />
+                  <div class="input-group-append">
+                    <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-12 mb-3">
+                <label class="control-label">Hasta <span style="color:#dc2626">*</span></label>
+                <div class="input-group">
+                  <input type="text" class="form-control date-picker" name="hasta" data-date-format="yyyy-mm-dd" required autocomplete="off" placeholder="Seleccionar fecha" />
+                  <div class="input-group-append">
+                    <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-3 col-sm-6">
-              <div class="form-group">
-                <label class="control-label" for="hasta">Hasta <span style="color:#dc2626">*</span></label>
-                <div class="input-group">
-                  <input type="text" class="form-control date-picker" name="hasta" id="hasta" data-date-format="yyyy-mm-dd" required autocomplete="off">
-                  <span class="input-group-addon"><i class="fa fa-calendar bigger-110"></i></span>
-                </div>
-              </div>
+            <div class="sm-footer">
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+              </button>
             </div>
-            <div class="col-md-2 col-sm-6">
-              <div class="form-group">
-                <button type="submit" class="btn btn-success btn-block">
-                  <i class="bi bi-file-earmark-excel mr-1"></i> Exportar
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
 
     </div>

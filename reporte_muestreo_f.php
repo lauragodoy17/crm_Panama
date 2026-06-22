@@ -16,30 +16,7 @@
   <link rel="stylesheet" type="text/css" href="vendors/styles/core.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/icon-font.min.css" />
   <link rel="stylesheet" type="text/css" href="vendors/styles/style.css" />
-  <style>
-    .sm-page-desc { font-size:13px; color:#6b7280; margin:2px 0 0; font-weight:400; }
-    .sm-section {
-      background:#fff; border:1px solid #e5e7eb; border-radius:12px;
-      overflow:hidden; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,.05);
-    }
-    .sm-section-head {
-      display:flex; align-items:center; gap:10px;
-      padding:13px 20px; background:#f8fafc; border-bottom:1px solid #e5e7eb;
-    }
-    .sm-sec-icon {
-      width:30px; height:30px; border-radius:8px; background:#eff6ff; color:#4361ee;
-      font-size:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    }
-    .sm-section-title { font-size:13.5px; font-weight:600; color:#1e293b; margin:0; }
-    .sm-section-body  { padding:22px 24px; }
-    .sm-footer {
-      display:flex; justify-content:flex-start; align-items:center; padding-top:8px;
-    }
-    .sm-footer .btn-primary {
-      display:inline-flex; align-items:center; gap:6px;
-      padding:9px 22px; font-size:14px; font-weight:600; border-radius:8px;
-    }
-  </style>
+
 </head>
 <body>
 
@@ -57,16 +34,7 @@
               <?php else: ?>
                 <h4>Reporte de muestras entregadas</h4>
               <?php endif; ?>
-              <p class="sm-page-desc">Filtra por usuario y rango de fechas para exportar el reporte.</p>
             </div>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">Reportes de muestras</li>
-                <li class="breadcrumb-item active">
-                  <?= $_GET['tp'] == 1 ? 'Solicitadas' : 'Entregadas' ?>
-                </li>
-              </ol>
-            </nav>
           </div>
         </div>
       </div>
@@ -101,12 +69,22 @@
 
               <div class="col-md-4 col-12 mb-3">
                 <label class="control-label">Desde <small style="color:red;">*</small></label>
-                <input type="date" name="desde" id="desde" class="form-control" required />
+                <div class="input-group">
+                  <input type="text" class="form-control date-picker" name="desde" id="desde" data-date-format="yyyy-mm-dd" required autocomplete="off" placeholder="Seleccionar fecha" />
+                  <div class="input-group-append">
+                    <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                  </div>
+                </div>
               </div>
 
               <div class="col-md-4 col-12 mb-3">
                 <label class="control-label">Hasta <small style="color:red;">*</small></label>
-                <input type="date" name="hasta" id="hasta" class="form-control" required />
+                <div class="input-group">
+                  <input type="text" class="form-control date-picker" name="hasta" id="hasta" data-date-format="yyyy-mm-dd" required autocomplete="off" placeholder="Seleccionar fecha" />
+                  <div class="input-group-append">
+                    <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                  </div>
+                </div>
               </div>
             </div>
 

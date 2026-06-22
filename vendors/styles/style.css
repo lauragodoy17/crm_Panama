@@ -253,6 +253,18 @@ body,html{-webkit-font-smoothing:antialiased;width:100%;height:100%}html{-webkit
   scrollbar-color: #94a3b8 #f1f5f9;
 }
 
+/* ── Secciones de reportes ─────────────────────────────────────────────── */
+.sm-section{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sm-section-head{display:flex;align-items:center;gap:10px;padding:13px 20px;background:#f8fafc;border-bottom:1px solid #e5e7eb}
+.sm-sec-icon{width:30px;height:30px;border-radius:8px;background:#eff6ff;color:#4361ee;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sm-sec-icon.green{background:#f0fdf4;color:#16a34a}
+.sm-sec-icon.orange{background:#fff7ed;color:#ea580c}
+.sm-sec-icon.purple{background:#faf5ff;color:#7c3aed}
+.sm-section-title{font-size:13.5px;font-weight:600;color:#1e293b;margin:0}
+.sm-section-body{padding:22px 24px}
+.sm-footer{display:flex;justify-content:flex-start;align-items:center;padding-top:8px}
+.sm-footer .btn-primary,.sm-footer .btn-success{display:inline-flex;align-items:center;gap:6px;padding:9px 22px;font-size:14px;font-weight:600;border-radius:8px}
+
 /* Ajuste header y contenedor principal para sidebar de 260px */
 .tbl-empty {
   text-align: center !important;
