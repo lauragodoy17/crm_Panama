@@ -100,7 +100,8 @@
   .pob-card-icon.c-bach { background:#ede7f6; color:#6a1b9a; }
   .pob-card-icon.c-tot  { background:#e2e8f0; color:#1e293b; }
   .pob-card-label { font-size:0.73rem; color:#64748b; margin:0 0 2px 0; font-weight:600; letter-spacing:.03em; text-transform:uppercase; }
-  .pob-card-val   { font-size:1.3rem; font-weight:800; color:#0f172a; margin:0; }
+  .pob-card-val   { font-size:1.3rem; font-weight:800; color:#0f172a; margin:0 0 2px 0; }
+  .pob-card-par   { font-size:0.72rem; color:#94a3b8; margin:0; font-weight:500; }
 
   /* ── Tabla vertical ──────────────────────────────────────────── */
   #tabla-pob {
@@ -197,6 +198,7 @@
       <div>
         <p class="pob-card-label">Preescolar</p>
         <p class="pob-card-val" id="pob-total-pre">—</p>
+        <p class="pob-card-par" id="pob-par-pre">— / — paralelos</p>
       </div>
     </div>
     <div class="pob-card">
@@ -204,6 +206,7 @@
       <div>
         <p class="pob-card-label">Primaria</p>
         <p class="pob-card-val" id="pob-total-prim">—</p>
+        <p class="pob-card-par" id="pob-par-prim">— / — paralelos</p>
       </div>
     </div>
     <div class="pob-card">
@@ -211,6 +214,7 @@
       <div>
         <p class="pob-card-label">Bachillerato</p>
         <p class="pob-card-val" id="pob-total-bach">—</p>
+        <p class="pob-card-par" id="pob-par-bach">— / — paralelos</p>
       </div>
     </div>
     <div class="pob-card">
@@ -218,6 +222,7 @@
       <div>
         <p class="pob-card-label">Total estudiantes</p>
         <p class="pob-card-val" id="pob-total-gen">—</p>
+        <p class="pob-card-par" id="pob-par-gen">— / — paralelos</p>
       </div>
     </div>
   </div>
@@ -286,19 +291,23 @@
 
   // ── Calcular totales ──────────────────────────────────────────────────
   function calcularTotales() {
-    var totCols  = [];
-    var totNivel = { pre: 0, prim: 0, bach: 0 };
-    var totGral  = 0;
+    var totCols   = [];
+    var totNivel  = { pre: 0, prim: 0, bach: 0 };
+    var parNonZero = { pre: 0, prim: 0, bach: 0 };
+    var parTotal   = { pre: 0, prim: 0, bach: 0 };
+    var totGral   = 0;
 
     $('#tabla-pob tbody tr.fila-grado').each(function () {
-      var nivel    = $(this).data('nivel');
-      var filaSum  = 0;
+      var nivel   = $(this).data('nivel');
+      var filaSum = 0;
 
       $(this).find('td.col-par input.pob-input').each(function (i) {
         var v = parseFloat($(this).val()) || 0;
         totCols[i] = (totCols[i] || 0) + v;
         filaSum   += v;
         totGral   += v;
+        parTotal[nivel]++;
+        if (v > 0) parNonZero[nivel]++;
       });
 
       totNivel[nivel] = (totNivel[nivel] || 0) + filaSum;
@@ -314,6 +323,14 @@
     $('#pob-total-prim').text(totNivel.prim || 0);
     $('#pob-total-bach').text(totNivel.bach || 0);
     $('#pob-total-gen').text(totGral || 0);
+
+    var totalNonZero = parNonZero.pre + parNonZero.prim + parNonZero.bach;
+    var totalPar     = parTotal.pre  + parTotal.prim  + parTotal.bach;
+
+    $('#pob-par-pre').text(parNonZero.pre  + ' / ' + parTotal.pre  + ' paralelos');
+    $('#pob-par-prim').text(parNonZero.prim + ' / ' + parTotal.prim + ' paralelos');
+    $('#pob-par-bach').text(parNonZero.bach + ' / ' + parTotal.bach + ' paralelos');
+    $('#pob-par-gen').text(totalNonZero + ' / ' + totalPar + ' paralelos');
   }
 
   calcularTotales();
