@@ -198,7 +198,7 @@
       <div>
         <p class="pob-card-label">Preescolar</p>
         <p class="pob-card-val" id="pob-total-pre">—</p>
-        <p class="pob-card-par" id="pob-par-pre">— / — paralelos</p>
+        <p class="pob-card-par" id="pob-par-pre">— paralelos</p>
       </div>
     </div>
     <div class="pob-card">
@@ -206,7 +206,7 @@
       <div>
         <p class="pob-card-label">Primaria</p>
         <p class="pob-card-val" id="pob-total-prim">—</p>
-        <p class="pob-card-par" id="pob-par-prim">— / — paralelos</p>
+        <p class="pob-card-par" id="pob-par-prim">— paralelos</p>
       </div>
     </div>
     <div class="pob-card">
@@ -214,7 +214,7 @@
       <div>
         <p class="pob-card-label">Bachillerato</p>
         <p class="pob-card-val" id="pob-total-bach">—</p>
-        <p class="pob-card-par" id="pob-par-bach">— / — paralelos</p>
+        <p class="pob-card-par" id="pob-par-bach">— paralelos</p>
       </div>
     </div>
     <div class="pob-card">
@@ -222,7 +222,7 @@
       <div>
         <p class="pob-card-label">Total estudiantes</p>
         <p class="pob-card-val" id="pob-total-gen">—</p>
-        <p class="pob-card-par" id="pob-par-gen">— / — paralelos</p>
+        <p class="pob-card-par" id="pob-par-gen">— paralelos</p>
       </div>
     </div>
   </div>
@@ -327,10 +327,10 @@
     var totalNonZero = parNonZero.pre + parNonZero.prim + parNonZero.bach;
     var totalPar     = parTotal.pre  + parTotal.prim  + parTotal.bach;
 
-    $('#pob-par-pre').text(parNonZero.pre  + ' / ' + parTotal.pre  + ' paralelos');
-    $('#pob-par-prim').text(parNonZero.prim + ' / ' + parTotal.prim + ' paralelos');
-    $('#pob-par-bach').text(parNonZero.bach + ' / ' + parTotal.bach + ' paralelos');
-    $('#pob-par-gen').text(totalNonZero + ' / ' + totalPar + ' paralelos');
+    $('#pob-par-pre').text(parNonZero.pre  + ' paralelos');
+    $('#pob-par-prim').text(parNonZero.prim + ' paralelos');
+    $('#pob-par-bach').text(parNonZero.bach + ' paralelos');
+    $('#pob-par-gen').text(totalNonZero + ' paralelos');
   }
 
   calcularTotales();
