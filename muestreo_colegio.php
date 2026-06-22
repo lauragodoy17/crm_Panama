@@ -118,6 +118,33 @@
     }
     .mc-obs-wrap textarea:focus { border-color:#6366f1; background:#fff; }
 
+    /* ── Archivo adjunto ───────────────────────────── */
+    .mc-file-wrap {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 20px;
+      box-shadow: 0 1px 6px rgba(15,23,42,.08);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .mc-file-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: #eff6ff; color: #2563eb;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .mc-file-label {
+      font-size: .72rem; font-weight: 700; color: #94a3b8;
+      text-transform: uppercase; letter-spacing: .05em; margin: 0 0 3px;
+    }
+    .mc-file-link {
+      font-size: .875rem; font-weight: 600; color: #2563eb;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .mc-file-link:hover { text-decoration: underline; color: #1d4ed8; }
+
     /* ── Acciones ───────────────────────────────────── */
     .mc-actions { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:4px; }
     .mc-btn {
@@ -172,7 +199,7 @@
             $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
             $pedido = $req_pedido->fetch();
 
-            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, z.zona, c.colegio, c.direccion, c.sub_zona, c.responsable, cal.calendario, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado LEFT JOIN calendarios cal ON c.id_calendario=cal.id WHERE pe.id='".$pedido["id"]."'";
+            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, pe.archivo, z.zona, c.colegio, c.direccion, c.sub_zona, c.responsable, cal.calendario, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado LEFT JOIN calendarios cal ON c.id_calendario=cal.id WHERE pe.id='".$pedido["id"]."'";
             $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
             $pedido = $req_pedido->fetch();
 
@@ -188,7 +215,7 @@
             $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
             $pedido = $req_pedido->fetch();
 
-            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, z.zona, c.colegio, c.direccion, c.sub_zona, c.responsable, cal.calendario, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos_e pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado LEFT JOIN calendarios cal ON c.id_calendario=cal.id WHERE pe.id='".$_GET["id_muestras_e"]."'";
+            $sql_pedido = "SELECT pe.id, pe.id_periodo, pe.id_colegio, pe.fecha, pe.observaciones, pe.archivo, z.zona, c.colegio, c.direccion, c.sub_zona, c.responsable, cal.calendario, u.nombres, u.apellidos, u.tipo, e.estado FROM muestreos_e pe JOIN colegios c ON pe.id_colegio=c.id JOIN zonas z ON z.codigo=c.cod_zona JOIN usuarios u ON u.cod_zona=z.codigo JOIN estados_pedidos e ON e.id=pe.estado LEFT JOIN calendarios cal ON c.id_calendario=cal.id WHERE pe.id='".$_GET["id_muestras_e"]."'";
             $req_pedido = $bdd->prepare($sql_pedido); $req_pedido->execute();
             $pedido = $req_pedido->fetch();
 
@@ -286,6 +313,19 @@
           </div>
           <?php endif; ?>
         </div>
+
+        <?php if (!empty($pedido['archivo'])): ?>
+        <div class="mc-file-wrap">
+          <div class="mc-file-icon"><i class="bi bi-paperclip"></i></div>
+          <div>
+            <p class="mc-file-label">Archivo adjunto</p>
+            <a class="mc-file-link" href="<?= htmlspecialchars($pedido['archivo']) ?>" target="_blank">
+              <i class="bi bi-file-earmark-arrow-down"></i>
+              <?= htmlspecialchars(basename($pedido['archivo'])) ?>
+            </a>
+          </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Tabla de libros -->
         <form action="php/aprobar_muestreo.php" method="POST" id="form_aprobar">

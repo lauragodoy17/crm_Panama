@@ -20,7 +20,17 @@
 	$gp_periodo = $req_periodo->fetch();
 
 	$colegio = $_POST['cole'];
-	//$objetivo = $_POST['objetivo'];
+
+	// Manejo del archivo adjunto
+	$archivo_path = '';
+	if (isset($_FILES['archivo_muestreo']) && $_FILES['archivo_muestreo']['error'] === UPLOAD_ERR_OK) {
+		$uploads_dir = dirname(__DIR__) . '/uploads/muestreos/';
+		if (!is_dir($uploads_dir)) mkdir($uploads_dir, 0755, true);
+		$filename = str_replace(['/', '\\', "\0"], '', $_FILES['archivo_muestreo']['name']);
+		if (move_uploaded_file($_FILES['archivo_muestreo']['tmp_name'], $uploads_dir . $filename)) {
+			$archivo_path = 'uploads/muestreos/' . $filename;
+		}
+	}
 
 	$bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	try {
@@ -124,10 +134,10 @@
 
 	if ($_POST['tp']!=2) {
 
-		$sql_p2 = "INSERT INTO muestreos(codigo,id_periodo,id_colegio,id_usuario,observaciones,estado) VALUES('".$cod_pedido."','".$gp_periodo["id"]."','".$colegio."','".$_SESSION["id"]."','".$_POST["observaciones"]."','1')";
+		$sql_p2 = "INSERT INTO muestreos(codigo,id_periodo,id_colegio,id_usuario,observaciones,estado,archivo) VALUES('".$cod_pedido."','".$gp_periodo["id"]."','".$colegio."','".$_SESSION["id"]."','".$_POST["observaciones"]."','1','".$archivo_path."')";
 	}else{
 
-		$sql_p2 = "INSERT INTO muestreos_e(codigo,id_periodo,id_colegio,id_usuario,observaciones,estado) VALUES('".$cod_pedido."','".$gp_periodo["id"]."','".$colegio."','".$_SESSION["id"]."','".$_POST["observaciones"]."','1')";
+		$sql_p2 = "INSERT INTO muestreos_e(codigo,id_periodo,id_colegio,id_usuario,observaciones,estado,archivo) VALUES('".$cod_pedido."','".$gp_periodo["id"]."','".$colegio."','".$_SESSION["id"]."','".$_POST["observaciones"]."','1','".$archivo_path."')";
 	}
 				
 				

@@ -152,6 +152,33 @@
         border-radius: 8px;
       }
 
+      /* ── Campo de archivo ───────────────────────────────────── */
+      .sm-file-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        padding: 13px 16px;
+        cursor: pointer;
+        background: #f9fafb;
+        transition: border-color .15s, background .15s;
+        color: #64748b;
+        font-size: 13.5px;
+        font-weight: 500;
+      }
+      .sm-file-label:hover  { border-color: #4361ee; background: #eff6ff; color: #4361ee; }
+      .sm-file-label.has-file { border-color: #16a34a; background: #f0fdf4; color: #15803d; }
+      .sm-file-label i { font-size: 1.15rem; flex-shrink: 0; }
+      .sm-file-name {
+        font-size: 12px;
+        color: #4361ee;
+        margin: 5px 0 0;
+        font-weight: 600;
+        word-break: break-all;
+      }
+      input[type="file"].sm-file-input { display: none; }
+
       /* ── Toast ───────────────────────────────────────────────── */
       .sm-toast {
         position: fixed;
@@ -204,7 +231,7 @@
           </div>
           <!-- /Page Header -->
 
-          <form action="php/crear_muestreo.php" method="POST" id="miFormulario">
+          <form action="php/crear_muestreo.php" method="POST" enctype="multipart/form-data" id="miFormulario">
 
             <!-- ── Sección 1: Colegio ──────────────────────────── -->
             <?php if (!isset($_GET['colegio'])): ?>
@@ -350,12 +377,26 @@
                 <hr class="sm-divider">
 
                 <div class="row">
-                  <div class="col-md-8 col-sm-12">
+                  <div class="<?= $_GET['tp'] == 2 ? 'col-md-8' : 'col-md-12' ?> col-sm-12">
                     <div class="form-group mb-3">
                       <label for="observaciones" class="control-label">Observaciones</label>
                       <textarea name="observaciones" id="observaciones" class="form-control" rows="3" placeholder="Escribe observaciones opcionales..."></textarea>
                     </div>
                   </div>
+                  <?php if ($_GET['tp'] == 2): ?>
+                  <div class="col-md-4 col-sm-12">
+                    <div class="form-group mb-3">
+                      <label class="control-label">Archivo adjunto</label>
+                      <label class="sm-file-label" id="sm-file-label" for="archivo_muestreo">
+                        <i class="bi bi-cloud-upload"></i>
+                        <span id="sm-file-text">Haz clic para adjuntar</span>
+                      </label>
+                      <input type="file" name="archivo_muestreo" id="archivo_muestreo" class="sm-file-input"
+                             accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                      <p class="sm-file-name" id="sm-file-name"></p>
+                    </div>
+                  </div>
+                  <?php endif; ?>
                 </div>
 
                 <div class="sm-footer">
@@ -580,6 +621,22 @@
 
 
   })
+    </script>
+
+    <script>
+      $('#archivo_muestreo').on('change', function () {
+        var $label = $('#sm-file-label');
+        var $name  = $('#sm-file-name');
+        if (this.files && this.files.length > 0) {
+          $('#sm-file-text').text('Archivo seleccionado');
+          $name.text(this.files[0].name);
+          $label.addClass('has-file');
+        } else {
+          $('#sm-file-text').text('Haz clic para adjuntar');
+          $name.text('');
+          $label.removeClass('has-file');
+        }
+      });
     </script>
 
     <!-- Toast de estado -->
