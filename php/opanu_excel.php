@@ -126,7 +126,8 @@ foreach($ops as $op) {
     $req = $bdd->prepare($sql);
     $req->execute();
 
-    $anu= $req->fetch();
+    $anu = $req->fetch();
+    $usr_anu = $anu ? $anu['usr_anu'] : '';
 
     $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$opid");
     $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$op[fecha]");
@@ -137,7 +138,7 @@ foreach($ops as $op) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$op[ciudad_destino]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$op[observaciones]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$op[fecha_anu]");
-    $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$anu[usr_anu]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", $usr_anu);
     $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$op[motivo_anu]");
     
 
