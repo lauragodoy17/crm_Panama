@@ -109,9 +109,12 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("M6", "Valor recurso entregado")
 $objSpreadsheet->getActiveSheet()->SetCellValue("N6", "fecha recurso entregado");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O6", "Legalizado");
 $objSpreadsheet->getActiveSheet()->SetCellValue("P6", "Contabilizado");
+$objSpreadsheet->getActiveSheet()->SetCellValue("Q6", "Presupuesto");
+$objSpreadsheet->getActiveSheet()->SetCellValue("R6", "Valor adopción total");
+$objSpreadsheet->getActiveSheet()->SetCellValue("S6", "Venta real");
 
 
-$objSpreadsheet->getActiveSheet()->getStyle('A6:P6')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A6:S6')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -139,6 +142,61 @@ $req = $bdd->prepare($sql);
 $req->execute();
 $solicitudes = $req->fetchAll();
 
+
+// Pre-computar presupuesto, adopción total y venta real por colegio
+$colegios_datos = [];
+$unique_cids = array_unique(array_column($solicitudes, 'cid'));
+foreach ($unique_cids as $cid) {
+    $val_presup = 0;
+    $val_adopcion = 0;
+    $val_venta_real = 0;
+
+    $req_vr = $bdd->prepare("SELECT venta_real FROM recursos WHERE id_colegio=? AND id_periodo=?");
+    $req_vr->execute([$cid, $_POST["periodo"]]);
+    $v_real = $req_vr->fetch();
+
+    $req_books = $bdd->prepare("SELECT p.tasa_compra, p.tasa_compra_d, p.descuento, p.descuento_d, p.precio, p.pre_definido, p.definido, p.cod_area, p.uni_vr, l.id as idlibro, l.id_grado FROM presupuestos p JOIN libros l ON p.id_libro=l.id WHERE p.id_colegio=? AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo=?");
+    $req_books->execute([$cid, $_POST["periodo"]]);
+    $books = $req_books->fetchAll();
+
+    foreach ($books as $book) {
+        if ($book["id_grado"] != 17 && $book["cod_area"] == "") {
+            $req_gp = $bdd->prepare("SELECT SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio=? AND id_grado=? AND id_periodo=? AND alumnos > 0");
+            $req_gp->execute([$cid, $book["id_grado"], $_POST["periodo"]]);
+        } else {
+            $req_go = $bdd->prepare("SELECT id_grado_otro FROM areas_objetivas WHERE id_colegio=? AND id_libro_eureka=? AND id_periodo=? AND codigo=?");
+            $req_go->execute([$cid, $book["idlibro"], $_POST["periodo"], $book["cod_area"]]);
+            $grado_o = $req_go->fetch();
+            $id_grado_o = $grado_o['id_grado_otro'] ?? 0;
+            $req_gp = $bdd->prepare("SELECT SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio=? AND id_grado=? AND id_periodo=? AND alumnos > 0");
+            $req_gp->execute([$cid, $id_grado_o, $_POST["periodo"]]);
+        }
+        $gp = $req_gp->fetch();
+        $alumnos = $gp["alumnos"] ?? 0;
+
+        if ($book["pre_definido"] == 1) {
+            $precio_neto = $book["precio"] - ($book["precio"] * $book["descuento"]);
+            $val_presup += $precio_neto * floor($alumnos * $book["tasa_compra"]);
+        }
+        if ($book["definido"] != 0) {
+            if ($book["tasa_compra_d"] == 0.00) {
+                $alumnos_tasa_d = floor($alumnos * $book["tasa_compra"]);
+                $precio_neto_d  = $book["precio"] - ($book["precio"] * $book["descuento"]);
+            } else {
+                $alumnos_tasa_d = floor($alumnos * $book["tasa_compra_d"]);
+                $precio_neto_d  = $book["precio"] - ($book["precio"] * $book["descuento_d"]);
+            }
+            $val_adopcion += $precio_neto_d * $alumnos_tasa_d;
+            if (!is_array($v_real) || !isset($v_real['venta_real']) || $v_real['venta_real'] < 1) {
+                $val_venta_real += $precio_neto_d * $book["uni_vr"];
+            }
+        }
+    }
+    if (is_array($v_real) && isset($v_real['venta_real']) && $v_real['venta_real'] > 0) {
+        $val_venta_real = $v_real['venta_real'];
+    }
+    $colegios_datos[$cid] = ['presupuesto' => $val_presup, 'adopcion' => $val_adopcion, 'venta_real' => $val_venta_real];
+}
 
 $conta=7;
 
@@ -221,7 +279,18 @@ foreach ($solicitudes as $solicitud) {
     }else{
         $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "Si");
     }
-    
+
+    $datos_cole = $colegios_datos[$solicitud["cid"]] ?? ['presupuesto' => 0, 'adopcion' => 0, 'venta_real' => 0];
+    $fmt_money = '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)';
+
+    $objSpreadsheet->getActiveSheet()->getStyle("Q$conta")->getNumberFormat()->setFormatCode($fmt_money);
+    $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", $datos_cole['presupuesto']);
+
+    $objSpreadsheet->getActiveSheet()->getStyle("R$conta")->getNumberFormat()->setFormatCode($fmt_money);
+    $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", $datos_cole['adopcion']);
+
+    $objSpreadsheet->getActiveSheet()->getStyle("S$conta")->getNumberFormat()->setFormatCode($fmt_money);
+    $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", $datos_cole['venta_real']);
 
 	$conta++;
 
