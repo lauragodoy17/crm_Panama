@@ -468,9 +468,20 @@
 
                           </div>
                           <hr style="background-color: #4c00ff;">
+                          <?php
+                            $sql_cargos_qd = "SELECT * FROM cargos WHERE id != 5";
+                            $req_cargos_qd = $bdd->prepare($sql_cargos_qd);
+                            $req_cargos_qd->execute();
+                            $cargos_qd = $req_cargos_qd->fetchAll();
+                            $cargos_qd_map = array_column($cargos_qd, 'cargo', 'id');
+                            $qd_val = $colegio['quien_decide'] ?? '';
+                            $qd_is_otro = $qd_val !== '' && !isset($cargos_qd_map[$qd_val]);
+                            $qd_sel = $qd_is_otro ? 'otro' : $qd_val;
+                            $qd_otro_val = $qd_is_otro ? htmlspecialchars($qd_val) : '';
+                          ?>
                           <div class="row">
 
-                            
+
                               <div class="col-sm-4">
                                 <div class="form-group">
                                   <label>Segmento <small style="color:red;"> *</small></label>
@@ -587,6 +598,24 @@
                           </div>
 
                           <div class="row">
+                            <div class="col-sm-4">
+                              <div class="form-group">
+                                <label>¿Quién decide?</label>
+                                <select class="custom-select" name="quien_decide" id="quien_decide_sel"
+                                        onchange="toggleQuienDecideOtro(this)">
+                                  <option value="">Seleccione...</option>
+                                  <?php foreach ($cargos_qd as $c):
+                                    $sel = $c['id'] == $qd_sel ? 'selected' : '';
+                                    echo '<option value="'.$c['id'].'" '.$sel.'>'.htmlspecialchars($c['cargo']).'</option>';
+                                  endforeach; ?>
+                                  <option value="otro" <?= $qd_sel === 'otro' ? 'selected' : '' ?>>Otro</option>
+                                </select>
+                                <input type="text" class="form-control mt-1<?= $qd_is_otro ? '' : ' d-none' ?>"
+                                       name="quien_decide_otro" id="quien_decide_otro"
+                                       value="<?= $qd_otro_val ?>" placeholder="Especifique quién decide"
+                                       <?= $qd_is_otro ? 'required' : '' ?> />
+                              </div>
+                            </div>
                             <div class="col-sm-4">
                               <div class="form-group">
                                 <label for="">Propuesta comercial</label>
@@ -774,6 +803,14 @@
     <script src="src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
 
     <script>
+    function toggleQuienDecideOtro(sel) {
+      var $inp = $('#quien_decide_otro');
+      if ($(sel).val() === 'otro') {
+        $inp.removeClass('d-none').attr('required', 'required');
+      } else {
+        $inp.addClass('d-none').removeAttr('required').val('');
+      }
+    }
 
 
        $("#zonificacion").addClass("show");

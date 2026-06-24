@@ -10,7 +10,7 @@ if (isset($_POST["colegio"])) {
     $id_colegio_h = intval($_POST["id_colegio"]);
 
     // Fetch old colegios values before UPDATE
-    $req_old_cole = $bdd->prepare("SELECT colegio, departamento, ciudad, dane, direccion, barrio, telefono, web, correo_i, id_calendario, id_segmento FROM colegios WHERE codigo='".$_POST["cod_colegio"]."'");
+    $req_old_cole = $bdd->prepare("SELECT colegio, departamento, ciudad, dane, direccion, barrio, telefono, web, correo_i, id_calendario, id_segmento, quien_decide FROM colegios WHERE codigo='".$_POST["cod_colegio"]."'");
     $req_old_cole->execute();
     $old_cole = $req_old_cole->fetch();
 
@@ -54,7 +54,11 @@ if (isset($_POST["colegio"])) {
     $req_old_ec->execute();
     $old_ec_row = $req_old_ec->fetch();
 
-    $sql = "UPDATE colegios SET colegio='".$_POST["colegio"]."',departamento='".$_POST["departamento"]."',ciudad='".$_POST["ciudad"]."',dane='".$_POST["dane"]."', direccion='".$_POST["direccion"]."', barrio='".$_POST["barrio"]."', telefono='".$_POST["telefono_c"]."', web='".$_POST["web"]."', correo_i='".$_POST["correo_i"]."', id_calendario='".$_POST["calendario"]."', id_segmento='".$_POST["segmento"]."', responsable='".$_POST["responsable"]."' WHERE codigo='".$_POST["cod_colegio"]."'";
+    $quien_decide_val = ($_POST['quien_decide'] === 'otro')
+        ? trim($_POST['quien_decide_otro'] ?? '')
+        : $_POST['quien_decide'];
+
+    $sql = "UPDATE colegios SET colegio='".$_POST["colegio"]."',departamento='".$_POST["departamento"]."',ciudad='".$_POST["ciudad"]."',dane='".$_POST["dane"]."', direccion='".$_POST["direccion"]."', barrio='".$_POST["barrio"]."', telefono='".$_POST["telefono_c"]."', web='".$_POST["web"]."', correo_i='".$_POST["correo_i"]."', id_calendario='".$_POST["calendario"]."', id_segmento='".$_POST["segmento"]."', responsable='".$_POST["responsable"]."', quien_decide='".$quien_decide_val."' WHERE codigo='".$_POST["cod_colegio"]."'";
     $req = $bdd->prepare($sql);
     $req->execute();
 
@@ -176,6 +180,7 @@ if (isset($_POST["colegio"])) {
             ['nombre' => 'Correo institucional', 'old' => trim((string)($old_cole['correo_i'] ?? '')),  'new' => trim((string)($_POST['correo_i'] ?? ''))],
             ['nombre' => 'Calendario',           'old' => $cal_old_name,                                'new' => $cal_new_name],
             ['nombre' => 'Segmento',             'old' => $seg_old_name,                                'new' => $seg_new_name],
+            ['nombre' => '¿Quién decide?',       'old' => trim((string)($old_cole['quien_decide'] ?? '')), 'new' => trim((string)$quien_decide_val)],
         ];
         foreach ($campos_cole as $c) {
             if ($c['old'] !== $c['new']) {
