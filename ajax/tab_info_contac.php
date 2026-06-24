@@ -102,7 +102,7 @@ function ic_initials($n, $a) {
     <?php foreach ($adms as $adm):
       $ini   = ic_initials($adm['nombre'], $adm['apellido']);
       $color = ic_color($adm['nombre']);
-      $cargo_nombre = $cargos_map[$adm['cargo']] ?? '—';
+      $cargo_nombre = $cargos_map[$adm['cargo']] ?? $adm['cargo'];
     ?>
     <div class="ic-card">
       <!-- Vista -->
@@ -113,7 +113,7 @@ function ic_initials($n, $a) {
         <div class="ic-info">
           <div class="ic-name">
             <?= htmlspecialchars($adm['nombre'].' '.$adm['apellido']) ?>
-            <?php if (!$adm['cargo'] || $cargo_nombre === '—'): ?>
+            <?php if (empty($adm['cargo'])): ?>
             <span class="ic-badge ic-badge-warning"><i class="bi bi-exclamation-triangle-fill"></i> Cargo incompleto</span>
             <?php else: ?>
             <span class="ic-badge ic-badge-cargo"><?= htmlspecialchars($cargo_nombre) ?></span>
@@ -170,13 +170,23 @@ function ic_initials($n, $a) {
             <div class="col-sm-3">
               <div class="form-group">
                 <label>Cargo <small style="color:red">*</small></label>
-                <select class="form-control form-control-sm custom-select" name="cargo_adm" required>
+                <?php
+                  $is_otro_edit  = !empty($adm['cargo']) && !isset($cargos_map[$adm['cargo']]);
+                  $cargo_sel_val = $is_otro_edit ? 'otro' : $adm['cargo'];
+                  $cargo_otro_val = $is_otro_edit ? htmlspecialchars($adm['cargo']) : '';
+                ?>
+                <select class="form-control form-control-sm custom-select" name="cargo_adm" required
+                        onchange="toggleCargoOtroEdit(this, '<?= $adm['id'] ?>')">
                   <option value="">Seleccione</option>
                   <?php foreach ($cargos_all as $c):
-                    $sel = $c['id'] == $adm['cargo'] ? 'selected' : '';
+                    $sel = $c['id'] == $cargo_sel_val ? 'selected' : '';
                     echo '<option value="'.$c['id'].'" '.$sel.'>'.$c['cargo'].'</option>';
                   endforeach; ?>
+                  <option value="otro" <?= $cargo_sel_val === 'otro' ? 'selected' : '' ?>>Otro</option>
                 </select>
+                <input type="text" class="form-control form-control-sm mt-1<?= $is_otro_edit ? '' : ' d-none' ?>"
+                       name="cargo_otro_adm" id="cargo_otro_edit_<?= $adm['id'] ?>"
+                       value="<?= $cargo_otro_val ?>" placeholder="Especifique el cargo" <?= $is_otro_edit ? 'required' : '' ?> />
               </div>
             </div>
           </div>
@@ -360,12 +370,16 @@ function ic_initials($n, $a) {
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label>Cargo <small style="color:red">*</small></label>
-                    <select class="custom-select" name="cargo_adm" id="cargo_adm" required>
+                    <select class="custom-select" name="cargo_adm" id="cargo_adm" required
+                            onchange="toggleCargoOtro(this, '')">
                       <option value="">Seleccione</option>
                       <?php foreach ($cargos_all as $c):
                         echo '<option value="'.$c['id'].'">'.$c['cargo'].'</option>';
                       endforeach; ?>
+                      <option value="otro">Otro</option>
                     </select>
+                    <input type="text" class="form-control mt-1 d-none" id="cargo_otro_adm"
+                           placeholder="Especifique el cargo" />
                   </div>
                 </div>
               </div>
@@ -405,12 +419,16 @@ function ic_initials($n, $a) {
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label>Cargo</label>
-                    <select class="custom-select" name="cargo_adm" id="cargo_adm<?= $i ?>">
+                    <select class="custom-select" name="cargo_adm" id="cargo_adm<?= $i ?>"
+                            onchange="toggleCargoOtro(this, '<?= $i ?>')">
                       <option value="">Seleccione</option>
                       <?php foreach ($cargos_all as $c):
                         echo '<option value="'.$c['id'].'">'.$c['cargo'].'</option>';
                       endforeach; ?>
+                      <option value="otro">Otro</option>
                     </select>
+                    <input type="text" class="form-control mt-1 d-none" id="cargo_otro_adm<?= $i ?>"
+                           placeholder="Especifique el cargo" />
                   </div>
                 </div>
               </div>
@@ -566,6 +584,27 @@ $(document).on('click', '.ic-btn-cancel', function () {
   card.find('.ic-view').show();
 });
 
+// ── Toggle "Otro" en modal (agregar) ──
+function toggleCargoOtro(sel, sfx) {
+  var $inp = $('#cargo_otro_adm' + sfx);
+  if ($(sel).val() === 'otro') {
+    $inp.removeClass('d-none').attr('required', 'required');
+  } else {
+    $inp.addClass('d-none').removeAttr('required').val('');
+  }
+  syncAdm(sfx === '' ? 0 : parseInt(sfx));
+}
+
+// ── Toggle "Otro" en formulario de edición inline ──
+function toggleCargoOtroEdit(sel, admId) {
+  var $inp = $('#cargo_otro_edit_' + admId);
+  if ($(sel).val() === 'otro') {
+    $inp.removeClass('d-none').attr('required', 'required');
+  } else {
+    $inp.addClass('d-none').removeAttr('required').val('');
+  }
+}
+
 // ── Guardar datos en hidden fields (administrativo) ──
 function syncAdm(i) {
   var sfx = i === 0 ? '' : i;
@@ -574,10 +613,12 @@ function syncAdm(i) {
   var c = $('#correo_adm'  + sfx).val();
   var t = $('#telefono_adm'+ sfx).val();
   var g = $('#cargo_adm'   + sfx).val();
+  if (g === 'otro') { g = $('#cargo_otro_adm' + sfx).val(); }
   $('#adm' + sfx).val(n+'/'+a+'/'+c+'/'+t+'/'+g);
 }
 $('#nombre_adm, #apellido_adm, #correo_adm, #telefono_adm').on('keyup', function(){ syncAdm(0); });
 $('#cargo_adm').on('change', function(){ syncAdm(0); });
+$('#cargo_otro_adm').on('keyup', function(){ syncAdm(0); });
 
 // Garantiza que todos los campos ocultos estén sincronizados antes de enviar
 $('form[action="php/guardar_adm.php"]').on('submit', function() {
@@ -592,6 +633,7 @@ $('#agregar_adm').on('click', function () {
   (function(i){
     $('#nombre_adm'+i+', #apellido_adm'+i+', #correo_adm'+i+', #telefono_adm'+i).on('keyup', function(){ syncAdm(i); });
     $('#cargo_adm'+i).on('change', function(){ syncAdm(i); });
+    $('#cargo_otro_adm'+i).on('keyup', function(){ syncAdm(i); });
   })(mAdm);
   mAdm++;
 });
