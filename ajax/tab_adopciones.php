@@ -397,10 +397,10 @@
     <div class="ad-filter-left">
       <span><i class="bi bi-funnel"></i> Ver:</span>
       <button class="ad-filter-btn active" data-filter="todos">
-        Todos los libros <span class="ad-filter-count" id="ad-count-todos">—</span>
+        Todos los libros
       </button>
       <button class="ad-filter-btn" data-filter="adoptados">
-        <i class="bi bi-bookmark-check-fill"></i> Solo adoptados <span class="ad-filter-count" id="ad-count-adoptados">—</span>
+        <i class="bi bi-bookmark-check-fill"></i> Solo adoptados
       </button>
     </div>
     <div class="ad-filter-right">
@@ -586,13 +586,23 @@
         </div><!-- /.modal-body -->
 
         <div class="modal-footer">
-          <?php if ($_SESSION["zona"] == $_GET["cod_zona"] || $_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2): ?>
-            <button type="button" class="lb-add-btn" id="agregar_aod">
-              <i class="bi bi-plus-circle"></i> Añadir otro libro
-            </button>
-            <button type="submit" class="btn btn-primary miBoton">
-              <i class="bi bi-floppy"></i> Guardar libros
-            </button>
+          <?php if ($_SESSION["tipo"] != 2 && $_SESSION["tipo"] != 4): ?>
+            <?php if ($_SESSION["zona"] == $_GET["cod_zona"] || $_SESSION["tipo"] == 1): ?>
+              <?php if ($_GET["f_cierre"] > date("Y-m-d")): ?>
+                <button type="button" class="lb-add-btn" id="agregar_aod">
+                  <i class="bi bi-plus-circle"></i> Añadir otro libro
+                </button>
+                <button type="submit" class="btn btn-primary miBoton">
+                  <i class="bi bi-floppy"></i> Guardar libros
+                </button>
+              <?php else: ?>
+                <span></span>
+                <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
+              <?php endif; ?>
+            <?php else: ?>
+              <span></span>
+              <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
+            <?php endif; ?>
           <?php else: ?>
             <span></span>
             <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
@@ -1540,27 +1550,45 @@
                           // Documento de adopción (solo para tipos 1, 3, 10)
                           if (in_array($_SESSION['tipo'], [1, 3, 10])) {
                               $arch_existente = ($count > 0 && !empty($recursos['archivo'])) ? $recursos['archivo'] : '';
-                              $arch_label_class = $arch_existente ? ' has-file' : '';
-                              $arch_icon_text   = $arch_existente
-                                  ? '<i class="bi bi-check-circle-fill" style="font-size:1.2rem;"></i><span id="ad-file-text">Documento cargado — clic para reemplazar</span>'
-                                  : '<i class="bi bi-cloud-upload" style="font-size:1.2rem;"></i><span id="ad-file-text">Haz clic para seleccionar un archivo</span>';
-                              $arch_name_html = $arch_existente
-                                  ? '<p class="ad-file-name" id="ad-file-name">'.htmlspecialchars(basename($arch_existente)).'</p>'
-                                  : '<p class="ad-file-name" id="ad-file-name"></p>';
-                              $arch_req_badge = $arch_existente ? '' : ' <span style="color:#dc2626">*</span>';
+                              $periodo_activo = $_GET["f_cierre"] > date("Y-m-d");
 
-                              echo '<div class="col-sm-4">
-                                      <span class="ad-footer-form form-label-sm">
-                                        <i class="bi bi-paperclip"></i> Acuerdo de adopción'.$arch_req_badge.'
-                                      </span>
-                                      <label class="ad-file-label'.$arch_label_class.'" id="ad-file-label" for="archivo_adopcion">
-                                        '.$arch_icon_text.'
-                                      </label>
-                                      <input type="file" name="archivo_adopcion" id="archivo_adopcion"
-                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
-                                      '.$arch_name_html.'
-                                    </div>';
-                              echo '<script>var adArchivoGuardado = '.($arch_existente ? 'true' : 'false').';</script>';
+                              if ($periodo_activo) {
+                                  // Periodo activo: upload interactivo
+                                  $arch_label_class = $arch_existente ? ' has-file' : '';
+                                  $arch_icon_text   = $arch_existente
+                                      ? '<i class="bi bi-check-circle-fill" style="font-size:1.2rem;"></i><span id="ad-file-text">Documento cargado — clic para reemplazar</span>'
+                                      : '<i class="bi bi-cloud-upload" style="font-size:1.2rem;"></i><span id="ad-file-text">Haz clic para seleccionar un archivo</span>';
+                                  $arch_name_html = $arch_existente
+                                      ? '<p class="ad-file-name" id="ad-file-name">'.htmlspecialchars(basename($arch_existente)).'</p>'
+                                      : '<p class="ad-file-name" id="ad-file-name"></p>';
+                                  $arch_req_badge = $arch_existente ? '' : ' <span style="color:#dc2626">*</span>';
+
+                                  echo '<div class="col-sm-4">
+                                          <span class="ad-footer-form form-label-sm">
+                                            <i class="bi bi-paperclip"></i> Acuerdo de adopción'.$arch_req_badge.'
+                                          </span>
+                                          <label class="ad-file-label'.$arch_label_class.'" id="ad-file-label" for="archivo_adopcion">
+                                            '.$arch_icon_text.'
+                                          </label>
+                                          <input type="file" name="archivo_adopcion" id="archivo_adopcion"
+                                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                                          '.$arch_name_html.'
+                                        </div>';
+                                  echo '<script>var adArchivoGuardado = '.($arch_existente ? 'true' : 'false').';</script>';
+                              } else {
+                                  // Periodo cerrado: solo lectura
+                                  echo '<div class="col-sm-4">
+                                          <span class="ad-footer-form form-label-sm">
+                                            <i class="bi bi-paperclip"></i> Acuerdo de adopción
+                                          </span>';
+                                  if ($arch_existente) {
+                                      echo '<p class="ad-file-name"><i class="bi bi-file-earmark-check" style="color:#16a34a;margin-right:4px;"></i>'.htmlspecialchars(basename($arch_existente)).'</p>';
+                                  } else {
+                                      echo '<p class="text-muted" style="font-size:.82rem;"><i class="bi bi-dash-circle"></i> Sin documento adjunto</p>';
+                                  }
+                                  echo '</div>';
+                                  echo '<script>var adArchivoGuardado = true;</script>';
+                              }
                           } else {
                               echo '<script>var adArchivoGuardado = true;</script>';
                           }
@@ -1894,10 +1922,6 @@
 
     // ── Filtro todos / adoptados ──────────────────────────────
     var $filas = $('#dataTables-adop tbody tr');
-    var totalTodos     = $filas.length;
-    var totalAdoptados = $filas.filter('[data-adoptado="1"]').length;
-    $('#ad-count-todos').text(totalTodos);
-    $('#ad-count-adoptados').text(totalAdoptados);
 
     $('.ad-filter-btn').on('click', function(){
       $('.ad-filter-btn').removeClass('active');
