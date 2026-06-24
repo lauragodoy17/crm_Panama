@@ -223,9 +223,10 @@
 								  <div class="form-group ocultar_oficina">
 									<label for="objetivo" class="col-sm-4 control-label">Objetivo<small style="color:red;"> *</small></label>
 									<div class="col-sm-8">
-									 <select name="objetivo" id="objetivo" class="form-control" required>
+									 <select name="objetivo" id="objetivo" class="form-control" required
+									         onchange="toggleOtroObjetivo(this)">
 									 	<option value="">Seleccionar</option>
-									 	<?php 
+									 	<?php
 
 									 		if ($_SESSION["tipo"] < 4) {
 									 			$sql = "SELECT id, objetivo FROM objetivos WHERE tipo < 3 ORDER BY objetivo";
@@ -244,7 +245,10 @@
 											    echo '<option value="'.$id.'">'.$nom.'</option>';
 											}
 									 	?>
+									 	<option value="otro">Otro</option>
 									 </select>
+									 <input type="text" name="otro_objetivo_txt" id="otro_objetivo_txt"
+									        class="form-control mt-1 d-none" placeholder="Especifique el objetivo">
 									</div>
 								  </div><br>
 
@@ -536,6 +540,15 @@
 				}
 
 			})
+
+			function toggleOtroObjetivo(sel) {
+				var $inp = $('#otro_objetivo_txt');
+				if ($(sel).val() === 'otro') {
+					$inp.removeClass('d-none').attr('required', 'required');
+				} else {
+					$inp.addClass('d-none').removeAttr('required').val('');
+				}
+			}
 
 			$("#otro_chk").click(function(){
 

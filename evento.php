@@ -101,11 +101,14 @@
               }
 
 
-              $sql_objetivo = "SELECT objetivo FROM objetivos WHERE id='".$visita["id_objetivo"]."'";
-
-              $req_objetivo = $bdd->prepare($sql_objetivo);
-              $req_objetivo->execute();
-              $objetivo = $req_objetivo->fetch();
+              if ($visita['id_objetivo'] == 0) {
+                $objetivo = ['objetivo' => $visita['otro_objetivo'] ?: 'Otro'];
+              } else {
+                $sql_objetivo = "SELECT objetivo FROM objetivos WHERE id='".$visita["id_objetivo"]."'";
+                $req_objetivo = $bdd->prepare($sql_objetivo);
+                $req_objetivo->execute();
+                $objetivo = $req_objetivo->fetch();
+              }
 
               $sql_grado = "SELECT grado FROM grados a JOIN grados_materias b ON a.id=b.id_grado WHERE cod_profesor='".$visita["cod_profesor"]."'";
 
