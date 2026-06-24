@@ -122,6 +122,19 @@
 											  <input type="checkbox" class="c_casa" name="casa" id="casa" value="<?php echo $casa['id'] ?>">
 											</div>
 								  		</div><br>
+
+								  		<div class="form-group">
+											<label for="otro_chk" class="col-sm-4 control-label c_otro">Otro lugar:</label>
+											<div class="col-sm-8">
+											  <input type="checkbox" class="c_otro" name="otro_chk" id="otro_chk" value="1">
+											</div>
+								  		</div><br>
+								  		<div class="form-group d-none" id="otro_lugar_wrap">
+								  		  <label for="otro_lugar_txt" class="col-sm-4 control-label">¿Cuál? <small style="color:red;">*</small></label>
+								  		  <div class="col-sm-8">
+								  		    <input type="text" name="otro_lugar_txt" id="otro_lugar_txt" class="form-control" placeholder="Especifique el lugar">
+								  		  </div>
+								  		</div><br>
 								  		
 								  		<div class="form-group ocultar_oficina">
 											<label for="cole" class="col-sm-4 control-label">Colegio<small style="color:red;"> *</small></label>
@@ -477,49 +490,74 @@
 				if( $('#oficina').prop('checked') ) {
 			   		$(".ocultar_oficina").addClass("d-none")
 			   		$(".c_casa").addClass("d-none");
+			   		$(".c_otro").addClass("d-none");
 			   		$(".ocultar_oficina").removeClass("d-block")
 			   		$("#cole").removeAttr("required");
 			   		$("#profesor").removeAttr("required");
 			   		$("#objetivo").removeAttr("required");
-
-			   		//$("#guardar").removeAttr("disabled");
+			   		$("#otro_lugar_wrap").addClass("d-none");
+			   		$("#otro_lugar_txt").removeAttr("required").val('');
+			   		$("#otro_chk").prop("checked", false);
 
 				}else {
 					$(".ocultar_oficina").addClass("d-block")
 					$(".ocultar_oficina").removeClass("d-none")
 					$(".c_casa").removeClass("d-none");
+					$(".c_otro").removeClass("d-none");
 					$("#cole").attr("required","required");
 					$("#profesor").attr("required","required");
 			   		$("#objetivo").attr("required","required");
-
-			   		//$("#guardar").attr("disabled","disabled")
 				}
 
 			})
 
 			$("#casa").click(function(){
 
-
 				if( $('#casa').prop('checked') ) {
 			   		$(".ocultar_oficina").addClass("d-none")
 			   		$(".c_ofi").addClass("d-none");
+			   		$(".c_otro").addClass("d-none");
 			   		$(".ocultar_oficina").removeClass("d-block")
 			   		$("#cole").removeAttr("required");
 			   		$("#profesor").removeAttr("required");
 			   		$("#objetivo").removeAttr("required");
-
-			   		//$("#guardar").removeAttr("disabled");
+			   		$("#otro_lugar_wrap").addClass("d-none");
+			   		$("#otro_lugar_txt").removeAttr("required").val('');
+			   		$("#otro_chk").prop("checked", false);
 
 				}else {
 					$(".ocultar_oficina").addClass("d-block")
 					$(".ocultar_oficina").removeClass("d-none")
 					$(".c_ofi").removeClass("d-none");
+					$(".c_otro").removeClass("d-none");
 					$("#cole").attr("required","required");
 					$("#profesor").attr("required","required");
 			   		$("#objetivo").attr("required","required");
+				}
 
-			   		//$("#guardar").attr("disabled","disabled")
+			})
 
+			$("#otro_chk").click(function(){
+
+				if ($('#otro_chk').prop('checked')) {
+					$(".ocultar_oficina").addClass("d-none").removeClass("d-block");
+					$(".c_ofi").addClass("d-none");
+					$(".c_casa").addClass("d-none");
+					$("#cole").removeAttr("required");
+					$("#profesor").removeAttr("required");
+					$("#objetivo").removeAttr("required");
+					$("#otro_lugar_wrap").removeClass("d-none");
+					$("#otro_lugar_txt").attr("required", "required");
+					$("#oficina").prop("checked", false);
+					$("#casa").prop("checked", false);
+				} else {
+					$(".ocultar_oficina").addClass("d-block").removeClass("d-none");
+					$(".c_ofi").removeClass("d-none");
+					$(".c_casa").removeClass("d-none");
+					$("#cole").attr("required", "required");
+					$("#objetivo").attr("required", "required");
+					$("#otro_lugar_wrap").addClass("d-none");
+					$("#otro_lugar_txt").removeAttr("required").val('');
 				}
 
 			})

@@ -76,8 +76,27 @@ if(isset($_POST["oficina"])) {
 }
 
 elseif(isset($_POST["casa"])) {
-	
+
 	$sql = "INSERT INTO plan_trabajo(codigo,id_periodo,id_promotor,id_colegio,resultado,color,start,end,agendamiento,descripcion) values ('$cod_plan','".$gp_periodo["id"]."', '".$_SESSION['id']."','".$_POST["casa"]."','0','#4c00ff', '$start', '$end', '5','".$_POST["descripcion"]."')";
+	$query = $bdd->prepare( $sql );
+	if ($query == false) {
+	 print_r($bdd->errorInfo());
+	 die ('Erreur prepare');
+	}
+	$sth = $query->execute();
+	if ($sth == false) {
+	 print_r($query->errorInfo());
+	 die ('Erreur execute');
+	}
+
+}
+
+elseif(isset($_POST["otro_chk"])) {
+
+	$otro_lugar = trim($_POST['otro_lugar_txt'] ?? '');
+	$otro_lugar = str_replace(["'", '"'], ' ', $otro_lugar);
+
+	$sql = "INSERT INTO plan_trabajo(codigo,id_periodo,id_promotor,id_colegio,otro_lugar,resultado,color,start,end,agendamiento,descripcion) values ('$cod_plan','".$gp_periodo["id"]."', '".$_SESSION['id']."','0','".$otro_lugar."','0','#4c00ff', '$start', '$end', '5','".$_POST["descripcion"]."')";
 	$query = $bdd->prepare( $sql );
 	if ($query == false) {
 	 print_r($bdd->errorInfo());

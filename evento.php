@@ -88,11 +88,17 @@
               list($a,$m,$d)=explode("-", $fecha);
               $fecha= $d."/".$m."/".$a;
                 
-              $sql_colegio = "SELECT id,codigo, colegio, barrio, direccion,telefono FROM colegios WHERE id='".$visita["id_colegio"]."'";
-
-              $req_colegio = $bdd->prepare($sql_colegio);
-              $req_colegio->execute();
-              $colegio = $req_colegio->fetch();
+              if ($visita['id_colegio'] == 0) {
+                $colegio = [
+                  'id' => 0, 'codigo' => '', 'barrio' => '', 'direccion' => '', 'telefono' => '',
+                  'colegio' => $visita['otro_lugar'] ?: 'Otro lugar',
+                ];
+              } else {
+                $sql_colegio = "SELECT id,codigo, colegio, barrio, direccion,telefono FROM colegios WHERE id='".$visita["id_colegio"]."'";
+                $req_colegio = $bdd->prepare($sql_colegio);
+                $req_colegio->execute();
+                $colegio = $req_colegio->fetch();
+              }
 
 
               $sql_objetivo = "SELECT objetivo FROM objetivos WHERE id='".$visita["id_objetivo"]."'";

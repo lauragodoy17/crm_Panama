@@ -13,7 +13,7 @@ include("../conexion/bdd.php");
 
 // Consulta eventos en el rango
 
-$sql = "SELECT id, codigo, id_colegio, color, start, end, id_objetivo FROM plan_trabajo WHERE (start BETWEEN :start AND :end OR end BETWEEN :start AND :end) AND id_promotor='".$_SESSION['id']."'";
+$sql = "SELECT id, codigo, id_colegio, otro_lugar, color, start, end, id_objetivo FROM plan_trabajo WHERE (start BETWEEN :start AND :end OR end BETWEEN :start AND :end) AND id_promotor='".$_SESSION['id']."'";
 
 $stmt = $bdd->prepare($sql);
 $stmt->execute([
@@ -24,9 +24,12 @@ $stmt->execute([
 $events = [];
 
 while ($event = $stmt->fetch(PDO::FETCH_ASSOC)) {
-  // Procesar título, participantes, colegio, objetivo igual que hacías
   // Colegio
-  $col = $bdd->query("SELECT colegio FROM colegios WHERE id='".$event['id_colegio']."' ")->fetch();
+  if ($event['id_colegio'] == 0) {
+    $col = ['colegio' => $event['otro_lugar'] ?: 'Otro lugar'];
+  } else {
+    $col = $bdd->query("SELECT colegio FROM colegios WHERE id='".$event['id_colegio']."' ")->fetch();
+  }
   $objetivo = $bdd->query("SELECT objetivo FROM objetivos WHERE id='".$event['id_objetivo']."' ")->fetch();
   
   $sql_parti = "SELECT CONCAT (nombres, ' ', apellidos) as parti, t.tipo 
