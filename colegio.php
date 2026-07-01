@@ -96,6 +96,7 @@
       #fc-campos.fc-readonly .select2-container--default .select2-selection--single .select2-selection__rendered {
         color:#374151;
       }
+
     </style>
 
     
@@ -132,20 +133,17 @@
 
             // Empresa / zona
             if ($promotor['tipo']==3 || $promotor['tipo']==1) {
-              list($emp_nombre, $zona_nombre) = array_map('trim', explode("/", $promotor["zona"]));
+              $partes      = array_pad(array_map('trim', explode("/", $promotor["zona"], 2)), 2, '');
+              $emp_nombre  = $partes[0];
+              $zona_nombre = $partes[1] ?: $partes[0];
             } else {
               $req_sz = $bdd->prepare("SELECT sub_zona FROM sub_zonas WHERE id='".$colegio["sub_zona"]."'");
               $req_sz->execute();
               $sub_zona    = $req_sz->fetch();
-              $emp_nombre  = $promotor['promotor'];
+              $emp_nombre  = $promotor['promotor'] ?? '—';
               $zona_nombre = $sub_zona['sub_zona'] ?? '—';
             }
-            $resp_txt = ($promotor['tipo']==3 || $promotor['tipo']==1) ? $promotor['promotor'] : ($colegio['responsable'] ?: '—');
-
-            // Calendario
-            $req_cal = $bdd->prepare("SELECT calendario FROM calendarios WHERE id='".$colegio["id_calendario"]."'");
-            $req_cal->execute();
-            $cal_row = $req_cal->fetch();
+            $resp_txt = ($promotor['tipo']==3 || $promotor['tipo']==1) ? ($promotor['promotor'] ?? '—') : ($colegio['responsable'] ?: '—');
 
             // Iniciales avatar
             $words_av = array_filter(explode(' ', $colegio['colegio']), fn($w) => strlen($w) > 2);
@@ -176,6 +174,11 @@
                 $badge_txt   = 'Activo';
                 $badge_style = 'background:#d1fae5;color:#059669;';
             }
+
+            // Pensión mensual del período actual
+            $req_pens = $bdd->prepare("SELECT pension FROM pension WHERE cod_colegio=:cod AND id_periodo=:per");
+            $req_pens->execute([':cod' => $colegio['codigo'], ':per' => $periodo]);
+            $pension_row = $req_pens->fetch();
           ?>
 
           <!-- Encabezado del colegio -->
@@ -187,7 +190,7 @@
                   <span class="fc-nombre"><?= htmlspecialchars($colegio['colegio']) ?></span>
                   <span class="fc-badge" style="<?= $badge_style ?>"><?= $badge_txt ?></span>
                 </div>
-                <small class="text-muted" style="font-size:12px">DANE: <?= htmlspecialchars($colegio['dane']) ?></small>
+                <small class="text-muted" style="font-size:12px">Código: <?= htmlspecialchars($colegio['codigo']) ?></small>
               </div>
             </div>
             <?php if ($_SESSION['tipo']==1): ?>
@@ -210,10 +213,6 @@
             <div class="fc-chip">
               <div class="fc-chip-ico orange"><i class="bi bi-person"></i></div>
               <div><div class="fc-chip-lbl">Responsable</div><div class="fc-chip-val"><?= htmlspecialchars($resp_txt) ?></div></div>
-            </div>
-            <div class="fc-chip">
-              <div class="fc-chip-ico purple"><i class="bi bi-calendar3"></i></div>
-              <div><div class="fc-chip-lbl">Calendario</div><div class="fc-chip-val"><?= htmlspecialchars($cal_row['calendario'] ?? '—') ?></div></div>
             </div>
           </div>
 
@@ -270,6 +269,7 @@
                         >Adopciones</a
                       >
                     </li>
+                    <?php /* Atenciones a clientes oculto temporalmente
                     <li class="nav-item atenc">
                       <a
                         class="nav-link"
@@ -280,6 +280,7 @@
                         >Atenciones a clientes</a
                       >
                     </li>
+                    */ ?>
                     <li class="nav-item atenc">
                       <a
                         class="nav-link"
@@ -288,6 +289,16 @@
                         role="tab"
                         aria-selected="false" data-url="ajax/tab_adjuntos.php"
                         >Adjuntos</a
+                      >
+                    </li>
+                    <li class="nav-item">
+                      <a
+                        class="nav-link"
+                        data-toggle="tab"
+                        href="#visitas"
+                        role="tab"
+                        aria-selected="false" data-url="ajax/tab_visitas.php"
+                        >Visitas</a
                       >
                     </li>
                     <?php if ($_SESSION['tipo'] == 1): ?>
@@ -335,12 +346,6 @@
                           <!-- Contenedor de campos — bloqueado en modo vista -->
                           <div id="fc-campos" class="fc-readonly">
                           <div class="row">
-                            <div class="col-sm-3">
-                              <div class="form-group">
-                                <label>DANE <small style="color:red;"> *</small></label>
-                                <input type="text" class="form-control" placeholder="DANE" name="dane" value="<?php echo $colegio['dane']; ?>" required/>
-                              </div>
-                            </div>
                             <div class="col-sm-6">
                               <div class="form-group">
                                 <label>Nombre de la institución <small style="color:red;"> *</small></label>
@@ -349,127 +354,85 @@
                             </div>
                             <div class="col-sm-3">
                               <div class="form-group">
-                                <label>Calendario <small style="color:red;"> *</small></label>
-                                <select class="custom-select" name="calendario" required>
+                                <label>Código</label>
+                                <input type="text" class="form-control" value="<?php echo htmlspecialchars($colegio['codigo']); ?>" readonly />
+                              </div>
+                            </div>
+                            <div class="col-sm-3">
+                              <div class="form-group">
+                                <label>Provincia <small style="color:red;"> *</small></label>
+                                <select class="custom-select2" name="departamento" required>
                                   <option value="">Seleccione...</option>
-                                  
-                                    <?php
-
-                                      $sql = "SELECT * FROM calendarios";
-
-                                      $req = $bdd->prepare($sql);
-                                      $req->execute();
-
-                                      $calendarios = $req->fetchAll();
-
-                                      foreach ($calendarios as $calendario) {
-                                        if ($calendario["id"]==$colegio["id_calendario"]) {
-                                          echo '<option value="'.$calendario["id"].'" SELECTED>'.$calendario["calendario"].'</option>';
-                                        }else{
-                                           echo '<option value="'.$calendario["id"].'">'.$calendario["calendario"].'</option>';
-                                        }
-                                       
-                                      }
-
-                                    ?>
-
-
+                                  <?php
+                                    $sql = "SELECT * FROM departamentos ORDER BY departamento";
+                                    $req = $bdd->prepare($sql);
+                                    $req->execute();
+                                    $departamentos = $req->fetchAll();
+                                    foreach ($departamentos as $departamento) {
+                                      $sel = $departamento["id"]==$colegio["departamento"] ? ' SELECTED' : '';
+                                      echo '<option value="'.$departamento["id"].'"'.$sel.'>'.$departamento["departamento"].'</option>';
+                                    }
+                                  ?>
                                 </select>
                               </div>
                             </div>
                           </div>
 
                           <div class="row">
-                            <div class="col-sm-6">
-                              <div class="form-group">
-                                <label>Departamento <small style="color:red;"> *</small></label>
-                                <select class="custom-select2" name="departamento" required>
-                                  <option value="">Seleccione...</option>
-                                  
-                                    <?php
-
-                                      $sql = "SELECT * FROM departamentos";
-
-                                      $req = $bdd->prepare($sql);
-                                      $req->execute();
-
-                                      $departamentos = $req->fetchAll();
-
-                                      foreach ($departamentos as $departamento) {
-                                        if ($departamento["id"]==$colegio["departamento"]) {
-                                          echo '<option value="'.$departamento["id"].'" SELECTED>'.$departamento["departamento"].'</option>';
-                                        }else{
-                                           echo '<option value="'.$departamento["id"].'">'.$departamento["departamento"].'</option>';
-                                        }
-                                       
-                                      }
-
-                                    ?>
-
-
-                                </select>
-                              </div>
-                            </div>
                             <div class="col-sm-6">
                               <div class="form-group">
                                 <label>Ciudad <small style="color:red;"> *</small></label>
-                                <!-- Vista: muestra la ciudad como texto -->
-                                <input type="text" id="ciudad-texto-edit" class="form-control"
-                                       value="<?php echo htmlspecialchars($colegio['ciudad']); ?>" readonly />
-                                <!-- Edición: mismo desplegable que crear colegio (oculto hasta editar) -->
-                                <div id="ciudad-dropdown-edit" style="display:none">
-                                  <select id="ciudad_select_edit" class="form-control">
-                                    <option value="">Cargando ciudades...</option>
-                                  </select>
-                                  <input type="text" id="ciudad_nueva_edit" class="form-control mt-2 d-none"
-                                         placeholder="Escriba el nombre de la ciudad" />
-                                </div>
-                                <input type="hidden" name="ciudad" id="ciudad_hidden_edit"
-                                       value="<?php echo htmlspecialchars($colegio['ciudad']); ?>" />
+                                <input type="text" class="form-control" placeholder="Ciudad" name="ciudad" value="<?php echo htmlspecialchars($colegio['ciudad']); ?>" required />
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <label>Ubicación <small style="color:red;"> *</small></label>
+                                <input type="text" class="form-control" placeholder="Ubicación" name="direccion" value="<?php echo $colegio['direccion']; ?>" required/>
                               </div>
                             </div>
                           </div>
 
                           <div class="row">
-                            <div class="col-sm-4">
-                              <div class="form-group">
-                                <label>Barrio</label>
-                                <input type="text" class="form-control" placeholder="Barrio" name="barrio"  value="<?php echo $colegio['barrio']; ?>"/>
-                              </div>
-                            </div>
-                            <div class="col-sm-4">
-                              <div class="form-group">
-                                <label>Dirección <small style="color:red;"> *</small></label>
-                                <input type="text" class="form-control" placeholder="Dirección" name="direccion" value="<?php echo $colegio['direccion']; ?>" required/>
-                              </div>
-                            </div>
                             <div class="col-sm-4">
                               <div class="form-group">
                                 <label>Teléfono <small style="color:red;"> *</small></label>
                                 <input type="text" class="form-control" placeholder="Teléfono" name="telefono_c" value="<?php echo $colegio['telefono']; ?>" required/>
                               </div>
                             </div>
-                          </div>
-
-                          <div class="row">
-                            
                             <div class="col-sm-4">
                               <div class="form-group">
                                 <label>Página Web</label>
                                 <input type="text" class="form-control" placeholder="Página Web" name="web"  value="<?php echo $colegio['web']; ?>"/>
                               </div>
                             </div>
+                            <?php if ($_SESSION['tipo']==6): ?>
                             <div class="col-sm-4">
                               <div class="form-group">
-                                <label>Correo institucional</label>
-                                <input type="text" class="form-control" placeholder="Correo institucional" name="correo_i" value="<?php echo $colegio['correo_i']; ?>"/>
+                                <label>Responsable <small style="color:red;"> *</small></label>
+                                <input type="text" class="form-control" placeholder="Responsable" name="responsable" value="<?php echo htmlspecialchars($colegio['responsable']); ?>" required/>
                               </div>
                             </div>
-
+                            <?php endif; ?>
                           </div>
-                          <hr style="background-color: #4c00ff;">
+
+                          <div class="row">
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <label>Cumpleaños del colegio</label>
+                                <input type="date" class="form-control" name="cumpleanos_c" value="<?php echo ($colegio['cumpleaños'] ?? '') !== '0000-00-00' ? ($colegio['cumpleaños'] ?? '') : ''; ?>" />
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <label>Costo mensual de pensión</label>
+                                <input type="text" class="form-control" placeholder="Costo mensual de pensión" name="pension" value="<?php echo htmlspecialchars($pension_row['pension'] ?? ''); ?>"/>
+                              </div>
+                            </div>
+                          </div>
+
                           <?php
-                            $sql_cargos_qd = "SELECT * FROM cargos WHERE id != 5";
+                            $sql_cargos_qd = "SELECT * FROM cargos WHERE id != 10";
                             $req_cargos_qd = $bdd->prepare($sql_cargos_qd);
                             $req_cargos_qd->execute();
                             $cargos_qd = $req_cargos_qd->fetchAll();
@@ -480,125 +443,7 @@
                             $qd_otro_val = $qd_is_otro ? htmlspecialchars($qd_val) : '';
                           ?>
                           <div class="row">
-
-
-                              <div class="col-sm-4">
-                                <div class="form-group">
-                                  <label>Segmento <small style="color:red;"> *</small></label>
-                                  <select class="custom-select" name="segmento" required>
-                                    <option value="">Seleccione...</option>
-                                    
-                                      <?php
-
-                                        $sql = "SELECT * FROM segmentos";
-
-                                        $req = $bdd->prepare($sql);
-                                        $req->execute();
-
-                                        $segmentos = $req->fetchAll();
-
-                                        foreach ($segmentos as $segmento) {
-                                          if ($segmento["id"]==$colegio["id_segmento"]) {
-                                            echo '<option value="'.$segmento["id"].'" SELECTED>'.$segmento["segmento"].'</option>';
-                                          }else{
-                                             echo '<option value="'.$segmento["id"].'">'.$segmento["segmento"].'</option>';
-                                          }
-                                         
-                                        }
-
-                                      ?>
-
-
-                                  </select>
-                                </div>
-                              </div>
-                            
-                            <div class="col-sm-4">
-
-                              <div class="form-group">
-                                <label>Status <small style="color:red;"> *</small></label>
-                                <select class="custom-select" name="status" required>
-                                  <option value="">Seleccione...</option>
-                                  
-                                    <?php
-
-                                      $sql = "SELECT id, id_status FROM colegios_status WHERE id_colegio='".$colegio["id"]."' AND id_periodo='".$_GET['periodo']."'";
-
-                                      $req = $bdd->prepare($sql);
-                                      $req->execute();
-                                      $cole_status = $req->fetch();
-
-                                      $sql = "SELECT * FROM status_cubrimiento WHERE act=1";
-
-                                      $req = $bdd->prepare($sql);
-                                      $req->execute();
-
-                                      $status = $req->fetchAll();
-
-                              
-                                      foreach ($status as $statu) {
-
-                                        if ($statu["id"]==$cole_status["id_status"]) {
-                                          echo '<option value="'.$statu["id"].'" SELECTED>'.$statu["status"].'</option>';
-                                        }else{
-                                          echo '<option value="'.$statu["id"].'">'.$statu["status"].'</option>';
-                                        }
-
-                                        
-                                      }    
-
-                                    ?>
-
-                                </select>
-                              </div>
-                             
-                            </div>
-                            <?php if ($_SESSION["tipo"]!=6) { ?>
-                              <div class="col-sm-4">
-
-                                <div class="form-group">
-                                  <label>Estado de cliente <small style="color:red;"> *</small></label>
-                                  <select class="custom-select" name="estado_cliente" required>
-                                    <option value="">Seleccione...</option>
-                                    
-                                      <?php
-
-                                        $sql = "SELECT id, id_estado_cliente FROM colegios_estados_clientes WHERE id_colegio='".$colegio["id"]."' AND id_periodo='".$_GET['periodo']."'";
-
-                                        $req = $bdd->prepare($sql);
-                                        $req->execute();
-                                        $cole_estado = $req->fetch();
-
-                                        $sql = "SELECT * FROM estados_cliente WHERE act=1";
-
-                                        $req = $bdd->prepare($sql);
-                                        $req->execute();
-
-                                        $estados = $req->fetchAll();
-
-                                
-                                        foreach ($estados as $estado) {
-
-                                          if ($estado["id"]==$cole_estado["id_estado_cliente"]) {
-                                            echo '<option value="'.$estado["id"].'" SELECTED>'.$estado["estado"].'</option>';
-                                          }else{
-                                            echo '<option value="'.$estado["id"].'">'.$estado["estado"].'</option>';
-                                          }
-
-                                          
-                                        }    
-
-                                      ?>
-
-                                  </select>
-                                </div>
-                               
-                              </div>
-                            <?php } ?>
-                          </div>
-
-                          <div class="row">
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                               <div class="form-group">
                                 <label>¿Quién decide?</label>
                                 <select class="custom-select" name="quien_decide" id="quien_decide_sel"
@@ -616,63 +461,72 @@
                                        <?= $qd_is_otro ? 'required' : '' ?> />
                               </div>
                             </div>
-                            <div class="col-sm-4">
+                          </div>
+
+                          <?php
+                            $req_status = $bdd->prepare("SELECT id_status FROM colegios_status WHERE id_colegio=:cole AND id_periodo=:per");
+                            $req_status->execute([':cole' => $colegio["id"], ':per' => $periodo]);
+                            $cole_status = $req_status->fetch();
+
+                            $status_ops = $bdd->query("SELECT * FROM status_cubrimiento WHERE act=1")->fetchAll();
+
+                            $req_estcli = $bdd->prepare("SELECT id_estado_cliente FROM colegios_estados_clientes WHERE id_colegio=:cole AND id_periodo=:per");
+                            $req_estcli->execute([':cole' => $colegio["id"], ':per' => $periodo]);
+                            $cole_estcli = $req_estcli->fetch();
+
+                            $estcli_ops = $bdd->query("SELECT * FROM estados_cliente WHERE act=1")->fetchAll();
+
+                            $segmento_ops = $bdd->query("SELECT * FROM segmentos WHERE act=1")->fetchAll();
+                          ?>
+                          <div class="row">
+                            <div class="col-sm-6">
                               <div class="form-group">
-                                <label for="">Propuesta comercial</label>
-                                <select name="propuesta_c" id="propuesta_c" class="form-control">
-                                  <?php
-
-                                    $sql = "SELECT adjunto FROM adjuntos WHERE id_colegio='".$colegio["id"]."' AND id_periodo='".$_GET['periodo']."' AND tipo=1";
-
-                                    $req = $bdd->prepare($sql);
-                                    $req->execute();
-                                    $count_p = $req->rowCount();
-                                    
-                                    if ($count_p > 0) {
-                                      echo '<option value="0">No</option>
-                                      <option value="1" SELECTED>Si</option>';
-                                    }ELSE{
-                                      echo '<option value="0">No</option>
-                                      <option value="1">Si</option>';
-                                    }
-                                  ?>
-                                  
+                                <label>Segmento <small style="color:red;"> *</small></label>
+                                <select class="custom-select" name="segmento" required>
+                                  <option value="">Seleccione...</option>
+                                  <?php foreach ($segmento_ops as $segmento):
+                                    $sel = $segmento["id"]==$colegio["id_segmento"] ? ' selected' : '';
+                                    echo '<option value="'.$segmento["id"].'"'.$sel.'>'.htmlspecialchars($segmento["segmento"]).'</option>';
+                                  endforeach; ?>
                                 </select>
                               </div>
                             </div>
-                            <?php if ($count_p > 0) {
-                              $propuesta = $req->fetch();
-                              list($antes,$archivo)=explode("_", $propuesta["adjunto"]);
-                              echo '<div class="col-sm-4">
-                                <label>Adjunto propuesta comercial</>
-                                <a href="adjuntos/'.$propuesta["adjunto"].'" download="'.$archivo.'">'.$archivo.'</a>
-                              </div>';
-
-                            ?>
-
-                              
-                              
-                            <?php }else { ?>
-                              <div class="col-sm-4 d-none" id="adjunto_propuesta_c">
-                  
-                                <div class="form-group">
-                                  <label class="control-label no-padding-right" for="archivo"> Adjunto propuesta comercial <small style="color:red;"> *</small></label>
-
-                                  <input type="file" name="archivo" id="i_pc" placeholder="Adjunto" class="form-control" />
-                                    
-                                </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <label>Status <small style="color:red;"> *</small></label>
+                                <select class="custom-select" name="status" required>
+                                  <option value="">Seleccione...</option>
+                                  <?php foreach ($status_ops as $statu):
+                                    $sel = ($cole_status && $statu["id"]==$cole_status["id_status"]) ? ' selected' : '';
+                                    echo '<option value="'.$statu["id"].'"'.$sel.'>'.htmlspecialchars($statu["status"]).'</option>';
+                                  endforeach; ?>
+                                </select>
                               </div>
-                            <?php } ?>
-
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <label>Estado a cliente <small style="color:red;"> *</small></label>
+                                <select class="custom-select" name="estado_cliente" required>
+                                  <option value="">Seleccione...</option>
+                                  <?php foreach ($estcli_ops as $estado):
+                                    $sel = ($cole_estcli && $estado["id"]==$cole_estcli["id_estado_cliente"]) ? ' selected' : '';
+                                    echo '<option value="'.$estado["id"].'"'.$sel.'>'.htmlspecialchars($estado["estado"]).'</option>';
+                                  endforeach; ?>
+                                </select>
+                              </div>
+                            </div>
                           </div>
                           </div><!-- /#fc-campos -->
+
+                          <?php if ($_SESSION['tipo']!=6): ?>
+                          <input type="hidden" name="responsable" value="<?php echo htmlspecialchars($colegio['responsable']); ?>">
+                          <?php endif; ?>
 
                           <input type="hidden" name="id_colegio"  value='<?php echo $colegio["id"] ?>'>
                           <input type="hidden" name="periodo"     value="<?php echo $periodo ?>">
                           <input type="hidden" name="cod_colegio" value="<?php echo $colegio['codigo'] ?>">
-                          <?php /* Preserva el responsable actual para que el UPDATE no lo borre.
-                                   Para tipo 6 se puede editar desde el campo visible en fc-campos. */ ?>
-                          <input type="hidden" name="responsable"  value="<?php echo htmlspecialchars($colegio['responsable']) ?>">
                         </form>
                       </div>
                     </div>
@@ -686,6 +540,8 @@
                     <div class="tab-pane" id="atenciones" role="tabpanel"></div>
 
                     <div class="tab-pane" id="adjuntos" role="tabpanel"></div>
+
+                    <div class="tab-pane" id="visitas" role="tabpanel"></div>
 
                     <?php if ($_SESSION['tipo'] == 1): ?>
                     <div class="tab-pane" id="historial" role="tabpanel"></div>
@@ -801,6 +657,7 @@
     <script src="src/plugins/datatables/js/dataTables.bootstrap4.min.js"></script>
     <script src="src/plugins/datatables/js/dataTables.responsive.min.js"></script>
     <script src="src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
+    <script src="src/ink-alerts.js"></script>
 
     <script>
     function toggleQuienDecideOtro(sel) {
@@ -812,7 +669,6 @@
       }
     }
 
-
        $("#zonificacion").addClass("show");
        $("#zonificacion .submenu").css("display","block");
        $("#ver_zonificacion").addClass("active");
@@ -822,72 +678,10 @@
         $('#fc-campos').removeClass('fc-readonly');
         $('#fc-acciones-ver').hide();
         $('#fc-acciones-edit').show();
-
-        // Ciudad: mostrar desplegable y cargar ciudades del departamento actual
-        var depto = $('select[name="departamento"]').val();
-        $('#ciudad-texto-edit').hide();
-        $('#ciudad-dropdown-edit').show();
-        if (depto) {
-          cargarCiudadesEdit(depto);
-        } else {
-          $('#ciudad_select_edit').html('<option value="">Primero seleccione un departamento</option>');
-        }
       });
 
       $('#btn-cancelar').on('click', function () {
         location.reload();
-      });
-
-      // Cargar ciudades en el select de edición
-      function cargarCiudadesEdit(deptoId) {
-        var ciudadActual = <?php echo json_encode($colegio['ciudad']); ?>;
-        $.ajax({
-          url: 'ajax/buscar_ciudades.php',
-          type: 'POST',
-          data: { departamento: deptoId },
-          success: function (resp) {
-            $('#ciudad_select_edit').html(resp);
-            // Pre-seleccionar la ciudad actual si existe en la lista
-            var encontrado = false;
-            $('#ciudad_select_edit option').each(function () {
-              if ($(this).val() === ciudadActual) {
-                $(this).prop('selected', true);
-                $('#ciudad_hidden_edit').val(ciudadActual);
-                encontrado = true;
-              }
-            });
-            if (!encontrado && ciudadActual) {
-              // La ciudad no está en la lista, mostrar campo libre
-              $('#ciudad_select_edit').val('__otra__');
-              $('#ciudad_nueva_edit').removeClass('d-none').val(ciudadActual).attr('required','required');
-              $('#ciudad_hidden_edit').val(ciudadActual);
-            }
-          }
-        });
-      }
-
-      // Al cambiar departamento en modo edición → recargar ciudades
-      $('select[name="departamento"]').on('change', function () {
-        if (!$('#ciudad-dropdown-edit').is(':visible')) return;
-        $('#ciudad_nueva_edit').addClass('d-none').val('').removeAttr('required');
-        $('#ciudad_hidden_edit').val('');
-        cargarCiudadesEdit($(this).val());
-      });
-
-      // Al seleccionar ciudad en el desplegable de edición
-      $('#ciudad_select_edit').on('change', function () {
-        if ($(this).val() === '__otra__') {
-          $('#ciudad_nueva_edit').removeClass('d-none').attr('required','required').focus();
-          $('#ciudad_hidden_edit').val('');
-        } else {
-          $('#ciudad_nueva_edit').addClass('d-none').val('').removeAttr('required');
-          $('#ciudad_hidden_edit').val($(this).val());
-        }
-      });
-
-      // Al escribir ciudad nueva
-      $('#ciudad_nueva_edit').on('input', function () {
-        $('#ciudad_hidden_edit').val($(this).val());
       });
 
       $(document).ready(function () {
@@ -901,11 +695,11 @@
           var codigo = <?php echo json_encode($colegio["codigo"]); ?>;
           // Agrega parámetros dinámicos
           if (target !="#presupuesto" && target !="#adopciones") {
-            var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&id_calendario='+ <?php echo $colegio['id_calendario'] ?>;
+            var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&id_calendario='+ <?php echo $colegio['id_calendario'] ?? 0 ?>;
           }else{
             var responsable = <?php echo json_encode($colegio["responsable"]); ?>;
             var f_cierre = <?php echo json_encode($gp_periodo["f_cierre"]); ?>;
-            var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&cod_zona='+ <?php echo $colegio['cod_zona'] ?>+ '&sub_zona='+ <?php echo $colegio['sub_zona'] ?>+ '&responsable='+encodeURIComponent(responsable)+ '&promotor='+ <?php echo $promotor['id'] ?>+ '&f_cierre='+encodeURIComponent(f_cierre);
+            var urlConParametros = baseUrl + '?colegio=' + <?php echo $colegio["id"] ?> + '&periodo='+ <?php echo $_GET["periodo"] ?>+ '&codigo='+ encodeURIComponent(codigo)+ '&cod_zona='+ <?php echo $colegio['cod_zona'] ?>+ '&sub_zona='+ <?php echo $colegio['sub_zona'] ?>+ '&responsable='+encodeURIComponent(responsable)+ '&promotor='+ <?php echo $promotor['id'] ?? 0 ?>+ '&f_cierre='+encodeURIComponent(f_cierre);
 
            
           }
@@ -947,24 +741,8 @@
 
         if (tab) {
            $('.nav-link[href="#' + tab + '"]').tab('show');
-           
+
         }
-
-
-        $('#propuesta_c').on('change',function(){
-            var valor = $(this).val();
-
-            if (valor==1) {
-              $("#adjunto_propuesta_c").removeClass("d-none");
-              $("#i_pc").attr("required","required");
-               
-                       
-            }else {
-              $("#adjunto_propuesta_c").addClass("d-none");
-              $("#i_pc").removeAttr("required","required");
-            }
-                
-        });
 
       });
 

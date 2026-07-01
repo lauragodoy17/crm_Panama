@@ -11,13 +11,13 @@
         if ($profe == "") continue;
 
         $parts = explode("/", $profe);
-        if (count($parts) < 5) continue;
+        if (count($parts) < 6) continue;
 
-        list($nombre,$apellido,$correo, $telefono, $area) = $parts;
+        list($nombre,$apellido,$correo, $telefono, $area, $nivel_academico) = $parts;
 
         if ($profe !="") {
 
-            $sql_p = "INSERT INTO trabajadores_colegios(id_colegio, nombre, apellido, email, telefono, area, cargo) VALUES('{$_POST['id_colegio']}', '{$nombre}','{$apellido}','{$correo}','{$telefono}','{$area}', '6')";
+            $sql_p = "INSERT INTO trabajadores_colegios(id_colegio, nombre, apellido, email, telefono, area, nivel_academico, cargo) VALUES('{$_POST['id_colegio']}', '{$nombre}','{$apellido}','{$correo}','{$telefono}','{$area}','{$nivel_academico}', '6')";
 
 
             $query_p = $bdd->prepare( $sql_p );

@@ -2,7 +2,7 @@
   require_once("../php/aut.php");
   include("../conexion/bdd.php");
 
-  $sql = "SELECT id, adjunto, nombre FROM adjuntos WHERE id_colegio='".$_GET['colegio']."' AND id_periodo='".$_GET['periodo']."' AND tipo!=1";
+  $sql = "SELECT id, adjunto, nombre FROM adjuntos WHERE id_colegio='".$_GET['colegio']."' AND id_periodo='".$_GET['periodo']."'";
   $req = $bdd->prepare($sql);
   $req->execute();
   $adjuntos = $req->fetchAll();

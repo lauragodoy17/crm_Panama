@@ -1,4 +1,12 @@
-<?php require_once("php/aut.php"); require_once("conexion/bdd.php"); ?>
+<?php
+  require_once("php/aut.php"); require_once("conexion/bdd.php");
+
+  $req_zona = $bdd->prepare("SELECT zona FROM zonas WHERE codigo='".$_SESSION['zona']."'");
+  $req_zona->execute();
+  $zona_actual = $req_zona->fetch();
+
+  $requiere_responsable = ($_SESSION['tipo'] == 6);
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,6 +88,9 @@
                 </ol>
               </nav>
             </div>
+            <div class="col-auto">
+              <span class="badge badge-primary" style="font-size:13px">Zona: <?php echo htmlspecialchars($zona_actual['zona'] ?? ''); ?></span>
+            </div>
           </div>
         </div>
 
@@ -108,14 +119,7 @@
                 <div class="cc-step-content active" id="step1">
                   <div class="cc-card-title"><i class="bi bi-info-circle"></i> Información básica</div>
                   <div class="row">
-                    <div class="col-sm-4">
-                      <div class="form-group">
-                        <label for="dane">DANE <small style="color:red">*</small></label>
-                        <input type="text" name="dane" id="dane" class="form-control" placeholder="Ej: 111001000123" maxlength="12" inputmode="numeric" />
-                        <small id="dane-feedback" class="form-text" style="display:none"></small>
-                      </div>
-                    </div>
-                    <div class="col-sm-5">
+                    <div class="col-sm-6">
                       <div class="form-group">
                         <label for="colegio">Nombre del colegio <small style="color:red">*</small></label>
                         <input type="text" name="colegio" id="colegio" class="form-control" placeholder="Nombre del colegio" />
@@ -123,26 +127,9 @@
                     </div>
                     <div class="col-sm-3">
                       <div class="form-group">
-                        <label for="calendario">Calendario <small style="color:red">*</small></label>
-                        <select name="calendario" id="calendario" class="form-control">
-                          <option value="">Seleccionar calendario</option>
-                          <?php
-                            $req = $bdd->prepare("SELECT * FROM calendarios WHERE act=1");
-                            $req->execute();
-                            foreach ($req->fetchAll() as $c) {
-                              echo '<option value="'.$c["id"].'">'.$c["calendario"].'</option>';
-                            }
-                          ?>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-6">
-                      <div class="form-group">
-                        <label for="departamento">Departamento <small style="color:red">*</small></label>
+                        <label for="departamento">Provincia <small style="color:red">*</small></label>
                         <select name="departamento" id="departamento" class="form-control custom-select2">
-                          <option value="">Seleccionar departamento</option>
+                          <option value="">Seleccionar provincia</option>
                           <?php
                             $req = $bdd->prepare("SELECT * FROM departamentos ORDER BY departamento");
                             $req->execute();
@@ -153,49 +140,10 @@
                         </select>
                       </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
                       <div class="form-group">
-                        <label for="ciudad_select">Ciudad <small style="color:red">*</small></label>
-                        <select id="ciudad_select" class="form-control" style="width:100%">
-                          <option value="">Primero seleccione un departamento</option>
-                        </select>
-                        <input type="text" id="ciudad_nueva" class="form-control mt-2 d-none" placeholder="Escriba el nombre de la ciudad" />
-                        <input type="hidden" id="ciudad_hidden" name="ciudad" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <hr class="my-3">
-                  <div class="cc-card-title" style="font-size:14px"><i class="bi bi-diagram-3"></i> Clasificación</div>
-                  <div class="row">
-                    <div class="col-sm-4">
-                      <div class="form-group">
-                        <label for="empresa">Empresa <small style="color:red">*</small></label>
-                        <select name="empresa" id="empresa" class="form-control custom-select2">
-                          <option value="">Seleccionar empresa</option>
-                          <option value="1">EUREKA</option>
-                          <?php
-                            $req = $bdd->prepare("SELECT * FROM zonas WHERE zona NOT LIKE '%Eureka%' AND zona NOT LIKE '%ALEJANDRO%'");
-                            $req->execute();
-                            foreach ($req->fetchAll() as $z) {
-                              echo '<option value="'.$z["codigo"].'">'.$z["zona"].'</option>';
-                            }
-                          ?>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-sm-4">
-                      <div class="form-group">
-                        <label for="zona">Zona <small style="color:red">*</small></label>
-                        <select name="zona" id="zona" class="form-control custom-select2">
-                          <option value="">Seleccionar zona</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-sm-4 col-responsable d-none">
-                      <div class="form-group">
-                        <label for="responsable">Responsable <small style="color:red">*</small></label>
-                        <input type="text" name="responsable" id="responsable" class="form-control" placeholder="Responsable" />
+                        <label for="ciudad">Ciudad <small style="color:red">*</small></label>
+                        <input type="text" name="ciudad" id="ciudad" class="form-control" placeholder="Ciudad" />
                       </div>
                     </div>
                   </div>
@@ -205,26 +153,44 @@
                 <div class="cc-step-content" id="step2">
                   <div class="cc-card-title"><i class="bi bi-geo-alt"></i> Ubicación y contacto</div>
                   <div class="row">
-                    <div class="col-sm-5">
+                    <div class="col-sm-<?php echo $requiere_responsable ? '4' : '6'; ?>">
                       <div class="form-group">
-                        <label for="direccion">Dirección <small style="color:red">*</small></label>
-                        <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Ej: Calle 10 # 5-23" />
+                        <label for="direccion">Ubicación <small style="color:red">*</small></label>
+                        <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Ej: Calle 10, Edificio 5" />
                       </div>
                     </div>
-                    <div class="col-sm-4">
-                      <div class="form-group">
-                        <label for="barrio">Barrio</label>
-                        <input type="text" name="barrio" id="barrio" class="form-control" placeholder="Barrio" />
-                      </div>
-                    </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-<?php echo $requiere_responsable ? '4' : '6'; ?>">
                       <div class="form-group">
                         <label for="telefono">Teléfono <small style="color:red">*</small></label>
-                        <input type="tel" name="telefono" id="telefono" class="form-control" placeholder="Ej: 601 234 5678" />
+                        <input type="tel" name="telefono" id="telefono" class="form-control" placeholder="Ej: 6012 3456" />
+                      </div>
+                    </div>
+                    <?php if ($requiere_responsable): ?>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="responsable">Responsable <small style="color:red">*</small></label>
+                        <input type="text" name="responsable" id="responsable" class="form-control" placeholder="Responsable" />
+                      </div>
+                    </div>
+                    <?php endif; ?>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label for="web">Página web</label>
+                        <input type="text" name="web" id="web" class="form-control" placeholder="Ej: https://colegio.edu.pa" />
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label for="cumple_colegio">Cumpleaños del colegio</label>
+                        <input type="date" name="cumple_colegio" id="cumple_colegio" class="form-control" />
                       </div>
                     </div>
                   </div>
                 </div>
+
+                <input type="hidden" name="cod_zona" value="<?php echo htmlspecialchars($_SESSION['zona']); ?>" />
 
                 <!-- ── Acciones ── -->
                 <div class="cc-actions">
@@ -258,22 +224,22 @@
                   <p>Aún no hay información.<br>Completa los campos para ver un resumen del colegio aquí.</p>
                 </div>
                 <ul class="cc-summary-list d-none" id="cc-summary-list">
-                  <li id="sr-dane"    class="d-none"><span class="cc-sl-label">DANE</span><span class="cc-sl-val" id="sv-dane">—</span></li>
                   <li id="sr-nombre"  class="d-none"><span class="cc-sl-label">Nombre</span><span class="cc-sl-val" id="sv-nombre">—</span></li>
-                  <li id="sr-cal"     class="d-none"><span class="cc-sl-label">Calendario</span><span class="cc-sl-val" id="sv-cal">—</span></li>
-                  <li id="sr-depto"   class="d-none"><span class="cc-sl-label">Departamento</span><span class="cc-sl-val" id="sv-depto">—</span></li>
+                  <li id="sr-depto"   class="d-none"><span class="cc-sl-label">Provincia</span><span class="cc-sl-val" id="sv-depto">—</span></li>
                   <li id="sr-ciudad"  class="d-none"><span class="cc-sl-label">Ciudad</span><span class="cc-sl-val" id="sv-ciudad">—</span></li>
-                  <li id="sr-dir"     class="d-none"><span class="cc-sl-label">Dirección</span><span class="cc-sl-val" id="sv-dir">—</span></li>
+                  <li id="sr-dir"     class="d-none"><span class="cc-sl-label">Ubicación</span><span class="cc-sl-val" id="sv-dir">—</span></li>
                   <li id="sr-tel"     class="d-none"><span class="cc-sl-label">Teléfono</span><span class="cc-sl-val" id="sv-tel">—</span></li>
-                  <li id="sr-empresa" class="d-none"><span class="cc-sl-label">Empresa</span><span class="cc-sl-val" id="sv-empresa">—</span></li>
+                  <li id="sr-resp"    class="d-none"><span class="cc-sl-label">Responsable</span><span class="cc-sl-val" id="sv-resp">—</span></li>
+                  <li id="sr-web"     class="d-none"><span class="cc-sl-label">Página web</span><span class="cc-sl-val" id="sv-web">—</span></li>
+                  <li id="sr-cumple"  class="d-none"><span class="cc-sl-label">Cumpleaños</span><span class="cc-sl-val" id="sv-cumple">—</span></li>
                 </ul>
               </div>
 
               <!-- Consejos -->
               <div class="cc-card">
                 <div class="cc-card-title"><i class="bi bi-lightbulb"></i> Consejos</div>
-                <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> El DANE debe tener 12 dígitos numéricos.</div>
-                <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> Selecciona la empresa y zona correspondiente para una mejor asignación.</div>
+                <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> El colegio se asignará automáticamente a tu zona actual.</div>
+                <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> El código del colegio se genera automáticamente al crearlo.</div>
                 <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> Los campos marcados con <span style="color:red">*</span> son obligatorios.</div>
               </div>
 
@@ -296,6 +262,7 @@
 
     var currentStep = 1;
     var totalSteps  = 2;
+    var requiereResponsable = <?php echo $requiere_responsable ? 'true' : 'false'; ?>;
 
     // ── Navegar pasos ────────────────────────────────────────────────────────
     function goTo(step) {
@@ -338,29 +305,17 @@
       if (currentStep > 1) goTo(currentStep - 1);
     });
 
-    // ── Estado de verificación DANE ──────────────────────────────────────────
-    var daneDisponible  = null;  // null=sin verificar, true=libre, false=duplicado
-    var daneVerificando = false;
-
     // ── Validación por paso ──────────────────────────────────────────────────
     function validarPaso(paso) {
       if (paso === 1) {
-        var dane = $('#dane').val().trim();
-        if (!dane)                        { alert('El DANE es obligatorio.'); $('#dane').focus(); return false; }
-        if (!/^\d{12}$/.test(dane))       { alert('El DANE debe tener exactamente 12 dígitos numéricos.'); $('#dane').focus(); return false; }
-        if (daneVerificando)              { alert('Espera mientras se verifica el DANE...'); $('#dane').focus(); return false; }
-        if (daneDisponible === false)     { alert('El DANE ingresado ya está registrado en el sistema.'); $('#dane').focus(); return false; }
-        if (daneDisponible === null)      { alert('Ingresa un DANE válido de 12 dígitos para verificar disponibilidad.'); $('#dane').focus(); return false; }
-        if (!$('#colegio').val().trim())   { alert('El nombre del colegio es obligatorio.'); $('#colegio').focus(); return false; }
-        if (!$('#calendario').val())       { alert('Selecciona un calendario.'); return false; }
-        if (!$('#departamento').val())     { alert('Selecciona un departamento.'); return false; }
-        if (!$('#ciudad_hidden').val().trim()) { alert('Selecciona o escribe una ciudad.'); return false; }
-        if (!$('#empresa').val())          { alert('Selecciona una empresa.'); return false; }
-        if (!$('#zona').val())             { alert('Selecciona una zona.'); return false; }
+        if (!$('#colegio').val().trim())     { alert('El nombre del colegio es obligatorio.'); $('#colegio').focus(); return false; }
+        if (!$('#departamento').val())       { alert('Selecciona una provincia.'); return false; }
+        if (!$('#ciudad').val().trim())      { alert('La ciudad es obligatoria.'); $('#ciudad').focus(); return false; }
       }
       if (paso === 2) {
-        if (!$('#direccion').val().trim()) { alert('La dirección es obligatoria.'); $('#direccion').focus(); return false; }
-        if (!$('#telefono').val().trim())  { alert('El teléfono es obligatorio.'); $('#telefono').focus(); return false; }
+        if (!$('#direccion').val().trim())   { alert('La ubicación es obligatoria.'); $('#direccion').focus(); return false; }
+        if (!$('#telefono').val().trim())    { alert('El teléfono es obligatorio.'); $('#telefono').focus(); return false; }
+        if (requiereResponsable && !$('#responsable').val().trim()) { alert('El responsable es obligatorio.'); $('#responsable').focus(); return false; }
       }
       return true;
     }
@@ -379,14 +334,14 @@
         if (val) { $('#' + rowId).removeClass('d-none'); $('#' + valId).text(val); hay = true; }
         else      { $('#' + rowId).addClass('d-none'); }
       }
-      set('sr-dane',    'sv-dane',    $('#dane').val().trim());
       set('sr-nombre',  'sv-nombre',  $('#colegio').val().trim());
-      set('sr-cal',     'sv-cal',     $('#calendario option:selected').text() !== 'Seleccionar calendario' ? $('#calendario option:selected').text() : '');
-      set('sr-depto',   'sv-depto',   $('#departamento option:selected').text() !== 'Seleccionar departamento' ? $('#departamento option:selected').text() : '');
-      set('sr-ciudad',  'sv-ciudad',  $('#ciudad_hidden').val().trim());
+      set('sr-depto',   'sv-depto',   $('#departamento option:selected').text() !== 'Seleccionar provincia' ? $('#departamento option:selected').text() : '');
+      set('sr-ciudad',  'sv-ciudad',  $('#ciudad').val().trim());
       set('sr-dir',     'sv-dir',     $('#direccion').val().trim());
       set('sr-tel',     'sv-tel',     $('#telefono').val().trim());
-      set('sr-empresa', 'sv-empresa', $('#empresa option:selected').text() !== 'Seleccionar empresa' ? $('#empresa option:selected').text() : '');
+      set('sr-resp',    'sv-resp',    $('#responsable').val() ? $('#responsable').val().trim() : '');
+      set('sr-web',     'sv-web',     $('#web').val().trim());
+      set('sr-cumple',  'sv-cumple',  $('#cumple_colegio').val().trim());
 
       if (hay) {
         $('#cc-summary-empty').addClass('d-none');
@@ -399,119 +354,10 @@
 
     $('input, select').on('input change', actualizarResumen);
 
-    // Feedback en tiempo real del DANE
-    $('#dane').on('input', function () {
-      var val = $(this).val().replace(/\D/g, '');
-      $(this).val(val);
-      var $input = $(this);
-      var $fb    = $('#dane-feedback');
-
-      daneDisponible  = null;
-      daneVerificando = false;
-
-      if (val.length === 0) {
-        $input.removeClass('is-valid is-invalid');
-        $fb.hide();
-      } else if (val.length < 12) {
-        $input.removeClass('is-valid').addClass('is-invalid');
-        $fb.show().css('color', '#dc3545').text('Faltan ' + (12 - val.length) + ' dígito(s)');
-      } else {
-        $input.removeClass('is-valid is-invalid');
-        $fb.show().css('color', '#6c757d').html('<i class="bi bi-hourglass-split"></i> Verificando...');
-        daneVerificando = true;
-
-        $.ajax({
-          url: 'ajax/verificar_dane.php',
-          type: 'POST',
-          data: { dane: val },
-          dataType: 'json',
-          success: function (resp) {
-            daneVerificando = false;
-            if (resp.disponible) {
-              daneDisponible = true;
-              $input.removeClass('is-invalid').addClass('is-valid');
-              $fb.show().css('color', '#198754').html('<i class="bi bi-check-circle-fill"></i> DANE disponible ✓');
-            } else {
-              daneDisponible = false;
-              $input.removeClass('is-valid').addClass('is-invalid');
-              $fb.show().css('color', '#dc3545').html('<i class="bi bi-x-circle-fill"></i> Este DANE ya está registrado en el sistema');
-            }
-          },
-          error: function () {
-            daneVerificando = false;
-            daneDisponible  = null;
-            $input.removeClass('is-valid is-invalid');
-            $fb.show().css('color', '#dc3545').text('No se pudo verificar el DANE. Inténtalo de nuevo.');
-          }
-        });
-      }
-    });
-
-    // ── Select2 en ciudad ────────────────────────────────────────────────────
-    function initCiudadSelect2() {
-      if ($('#ciudad_select').hasClass('select2-hidden-accessible')) {
-        $('#ciudad_select').select2('destroy');
-      }
-      $('#ciudad_select').select2({ width: '100%', placeholder: 'Seleccionar ciudad...' });
+    // ── Select2 en provincia ─────────────────────────────────────────────────
+    if ($.fn.select2) {
+      $('#departamento').select2({ width: '100%', placeholder: 'Seleccionar provincia...' });
     }
-    initCiudadSelect2();
-
-    // ── Ciudad dinámica ──────────────────────────────────────────────────────
-    $('#departamento').on('change', function () {
-      var depto = $(this).val();
-      $('#ciudad_nueva').addClass('d-none').val('').removeAttr('required');
-      $('#ciudad_hidden').val('');
-      if (!depto) {
-        $('#ciudad_select').html('<option value="">Primero seleccione un departamento</option>');
-        initCiudadSelect2();
-        return;
-      }
-      $('#ciudad_select').html('<option value="">Cargando...</option>');
-      $.ajax({
-        url: 'ajax/buscar_ciudades.php', type: 'POST', data: { departamento: depto },
-        success: function (resp) {
-          $('#ciudad_select').html(resp);
-          initCiudadSelect2();
-        },
-        error: function () {
-          $('#ciudad_select').html('<option value="">Error al cargar ciudades</option>');
-          initCiudadSelect2();
-        }
-      });
-    });
-
-    $('#ciudad_select').on('change', function () {
-      var val = $(this).val();
-      if (val === '__otra__') {
-        $('#ciudad_nueva').removeClass('d-none').attr('required','required').focus();
-        $('#ciudad_hidden').val('');
-      } else {
-        $('#ciudad_nueva').addClass('d-none').val('').removeAttr('required');
-        $('#ciudad_hidden').val(val);
-      }
-      actualizarResumen();
-    });
-
-    $('#ciudad_nueva').on('input', function () {
-      $('#ciudad_hidden').val($(this).val());
-      actualizarResumen();
-    });
-
-    // ── Empresa / Zona ───────────────────────────────────────────────────────
-    $('#empresa').on('change', function () {
-      var valor = $(this).val();
-      if (valor == 1) {
-        $('.col-responsable').addClass('d-none');
-        $('#responsable').removeAttr('required');
-      } else {
-        $('.col-responsable').removeClass('d-none');
-        $('#responsable').attr('required','required');
-      }
-      $.ajax({
-        url: 'ajax/buscar_zona.php', type: 'POST', data: 'empresa=' + valor,
-        success: function (resp) { $('#zona').html(valor ? resp : '<option value="">Seleccionar zona</option>'); }
-      });
-    });
 
   });
   </script>

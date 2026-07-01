@@ -12,10 +12,17 @@
   $n1 = (int)$req1->fetchColumn();
 
   if ($n1 < 1) {
-    $req_pa = $bdd->prepare("SELECT id FROM periodos
-                             WHERE id_calendario=? ORDER BY id DESC LIMIT 1 OFFSET 1");
-    $req_pa->execute([$_GET['id_calendario']]);
-    $pa_id = $req_pa->fetchColumn();
+    try {
+      $req_pa = $bdd->prepare("SELECT id FROM periodos
+                               WHERE id_calendario=? ORDER BY id DESC LIMIT 1 OFFSET 1");
+      $req_pa->execute([$_GET['id_calendario']]);
+      $pa_id = $req_pa->fetchColumn();
+    } catch (Exception $e) {
+      // Esta BD no maneja calendarios (ej. Panamá): se toma el periodo anterior global
+      $req_pa = $bdd->prepare("SELECT id FROM periodos ORDER BY id DESC LIMIT 1 OFFSET 1");
+      $req_pa->execute();
+      $pa_id = $req_pa->fetchColumn();
+    }
     if ($pa_id) {
       $periodo_po = $pa_id;
       $req2 = $bdd->prepare("SELECT MAX(paralelos) as n FROM grados_paralelos
@@ -32,11 +39,12 @@
   }
 
   // ── Grados ────────────────────────────────────────────────────────────
-  $grados_ids = [1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+  // Panamá: Maternal/Prekínder/Kínder (pre), 1-6 Primaria (prim), 1-3 Pre-media y 1-3 Media (bach)
+  $grados_ids = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,18];
   $nivel_map  = [
     1=>'pre', 2=>'pre', 3=>'pre',
-    4=>'prim',5=>'prim',6=>'prim',7=>'prim',8=>'prim',
-    9=>'bach',10=>'bach',11=>'bach',12=>'bach',13=>'bach',14=>'bach'
+    4=>'prim',5=>'prim',6=>'prim',7=>'prim',8=>'prim',9=>'prim',
+    10=>'bach',11=>'bach',12=>'bach',13=>'bach',14=>'bach',18=>'bach'
   ];
 
   $req_g = $bdd->prepare("SELECT id, grado FROM grados

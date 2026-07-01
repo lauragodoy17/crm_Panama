@@ -40,6 +40,8 @@ function ic_initials($n, $a) {
   .ic-actions { display:flex; gap:6px; margin-left:auto; }
   .ic-btn-edit { border:1px solid #e9ecef; background:#fff; color:#4361ee; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:13px; line-height:1; }
   .ic-btn-edit:hover { background:#eef0ff; border-color:#c7d2fe; }
+  .ic-btn-delete { border:1px solid #e9ecef; background:#fff; color:#dc2626; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:13px; line-height:1; }
+  .ic-btn-delete:hover { background:#fee2e2; border-color:#fecaca; }
 
   /* ── Inline edit form ── */
   .ic-edit-form { padding:16px; border-top:2px solid #4361ee; background:#fafbff; }
@@ -74,11 +76,11 @@ function ic_initials($n, $a) {
   /* ══════════════════════════════
      NIVEL 1 — ADMINISTRATIVO
   ══════════════════════════════ */
-  $adms = $bdd->prepare("SELECT * FROM trabajadores_colegios WHERE id_colegio=? AND cargo !=6");
+  $adms = $bdd->prepare("SELECT * FROM trabajadores_colegios WHERE id_colegio=? AND cargo !=6 AND activo=1");
   $adms->execute([$_GET["colegio"]]);
   $adms = $adms->fetchAll();
 
-  $cargos_q = $bdd->prepare("SELECT * FROM cargos WHERE id !=5");
+  $cargos_q = $bdd->prepare("SELECT * FROM cargos WHERE id !=10");
   $cargos_q->execute();
   $cargos_all = $cargos_q->fetchAll();
   $cargos_map = array_column($cargos_all, 'cargo', 'id');
@@ -131,6 +133,9 @@ function ic_initials($n, $a) {
         <div class="ic-actions">
           <button type="button" class="ic-btn-edit" title="Editar">
             <i class="bi bi-pencil"></i>
+          </button>
+          <button type="button" class="ic-btn-delete" data-id="<?= $adm['id'] ?>" title="Eliminar">
+            <i class="bi bi-trash3"></i>
           </button>
         </div>
       </div>
@@ -208,7 +213,7 @@ function ic_initials($n, $a) {
   /* ══════════════════════════════
      NIVEL 2 — ACADÉMICO
   ══════════════════════════════ */
-  $profes = $bdd->prepare("SELECT * FROM trabajadores_colegios WHERE id_colegio=? AND cargo=6");
+  $profes = $bdd->prepare("SELECT * FROM trabajadores_colegios WHERE id_colegio=? AND cargo=6 AND activo=1");
   $profes->execute([$_GET["colegio"]]);
   $profes = $profes->fetchAll();
 
@@ -216,6 +221,8 @@ function ic_initials($n, $a) {
   $materias_q->execute();
   $materias_all = $materias_q->fetchAll();
   $materias_map = array_column($materias_all, 'materia', 'id');
+
+  $niveles_escolaridad = ['Preescolar', 'Primaria', 'Bachillerato'];
   ?>
 
   <div class="ic-section">
@@ -252,6 +259,9 @@ function ic_initials($n, $a) {
             <?php else: ?>
             <span class="ic-badge ic-badge-area"><?= htmlspecialchars($area_nombre) ?></span>
             <?php endif; ?>
+            <?php if (!empty($profe['nivel_academico'])): ?>
+            <span class="ic-badge ic-badge-cargo"><?= htmlspecialchars($profe['nivel_academico']) ?></span>
+            <?php endif; ?>
           </div>
           <div class="ic-meta">
             <?php if ($profe['email']): ?>
@@ -265,6 +275,9 @@ function ic_initials($n, $a) {
         <div class="ic-actions">
           <button type="button" class="ic-btn-edit" title="Editar">
             <i class="bi bi-pencil"></i>
+          </button>
+          <button type="button" class="ic-btn-delete" data-id="<?= $profe['id'] ?>" title="Eliminar">
+            <i class="bi bi-trash3"></i>
           </button>
         </div>
       </div>
@@ -309,6 +322,18 @@ function ic_initials($n, $a) {
                   <?php foreach ($materias_all as $m):
                     $sel = $m['id'] == $profe['area'] ? 'selected' : '';
                     echo '<option value="'.$m['id'].'" '.$sel.'>'.$m['materia'].'</option>';
+                  endforeach; ?>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>Nivel de escolaridad <small style="color:red">*</small></label>
+                <select class="form-control form-control-sm custom-select" name="nivel_academico_profe" required>
+                  <option value="">Seleccione</option>
+                  <?php foreach ($niveles_escolaridad as $nv):
+                    $sel = $nv == $profe['nivel_academico'] ? 'selected' : '';
+                    echo '<option value="'.$nv.'" '.$sel.'>'.$nv.'</option>';
                   endforeach; ?>
                 </select>
               </div>
@@ -502,6 +527,17 @@ function ic_initials($n, $a) {
                     </select>
                   </div>
                 </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label>Nivel de escolaridad <small style="color:red">*</small></label>
+                    <select class="custom-select" name="nivel_academico_profe" id="nivel_academico_profe" required>
+                      <option value="">Seleccione</option>
+                      <?php foreach ($niveles_escolaridad as $nv):
+                        echo '<option value="'.$nv.'">'.$nv.'</option>';
+                      endforeach; ?>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -547,6 +583,17 @@ function ic_initials($n, $a) {
                     </select>
                   </div>
                 </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label>Nivel de escolaridad</label>
+                    <select class="custom-select" name="nivel_academico_profe" id="nivel_academico_profe<?= $i ?>">
+                      <option value="">Seleccione</option>
+                      <?php foreach ($niveles_escolaridad as $nv):
+                        echo '<option value="'.$nv.'">'.$nv.'</option>';
+                      endforeach; ?>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
             <input type="hidden" name="profe[]" id="profe<?= $i ?>">
@@ -582,6 +629,21 @@ $(document).on('click', '.ic-btn-cancel', function () {
   var card = $(this).closest('.ic-card');
   card.find('.ic-edit-form').addClass('d-none');
   card.find('.ic-view').show();
+});
+
+// Eliminar contacto (desactivar, no se borra de la base de datos)
+$(document).on('click', '.ic-btn-delete', function () {
+  var id = $(this).data('id');
+  inkConfirm({
+    title: '¿Eliminar este contacto?',
+    text:  'El contacto dejará de aparecer en la lista.',
+    type:  'danger',
+    btnOk: 'Sí, eliminar'
+  }, function () {
+    window.location = 'php/eliminar_trabajador.php?id=' + id
+      + '&cod_colegio=' + encodeURIComponent(<?= json_encode($_GET['codigo']) ?>)
+      + '&periodo=' + encodeURIComponent(<?= json_encode($_GET['periodo']) ?>);
+  });
 });
 
 // ── Toggle "Otro" en modal (agregar) ──
@@ -646,10 +708,11 @@ function syncProfe(i) {
   var c = $('#correo_profe'  + sfx).val();
   var t = $('#telefono_profe'+ sfx).val();
   var r = $('#area_profe'    + sfx).val();
-  $('#profe' + sfx).val(n+'/'+a+'/'+c+'/'+t+'/'+r);
+  var nv = $('#nivel_academico_profe' + sfx).val();
+  $('#profe' + sfx).val(n+'/'+a+'/'+c+'/'+t+'/'+r+'/'+nv);
 }
 $('#nombre_profe, #apellido_profe, #correo_profe, #telefono_profe').on('keyup', function(){ syncProfe(0); });
-$('#area_profe').on('change', function(){ syncProfe(0); });
+$('#area_profe, #nivel_academico_profe').on('change', function(){ syncProfe(0); });
 
 // Garantiza que todos los campos ocultos estén sincronizados antes de enviar
 $('form[action="php/guardar_profe.php"]').on('submit', function() {
@@ -663,7 +726,7 @@ $('#agregar_profe').on('click', function () {
   $('#agg_profe' + mProfe).removeClass('d-none');
   (function(i){
     $('#nombre_profe'+i+', #apellido_profe'+i+', #correo_profe'+i+', #telefono_profe'+i).on('keyup', function(){ syncProfe(i); });
-    $('#area_profe'+i).on('change', function(){ syncProfe(i); });
+    $('#area_profe'+i+', #nivel_academico_profe'+i).on('change', function(){ syncProfe(i); });
   })(mProfe);
   mProfe++;
 });

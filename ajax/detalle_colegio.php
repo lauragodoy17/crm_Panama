@@ -17,20 +17,22 @@ $stmt = $bdd->prepare("
     SELECT
         c.id,
         c.colegio,
-        c.dane,
+        c.codigo,
         c.direccion,
         c.ciudad,
         c.telefono,
-        cal.calendario,
-        seg.segmento,
+        (SELECT s.segmento FROM segmentos s WHERE s.id = c.id_segmento) AS segmento,
         (SELECT sc.status
          FROM colegios_status cs
          JOIN status_cubrimiento sc ON cs.id_status = sc.id
          WHERE cs.id_colegio = c.id
-         ORDER BY cs.id_periodo DESC LIMIT 1) AS status
+         ORDER BY cs.id_periodo DESC LIMIT 1) AS status,
+        (SELECT ec.estado
+         FROM colegios_estados_clientes cec
+         JOIN estados_cliente ec ON cec.id_estado_cliente = ec.id
+         WHERE cec.id_colegio = c.id
+         ORDER BY cec.id_periodo DESC LIMIT 1) AS estado_cliente
     FROM colegios c
-    LEFT JOIN calendarios cal ON c.id_calendario = cal.id
-    LEFT JOIN segmentos seg ON c.id_segmento = seg.id
     WHERE c.codigo = :codigo
     LIMIT 1
 ");
@@ -101,7 +103,7 @@ if ($ultimo_periodo > 0) {
     }
 }
 
-$data['valor_potencial'] = (int) $valor_potencial;
+$data['valor_potencial'] = round($valor_potencial, 2);
 
 // Cálculo de venta potencial de adopciones — replica exacta de la lógica de tab_adopciones.php:
 // pre_definido=1 (libro marcado para adopción), aprobado<2, probabilidad!=3, definido=1 (adopción confirmada).
@@ -154,6 +156,6 @@ if ($ultimo_periodo > 0) {
     }
 }
 
-$data['valor_potencial_adopciones'] = (int) $valor_potencial_adopciones;
+$data['valor_potencial_adopciones'] = round($valor_potencial_adopciones, 2);
 
 echo json_encode($data);
