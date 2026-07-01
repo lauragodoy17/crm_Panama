@@ -5,12 +5,7 @@
 
 	$id_usuario_h = intval($_SESSION["id"] ?? 0);
 
-	$sql_y = "SELECT 
-			    CASE 
-			        WHEN p.id_calendario = 1 THEN RIGHT(p.periodo, 2)
-			        ELSE RIGHT(p.periodo, 3)
-			    END AS ultimos
-			FROM periodos p JOIN calendarios c ON c.id=p.id_calendario WHERE p.id='".$_POST["periodo"]."'";
+	$sql_y = "SELECT RIGHT(periodo, 2) AS ultimos FROM periodos WHERE id='".$_POST["periodo"]."'";
 	$req_y = $bdd->prepare($sql_y);
 	$req_y->execute();
 	$row_y = $req_y->fetch();
@@ -169,12 +164,12 @@
 
 	if ($num < 1 ) {
 
-		$sql_e = "INSERT INTO recursos(id_periodo,id_colegio,recurso,valor_recurso, reintegro, valor_reintegro,id_canal,descripcion_canal,venta_real,fecha,observaciones,archivo) VALUES ('".$_POST["periodo"]."', '".$_POST["id_colegio"]."', '".$_POST["recurso"]."','".$_POST["valor_recurso"]."', '".$_POST["reintegro"]."','".$_POST["valor_reintegro"]."','".$_POST["canal"]."','".$_POST["descripcion"]."','".$_POST["venta_real"]."','".date("Y-m-d")."','".$_POST["observaciones"]."','".$archivo_path."')";
+		$sql_e = "INSERT INTO recursos(id_periodo,id_colegio,recurso,valor_recurso, reintegro, valor_reintegro,id_canal,descripcion_canal,venta_real,fecha,observaciones,archivo) VALUES ('".$_POST["periodo"]."', '".$_POST["id_colegio"]."', '', '0', '', '0', '".$_POST["canal"]."', '', '0', '".date("Y-m-d")."', '".$_POST["observaciones"]."', '".$archivo_path."')";
 
 	}else {
 
 		$arch_set = $archivo_path !== '' ? ", archivo='".$archivo_path."'" : '';
-		$sql_e = "UPDATE recursos SET recurso='".$_POST["recurso"]."', valor_recurso='".$_POST["valor_recurso"]."', reintegro='".$_POST["reintegro"]."', valor_reintegro='".$_POST["valor_reintegro"]."', id_canal='".$_POST["canal"]."', descripcion_canal='".$_POST["descripcion"]."',venta_real='".$_POST["venta_real"]."' , fecha='".date("Y-m-d")."', observaciones='".$_POST["observaciones"]."'".$arch_set." WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
+		$sql_e = "UPDATE recursos SET id_canal='".$_POST["canal"]."', fecha='".date("Y-m-d")."', observaciones='".$_POST["observaciones"]."'".$arch_set." WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
 	}
 
 	
