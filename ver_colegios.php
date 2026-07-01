@@ -2,14 +2,14 @@
 require_once("php/aut.php");
 require_once("conexion/bdd.php");
 
-// WHERE base según rol del usuario
+// WHERE base según rol del usuario (debe coincidir con colegios_tabla.php)
 if ($_SESSION['zona']=='5656' || ($_SESSION["tipo"]!=3 && $_SESSION["tipo"]!=6 && $_SESSION["tipo"]!=10)) {
-    $where_stats = "cod_zona != 0 AND id > 2";
+    $where_stats = "cod_zona != '' AND cod_zona != '0' AND id > 0";
 } elseif ($_SESSION["tipo"]==10) {
-    $zona_id = intval($_SESSION['zona']);
+    $zona_id = $bdd->quote($_SESSION['zona']);
     $where_stats = "(cod_zona=$zona_id OR zona_madre=$zona_id)";
 } else {
-    $zona_id = intval($_SESSION['zona']);
+    $zona_id = $bdd->quote($_SESSION['zona']);
     $where_stats = "cod_zona=$zona_id";
 }
 
@@ -60,8 +60,8 @@ if ($_SESSION['tipo'] != 3) {
 
 $show_zona_filter = ($_SESSION['tipo'] != 3 && ($_SESSION['tipo']==1 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5 || $_SESSION['zona']=='5656'));
 if ($show_zona_filter) {
-    $filtro_prueba_zona = $_SESSION['tipo'] != 1 ? "WHERE LOWER(zona) NOT LIKE '%prueba%'" : "";
-    $zonas_filter_list = $bdd->query("SELECT codigo, zona FROM zonas $filtro_prueba_zona ORDER BY zona")->fetchAll(PDO::FETCH_ASSOC);
+    $filtro_prueba_zona = $_SESSION['tipo'] != 1 ? "WHERE LOWER(sub_zona) NOT LIKE '%prueba%'" : "";
+    $zonas_filter_list = $bdd->query("SELECT id, sub_zona FROM sub_zonas $filtro_prueba_zona ORDER BY sub_zona")->fetchAll(PDO::FETCH_ASSOC);
 }
 
 $show_resp_filter = ($_SESSION['tipo']==1 || $_SESSION['tipo']==2);
@@ -151,7 +151,7 @@ if ($show_resp_filter) {
                 <div class="stat-icon-modern sgreen"><i class="bi bi-geo-alt"></i></div>
                 <div class="stat-info-modern">
                   <h3><?= number_format($total_deptos) ?></h3>
-                  <p class="stat-label">Departamentos</p>
+                  <p class="stat-label">Provincias</p>
                   <span class="stat-sub">Con presencia activa</span>
                 </div>
               </div>
@@ -162,11 +162,11 @@ if ($show_resp_filter) {
           <div class="filter-toolbar">
             <div class="ft-search">
               <i class="bi bi-search ft-search-icon"></i>
-              <input type="text" id="ft-input-search" placeholder="Buscar por nombre o DANE...">
+              <input type="text" id="ft-input-search" placeholder="Buscar por nombre o código...">
             </div>
 
             <select class="ft-select" id="ft-depto">
-              <option value="">Todos los departamentos</option>
+              <option value="">Todas las provincias</option>
               <?php foreach ($depto_list as $dep): ?>
               <option value="<?= $dep['id'] ?>"><?= htmlspecialchars($dep['departamento']) ?></option>
               <?php endforeach; ?>
@@ -184,11 +184,8 @@ if ($show_resp_filter) {
             <?php if ($show_zona_filter): ?>
             <select class="ft-select" id="ft-zona">
               <option value="">Todas las zonas</option>
-              <?php foreach ($zonas_filter_list as $z):
-                $parts = explode("/", $z['zona']);
-                $label = trim(count($parts) > 1 ? $parts[1] : $parts[0]);
-              ?>
-              <option value="<?= $z['codigo'] ?>"><?= htmlspecialchars($label) ?></option>
+              <?php foreach ($zonas_filter_list as $z): ?>
+              <option value="<?= $z['id'] ?>"><?= htmlspecialchars($z['sub_zona']) ?></option>
               <?php endforeach; ?>
             </select>
             <?php endif; ?>
@@ -228,7 +225,7 @@ if ($show_resp_filter) {
                       <th>Zona</th>
                       <th>Responsable</th>
                     <?php endif; ?>
-                    <th>Departamento</th>
+                    <th>Provincia</th>
                     <th>Ciudad</th>
                     <th>Dirección</th>
                     <th>Periodo</th>
@@ -295,6 +292,13 @@ if ($show_resp_filter) {
           </div>
         </div>
         <div class="dp-row">
+          <span class="dp-icon" style="background:#fee2e2;color:#dc2626"><i class="bi bi-person-check"></i></span>
+          <div class="dp-field">
+            <span class="dp-label">Estado a cliente</span>
+            <span class="dp-val" id="dp-estado-cliente">—</span>
+          </div>
+        </div>
+        <div class="dp-row">
           <span class="dp-icon" style="background:#e0f2fe;color:#0284c7"><i class="bi bi-calendar-range"></i></span>
           <div class="dp-field">
             <span class="dp-label">Periodo</span>
@@ -338,10 +342,10 @@ if ($show_resp_filter) {
             var words = txt.trim().split(/\s+/).filter(function(w){ return w.length > 2; });
             var initials = words.slice(0,2).map(function(w){ return w[0].toUpperCase(); }).join('');
             if (!initials) initials = txt.substring(0,2).toUpperCase();
-            var dane = row.dane ? '<div class="dt-dane-sub">' + row.dane + '</div>' : '';
+            var codigo = row.codigo ? '<div class="dt-dane-sub">' + row.codigo + '</div>' : '';
             return '<div class="dt-cole-wrap">'
                  + '<span class="school-avatar">' + initials + '</span>'
-                 + '<div class="dt-cole-info">' + data + dane + '</div>'
+                 + '<div class="dt-cole-info">' + data + codigo + '</div>'
                  + '</div>';
         }
 
@@ -490,19 +494,21 @@ if ($show_resp_filter) {
 
                 $('#dp-avatar').text(ini);
                 $('#dp-nombre').text(d.colegio || '—');
-                $('#dp-dane').text(d.dane || '—');
+                $('#dp-dane').text(d.codigo || '—');
                 $('#dp-calendario').text(d.calendario || '—');
                 $('#dp-direccion').text(d.direccion ? d.direccion + (d.ciudad ? ', ' + d.ciudad : '') : '—');
                 $('#dp-telefono').text(d.telefono || '—');
                 $('#dp-segmento').text(d.segmento || '—');
                 $('#dp-status').text(d.status || '—');
+                $('#dp-estado-cliente').text(d.estado_cliente || '—');
                 $('#dp-periodo').text(periodoTexto || '—');
 
+                var moneyOpts = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
                 var val = parseFloat(d.valor_potencial) || 0;
-                $('#dp-valor').text(val > 0 ? '$ ' + val.toLocaleString('es-CO') : '—');
+                $('#dp-valor').text(val > 0 ? '$ ' + val.toLocaleString('es-CO', moneyOpts) : '—');
 
                 var valAdop = parseFloat(d.valor_potencial_adopciones) || 0;
-                $('#dp-valor-adopciones').text(valAdop > 0 ? '$ ' + valAdop.toLocaleString('es-CO') : '—');
+                $('#dp-valor-adopciones').text(valAdop > 0 ? '$ ' + valAdop.toLocaleString('es-CO', moneyOpts) : '—');
 
                 $('#panel-detalle, #panel-overlay').addClass('dp-open');
                 $('body').addClass('dp-body-lock');
