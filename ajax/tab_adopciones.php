@@ -703,14 +703,14 @@
                                         
                                         
                                     if ($presup["precio"] !=0) {
-                                        $precio=number_format($presup["precio"],0,",", ".");
+                                        $precio=number_format($presup["precio"],2,",", ".");
 
                                         echo "<td id='pvp_d".$libro2["id"]."'>".$precio."</td>";
 
                                         echo "<input type='hidden' id='pvp_s_d".$libro2["id"]."' value='".$presup["precio"]."'>";
                                     }else {
 
-                                        $precio=number_format($libro2["precio"],0,",", ".");
+                                        $precio=number_format($libro2["precio"],2,",", ".");
 
                                         echo "<td id='pvp_d".$libro2["id"]."'>".$precio."</td>";
 
@@ -747,9 +747,9 @@
 
                                         echo "<input type='hidden' id='pn_s_d".$libro2["id"]."' value='".$precio_neto."'>";
                                         if ($presup["definido"] ==1) {
-                                            $venta_po=number_format($venta_p,0,",", ".");
+                                            $venta_po=number_format($venta_p,2,",", ".");
                                         }else{
-                                            $venta_po=0;
+                                            $venta_po=number_format(0,2,",", ".");
                                         }
 
                                         echo"<td id='venta_p_d".$libro2["id"]."' class='venta'>".$venta_po."</td>
@@ -772,9 +772,9 @@
 
                                         echo "<input type='hidden' id='pn_s_d".$libro2["id"]."' value='".$precio_neto."'>";
                                         if ($presup["definido"] ==1) {
-                                            $venta_po=number_format($venta_p,0,",", ".");
+                                            $venta_po=number_format($venta_p,2,",", ".");
                                         }else{
-                                            $venta_po=0;
+                                            $venta_po=number_format(0,2,",", ".");
                                         }
 
                                         echo"<td id='venta_p_d".$libro2["id"]."' class='venta'>".$venta_po."</td>
@@ -1071,13 +1071,13 @@
                                         }
                                         if ($presup["precio"] !=0) {
 
-                                          $precio=number_format($presup["precio"],0,",", ".");
+                                          $precio=number_format($presup["precio"],2,",", ".");
 
                                           echo "<td id='pvp_d".$libro_p["id"]."'>".$precio."</td>";
 
                                           echo "<input type='hidden' id='pvp_s_d".$libro_p["id"]."' value='".$presup["precio"]."'>";
                                         }else {
-                                          $precio=number_format($libro_p["precio"],0,",", ".");
+                                          $precio=number_format($libro_p["precio"],2,",", ".");
 
                                           echo "<td id='pvp_d".$libro_p["id"]."'>".$precio."</td>";
 
@@ -1114,9 +1114,9 @@
 
                                           echo "<input type='hidden' id='pn_s_d".$libro_p["id"]."' value='".$precio_neto."'>";
                                           if ($presup["definido"]==1) {
-                                            $venta_po=number_format($venta_p,0,",", ".");
+                                            $venta_po=number_format($venta_p,2,",", ".");
                                           }else{
-                                            $venta_po=0;
+                                            $venta_po=number_format(0,2,",", ".");
                                           }
 
                                           echo"<td id='venta_p_d".$libro_p["id"]."' class='venta'>".$venta_po."</td>
@@ -1139,9 +1139,9 @@
 
                                           echo "<input type='hidden' id='pn_s_d".$libro_p["id"]."' value='".$precio_neto."'>";
                                           if ($presup["definido"]==1) {
-                                            $venta_po=number_format($venta_p,0,",", ".");
+                                            $venta_po=number_format($venta_p,2,",", ".");
                                           }else{
-                                            $venta_po=0;
+                                            $venta_po=number_format(0,2,",", ".");
                                           }
 
                                           echo"<td id='venta_p_d".$libro_p["id"]."' class='venta'>".$venta_po."</td>
@@ -1183,7 +1183,7 @@
 
                                               $venta_r= $precio_neto * $presup["uni_vr"];
                                             
-                                              $venta_ro=number_format($venta_r,0,",", ".");
+                                              $venta_ro=number_format($venta_r,2,",", ".");
                                            
                                               echo"<td id='venta_r".$libro_p["id"]."' class='venta'>".$venta_ro."</td>
                                               <input type='hidden' id='i_uni_vr".$libro_p["id"]."' class='uni_vr_d' value='".$venta_r."'>";
@@ -1836,7 +1836,7 @@
         separador: ".", // separador para los miles
         sepDecimal: ',', // separador para los decimales
         formatear:function (num){
-            num +='';
+            num = (parseFloat(num) || 0).toFixed(2);
             var splitStr = num.split('.');
             var splitLeft = splitStr[0];
             var splitRight = splitStr.length > 1 ? this.sepDecimal + splitStr[1] : '';

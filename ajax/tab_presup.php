@@ -348,7 +348,7 @@
                     <select name="grado_otro" id="grado_otro" class="form-control">
                       <option value="">Seleccionar</option>
                       <?php
-                        $sql = "SELECT id, grado FROM grados WHERE id < 15";
+                        $sql = "SELECT id, grado FROM grados WHERE id < 15 OR id = 18";
                         $req = $bdd->prepare($sql); $req->execute();
                         foreach ($req->fetchAll() as $grado)
                           echo '<option value="'.$grado['id'].'">'.$grado['grado'].'</option>';
@@ -406,7 +406,7 @@
                     <select name="grado_otro" id="grado_otro<?= $i ?>" class="form-control">
                       <option value="">Seleccionar</option>
                       <?php
-                        $sql = "SELECT id, grado FROM grados WHERE id < 15";
+                        $sql = "SELECT id, grado FROM grados WHERE id < 15 OR id = 18";
                         $req = $bdd->prepare($sql); $req->execute();
                         foreach ($req->fetchAll() as $grado)
                           echo '<option value="'.$grado['id'].'">'.$grado['grado'].'</option>';
@@ -556,11 +556,13 @@
             $presup["tasa_compra"] = $presup["tasa_compra"] * 100;
             echo "<td><input type='text' class='pr-input' name='tasa[]' id='tasa_p".$libro_p["id"]."' value='".$presup["tasa_compra"]."'> %</td>";
         } else {
+            // Rangos de grado ajustados a la estructura de Panamá:
+            // Preescolar 1-3, Primaria 4-9 (1-6 Primaria), Pre-media 10-12, Media 13/14/18
             if ($libro_p["id_grado"] < 4) {
                 echo "<td><input type='text' class='pr-input' name='tasa[]' id='tasa_p".$libro_p["id"]."' value='".$gp_periodo["t_preescolar"]."' required> %</td>";
-            } elseif ($libro_p["id_grado"] < 9 && $libro_p["id_grado"] > 3) {
+            } elseif ($libro_p["id_grado"] < 10 && $libro_p["id_grado"] > 3) {
                 echo "<td><input type='text' class='pr-input' name='tasa[]' id='tasa_p".$libro_p["id"]."' value='".$gp_periodo["t_primaria"]."' required> %</td>";
-            } elseif ($libro_p["id_grado"] > 8 && $libro_p["id_grado"] < 13) {
+            } elseif ($libro_p["id_grado"] > 9 && $libro_p["id_grado"] < 13) {
                 echo "<td><input type='text' class='pr-input' name='tasa[]' id='tasa_p".$libro_p["id"]."' value='".$gp_periodo["t_6_9"]."' required> %</td>";
             } else {
                 echo "<td><input type='text' class='pr-input' name='tasa[]' id='tasa_p".$libro_p["id"]."' value='".$gp_periodo["t_10_11"]."' required> %</td>";
@@ -569,11 +571,11 @@
 
         // PVP
         if ($presup["precio"] != "" && $presup["precio"] != 0) {
-            $precio = number_format($presup["precio"], 0, ",", ".");
+            $precio = number_format($presup["precio"], 2, ",", ".");
             echo "<td id='pvp_p".$libro_p["id"]."'>".$precio."</td>";
             echo "<input type='hidden' id='pvp_s_p".$libro_p["id"]."' value='".$presup["precio"]."'>";
         } else {
-            $precio = number_format($libro_p["precio"], 0, ",", ".");
+            $precio = number_format($libro_p["precio"], 2, ",", ".");
             echo "<td id='pvp_p".$libro_p["id"]."'>".$precio."</td>";
             echo "<input type='hidden' id='pvp_s_p".$libro_p["id"]."' value='".$libro_p["precio"]."'>";
         }
@@ -598,9 +600,9 @@
             echo "<td id='pn_p".$libro_p["id"]."'>".$precio_ne."</td>";
             echo "<input type='hidden' id='pn_s_p".$libro_p["id"]."' value='".$precio_neto."'>";
             if ($presup["probabilidad"] != 3) {
-                $venta_po = number_format($venta_p, 0, ",", ".");
+                $venta_po = number_format($venta_p, 2, ",", ".");
             } else {
-                $venta_po = 0;
+                $venta_po = number_format(0, 2, ",", ".");
             }
             echo "<td id='venta_p_p".$libro_p["id"]."' class='venta'>".$venta_po."</td>
                   <input type='hidden' id='venta_ps_p".$libro_p["id"]."' class='venta1_p' value='".$venta_p."'>";
@@ -625,7 +627,7 @@
             }
         }
         $venta_ajustada = isset($venta_p) ? $venta_p * ($prob_valor_actual / 100) : 0;
-        $venta_ajustada_fmt = $venta_ajustada > 0 ? number_format($venta_ajustada, 0, ",", ".") : 0;
+        $venta_ajustada_fmt = number_format($venta_ajustada, 2, ",", ".");
         echo "<td id='venta_aj_p".$libro_p["id"]."' class='venta-aj'>".$venta_ajustada_fmt."</td>
               <input type='hidden' id='venta_ajs_p".$libro_p["id"]."' class='venta1_aj_p' value='".$venta_ajustada."'>";
 
@@ -1030,7 +1032,7 @@
         separador: ".",
         sepDecimal: ',',
         formatear:function (num){
-            num +='';
+            num = (parseFloat(num) || 0).toFixed(2);
             var splitStr = num.split('.');
             var splitLeft = splitStr[0];
             var splitRight = splitStr.length > 1 ? this.sepDecimal + splitStr[1] : '';

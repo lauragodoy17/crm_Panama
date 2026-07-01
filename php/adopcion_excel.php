@@ -175,7 +175,7 @@ $req_periodo->execute();
 $gp_periodo = $req_periodo->fetch();
 
 if ($usuario['tipo']!=6) {
-	list($empresa,$n_zona) = explode("/", $zona["zona"]);
+	list($empresa,$n_zona) = array_pad(explode("/", $zona["zona"] ?? ''), 2, '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Empresa:");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "$empresa");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D5", "Zona:");
@@ -672,13 +672,13 @@ foreach($adopciones as $adopcion) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$gp[alumnos]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$tasa_compra");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$comp_activos");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$adopcion[precio]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", number_format($adopcion["precio"],2,",", "."));
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$descuento");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$venta_bruta");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$precio_fact");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$venta_estimada");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$adopcion[precio_venta_final]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$venta_real");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", number_format($venta_bruta,2,",", "."));
+	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", number_format($precio_fact,2,",", "."));
+	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", number_format($venta_estimada,2,",", "."));
+	$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", number_format($adopcion["precio_venta_final"],2,",", "."));
+	$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", number_format($venta_real,2,",", "."));
 	//$objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$$diferencia1");*/
 
 	$objSpreadsheet->getActiveSheet()->getStyle('F'.$conta)->applyFromArray($estilo_derecha);
@@ -775,10 +775,10 @@ if (isset($t_alumnos_g4)) {
 	$t_alumnos_g4=array_sum($t_alumnos_g4);
 	$t_compradores_g4=array_sum($t_compradores_g4);
 	$t_descuento_g4 = array_sum($t_descuento_g4) / count($t_descuento_g4);
-	$t_precio_fact_g4=array_sum($t_precio_fact_g4);
-	$t_venta_bruta_g4=array_sum($t_venta_bruta_g4);
-	$t_venta_estimada_g4=array_sum($t_venta_estimada_g4);
-	$t_venta_real_g4=array_sum($t_venta_real_g4);
+	$t_precio_fact_g4=number_format(array_sum($t_precio_fact_g4),2,",", ".");
+	$t_venta_bruta_g4=number_format(array_sum($t_venta_bruta_g4),2,",", ".");
+	$t_venta_estimada_g4=number_format(array_sum($t_venta_estimada_g4),2,",", ".");
+	$t_venta_real_g4=number_format(array_sum($t_venta_real_g4),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "1 (Primero)");
@@ -797,10 +797,10 @@ if (isset($t_alumnos_g5)) {
 	$t_alumnos_g5=array_sum($t_alumnos_g5);
 	$t_compradores_g5=array_sum($t_compradores_g5);
 	$t_descuento_g5 = array_sum($t_descuento_g5) / count($t_descuento_g5);
-	$t_precio_fact_g5=array_sum($t_precio_fact_g5);
-	$t_venta_bruta_g5=array_sum($t_venta_bruta_g5);
-	$t_venta_estimada_g5=array_sum($t_venta_estimada_g5);
-	$t_venta_real_g5=array_sum($t_venta_real_g5);
+	$t_precio_fact_g5=number_format(array_sum($t_precio_fact_g5),2,",", ".");
+	$t_venta_bruta_g5=number_format(array_sum($t_venta_bruta_g5),2,",", ".");
+	$t_venta_estimada_g5=number_format(array_sum($t_venta_estimada_g5),2,",", ".");
+	$t_venta_real_g5=number_format(array_sum($t_venta_real_g5),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "2 (Segundo)");
@@ -820,10 +820,10 @@ if (isset($t_alumnos_g6)) {
 	$t_alumnos_g6=array_sum($t_alumnos_g6);
 	$t_compradores_g6=array_sum($t_compradores_g6);
 	$t_descuento_g6 = array_sum($t_descuento_g6) / count($t_descuento_g6);
-	$t_precio_fact_g6=array_sum($t_precio_fact_g6);
-	$t_venta_bruta_g6=array_sum($t_venta_bruta_g6);
-	$t_venta_estimada_g6=array_sum($t_venta_estimada_g6);
-	$t_venta_real_g6=array_sum($t_venta_real_g6);
+	$t_precio_fact_g6=number_format(array_sum($t_precio_fact_g6),2,",", ".");
+	$t_venta_bruta_g6=number_format(array_sum($t_venta_bruta_g6),2,",", ".");
+	$t_venta_estimada_g6=number_format(array_sum($t_venta_estimada_g6),2,",", ".");
+	$t_venta_real_g6=number_format(array_sum($t_venta_real_g6),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "3 (Tercero)");
@@ -843,10 +843,10 @@ if (isset($t_alumnos_g7)) {
 	$t_alumnos_g7=array_sum($t_alumnos_g7);
 	$t_compradores_g7=array_sum($t_compradores_g7);
 	$t_descuento_g7 = array_sum($t_descuento_g7) / count($t_descuento_g7);
-	$t_precio_fact_g7=array_sum($t_precio_fact_g7);
-	$t_venta_bruta_g7=array_sum($t_venta_bruta_g7);
-	$t_venta_estimada_g7=array_sum($t_venta_estimada_g7);
-	$t_venta_real_g7=array_sum($t_venta_real_g7);
+	$t_precio_fact_g7=number_format(array_sum($t_precio_fact_g7),2,",", ".");
+	$t_venta_bruta_g7=number_format(array_sum($t_venta_bruta_g7),2,",", ".");
+	$t_venta_estimada_g7=number_format(array_sum($t_venta_estimada_g7),2,",", ".");
+	$t_venta_real_g7=number_format(array_sum($t_venta_real_g7),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "4 (Cuarto)");
@@ -866,10 +866,10 @@ if (isset($t_alumnos_g8)) {
 	$t_alumnos_g8=array_sum($t_alumnos_g8);
 	$t_compradores_g8=array_sum($t_compradores_g8);
 	$t_descuento_g8 = array_sum($t_descuento_g8) / count($t_descuento_g8);
-	$t_precio_fact_g8=array_sum($t_precio_fact_g8);
-	$t_venta_bruta_g8=array_sum($t_venta_bruta_g8);
-	$t_venta_estimada_g8=array_sum($t_venta_estimada_g8);
-	$t_venta_real_g8=array_sum($t_venta_real_g8);
+	$t_precio_fact_g8=number_format(array_sum($t_precio_fact_g8),2,",", ".");
+	$t_venta_bruta_g8=number_format(array_sum($t_venta_bruta_g8),2,",", ".");
+	$t_venta_estimada_g8=number_format(array_sum($t_venta_estimada_g8),2,",", ".");
+	$t_venta_real_g8=number_format(array_sum($t_venta_real_g8),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "5 (Quinto)");
@@ -889,10 +889,10 @@ if (isset($t_alumnos_g9)) {
 	$t_alumnos_g9=array_sum($t_alumnos_g9);
 	$t_compradores_g9=array_sum($t_compradores_g9);
 	$t_descuento_g9 = array_sum($t_descuento_g9) / count($t_descuento_g9);
-	$t_precio_fact_g9=array_sum($t_precio_fact_g9);
-	$t_venta_bruta_g9=array_sum($t_venta_bruta_g9);
-	$t_venta_estimada_g9=array_sum($t_venta_estimada_g9);
-	$t_venta_real_g9=array_sum($t_venta_real_g9);
+	$t_precio_fact_g9=number_format(array_sum($t_precio_fact_g9),2,",", ".");
+	$t_venta_bruta_g9=number_format(array_sum($t_venta_bruta_g9),2,",", ".");
+	$t_venta_estimada_g9=number_format(array_sum($t_venta_estimada_g9),2,",", ".");
+	$t_venta_real_g9=number_format(array_sum($t_venta_real_g9),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "6 (Sexto)");
@@ -912,10 +912,10 @@ if (isset($t_alumnos_g10)) {
 	$t_alumnos_g10=array_sum($t_alumnos_g10);
 	$t_compradores_g10=array_sum($t_compradores_g10);
 	$t_descuento_g10 = array_sum($t_descuento_g10) / count($t_descuento_g10);
-	$t_precio_fact_g10=array_sum($t_precio_fact_g10);
-	$t_venta_bruta_g10=array_sum($t_venta_bruta_g10);
-	$t_venta_estimada_g10=array_sum($t_venta_estimada_g10);
-	$t_venta_real_g10=array_sum($t_venta_real_g10);
+	$t_precio_fact_g10=number_format(array_sum($t_precio_fact_g10),2,",", ".");
+	$t_venta_bruta_g10=number_format(array_sum($t_venta_bruta_g10),2,",", ".");
+	$t_venta_estimada_g10=number_format(array_sum($t_venta_estimada_g10),2,",", ".");
+	$t_venta_real_g10=number_format(array_sum($t_venta_real_g10),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "7 (Séptimo)");
@@ -935,10 +935,10 @@ if (isset($t_alumnos_g11)) {
 	$t_alumnos_g11=array_sum($t_alumnos_g11);
 	$t_compradores_g11=array_sum($t_compradores_g11);
 	$t_descuento_g11 = array_sum($t_descuento_g11) / count($t_descuento_g11);
-	$t_precio_fact_g11=array_sum($t_precio_fact_g11);
-	$t_venta_bruta_g11=array_sum($t_venta_bruta_g11);
-	$t_venta_estimada_g11=array_sum($t_venta_estimada_g11);
-	$t_venta_real_g11=array_sum($t_venta_real_g11);
+	$t_precio_fact_g11=number_format(array_sum($t_precio_fact_g11),2,",", ".");
+	$t_venta_bruta_g11=number_format(array_sum($t_venta_bruta_g11),2,",", ".");
+	$t_venta_estimada_g11=number_format(array_sum($t_venta_estimada_g11),2,",", ".");
+	$t_venta_real_g11=number_format(array_sum($t_venta_real_g11),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "8 (Octavo)");
@@ -958,10 +958,10 @@ if (isset($t_alumnos_g12)) {
 	$t_alumnos_g12=array_sum($t_alumnos_g12);
 	$t_compradores_g12=array_sum($t_compradores_g12);
 	$t_descuento_g12 = array_sum($t_descuento_g12) / count($t_descuento_g12);
-	$t_precio_fact_g12=array_sum($t_precio_fact_g12);
-	$t_venta_bruta_g12=array_sum($t_venta_bruta_g12);
-	$t_venta_estimada_g12=array_sum($t_venta_estimada_g12);
-	$t_venta_real_g12=array_sum($t_venta_real_g12);
+	$t_precio_fact_g12=number_format(array_sum($t_precio_fact_g12),2,",", ".");
+	$t_venta_bruta_g12=number_format(array_sum($t_venta_bruta_g12),2,",", ".");
+	$t_venta_estimada_g12=number_format(array_sum($t_venta_estimada_g12),2,",", ".");
+	$t_venta_real_g12=number_format(array_sum($t_venta_real_g12),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "9 (Noveno)");
@@ -981,10 +981,10 @@ if (isset($t_alumnos_g13)) {
 	$t_alumnos_g13=array_sum($t_alumnos_g13);
 	$t_compradores_g13=array_sum($t_compradores_g13);
 	$t_descuento_g13 = array_sum($t_descuento_g13) / count($t_descuento_g13);
-	$t_precio_fact_g13=array_sum($t_precio_fact_g13);
-	$t_venta_bruta_g13=array_sum($t_venta_bruta_g13);
-	$t_venta_estimada_g13=array_sum($t_venta_estimada_g13);
-	$t_venta_real_g13=array_sum($t_venta_real_g13);
+	$t_precio_fact_g13=number_format(array_sum($t_precio_fact_g13),2,",", ".");
+	$t_venta_bruta_g13=number_format(array_sum($t_venta_bruta_g13),2,",", ".");
+	$t_venta_estimada_g13=number_format(array_sum($t_venta_estimada_g13),2,",", ".");
+	$t_venta_real_g13=number_format(array_sum($t_venta_real_g13),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "10 (Décimo)");
@@ -1004,10 +1004,10 @@ if (isset($t_alumnos_g14)) {
 	$t_alumnos_g14=array_sum($t_alumnos_g14);
 	$t_compradores_g14=array_sum($t_compradores_g14);
 	$t_descuento_g14 = array_sum($t_descuento_g14) / count($t_descuento_g14);
-	$t_precio_fact_g14=array_sum($t_precio_fact_g14);
-	$t_venta_bruta_g14=array_sum($t_venta_bruta_g14);
-	$t_venta_estimada_g14=array_sum($t_venta_estimada_g14);
-	$t_venta_real_g14=array_sum($t_venta_real_g14);
+	$t_precio_fact_g14=number_format(array_sum($t_precio_fact_g14),2,",", ".");
+	$t_venta_bruta_g14=number_format(array_sum($t_venta_bruta_g14),2,",", ".");
+	$t_venta_estimada_g14=number_format(array_sum($t_venta_estimada_g14),2,",", ".");
+	$t_venta_real_g14=number_format(array_sum($t_venta_real_g14),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "11 (Once)");
@@ -1027,10 +1027,10 @@ if (isset($t_alumnos_g1)) {
 	$t_alumnos_g1=array_sum($t_alumnos_g1);
 	$t_compradores_g1=array_sum($t_compradores_g1);
 	$t_descuento_g1 = array_sum($t_descuento_g1) / count($t_descuento_g1);
-	$t_precio_fact_g1=array_sum($t_precio_fact_g1);
-	$t_venta_bruta_g1=array_sum($t_venta_bruta_g1);
-	$t_venta_estimada_g1=array_sum($t_venta_estimada_g1);
-	$t_venta_real_g1=array_sum($t_venta_real_g1);
+	$t_precio_fact_g1=number_format(array_sum($t_precio_fact_g1),2,",", ".");
+	$t_venta_bruta_g1=number_format(array_sum($t_venta_bruta_g1),2,",", ".");
+	$t_venta_estimada_g1=number_format(array_sum($t_venta_estimada_g1),2,",", ".");
+	$t_venta_real_g1=number_format(array_sum($t_venta_real_g1),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "Pre jardín");
@@ -1050,10 +1050,10 @@ if (isset($t_alumnos_g2)) {
 	$t_alumnos_g2=array_sum($t_alumnos_g2);
 	$t_compradores_g2=array_sum($t_compradores_g2);
 	$t_descuento_g2 = array_sum($t_descuento_g2) / count($t_descuento_g2);
-	$t_precio_fact_g2=array_sum($t_precio_fact_g2);
-	$t_venta_bruta_g2=array_sum($t_venta_bruta_g2);
-	$t_venta_estimada_g2=array_sum($t_venta_estimada_g2);
-	$t_venta_real_g2=array_sum($t_venta_real_g2);
+	$t_precio_fact_g2=number_format(array_sum($t_precio_fact_g2),2,",", ".");
+	$t_venta_bruta_g2=number_format(array_sum($t_venta_bruta_g2),2,",", ".");
+	$t_venta_estimada_g2=number_format(array_sum($t_venta_estimada_g2),2,",", ".");
+	$t_venta_real_g2=number_format(array_sum($t_venta_real_g2),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "Jardín");
@@ -1072,10 +1072,10 @@ if (isset($t_alumnos_g3)) {
 	$t_alumnos_g3=array_sum($t_alumnos_g3);
 	$t_compradores_g3=array_sum($t_compradores_g3);
 	$t_descuento_g3 = array_sum($t_descuento_g3) / count($t_descuento_g3);
-	$t_precio_fact_g3=array_sum($t_precio_fact_g3);
-	$t_venta_bruta_g3=array_sum($t_venta_bruta_g3);
-	$t_venta_estimada_g3=array_sum($t_venta_estimada_g3);
-	$t_venta_real_g3=array_sum($t_venta_real_g3);
+	$t_precio_fact_g3=number_format(array_sum($t_precio_fact_g3),2,",", ".");
+	$t_venta_bruta_g3=number_format(array_sum($t_venta_bruta_g3),2,",", ".");
+	$t_venta_estimada_g3=number_format(array_sum($t_venta_estimada_g3),2,",", ".");
+	$t_venta_real_g3=number_format(array_sum($t_venta_real_g3),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "Transición");
@@ -1172,9 +1172,9 @@ $conta++;
 $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL VENTA");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores");
-$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$t_venta_bruta");
-$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$t_venta_estimada");
-$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$t_venta_real");
+$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", number_format($t_venta_bruta,2,",", "."));
+$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", number_format($t_venta_estimada,2,",", "."));
+$objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", number_format($t_venta_real,2,",", "."));
 
 $objSpreadsheet->getActiveSheet()->getStyle('A'.$conta.':'.'L'.$conta)->applyFromArray($estilo_negrita);
 $objSpreadsheet->getActiveSheet()->getStyle('H'.$conta)->applyFromArray($estilo_derecha);
