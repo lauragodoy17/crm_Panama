@@ -26,6 +26,10 @@ $sql_periodo="SELECT id FROM periodos ORDER BY id DESC";
 	$otro_objetivo = ($_POST['objetivo'] === 'otro')
 	    ? str_replace(["'", '"'], ' ', trim($_POST['otro_objetivo_txt'] ?? ''))
 	    : '';
+	$otro_participante = in_array('otro', $_POST['participantes'] ?? [])
+	    ? str_replace(["'", '"'], ' ', trim($_POST['otro_participante_txt'] ?? ''))
+	    : '';
+	$_POST['participantes'] = array_values(array_filter($_POST['participantes'] ?? [], fn($p) => $p !== 'otro'));
 	$start = $_POST['start'];
 	$end = $_POST['end'];
 
@@ -137,7 +141,7 @@ else {
 
 		if ($participante == $_SESSION["id"]) {
 
-			$sql = "INSERT INTO plan_trabajo(codigo,id_periodo,id_promotor,id_colegio,cod_profesor,id_objetivo,otro_objetivo,resultado,color,start,end,agendamiento,descripcion) values ('$cod_plan','".$gp_periodo["id"]."', '".$participante."', '$colegio', '$cod_profesor', '$objetivo','$otro_objetivo','0','#4c00ff', '$start', '$end', '5', '".$_POST["descripcion"]."')";
+			$sql = "INSERT INTO plan_trabajo(codigo,id_periodo,id_promotor,id_colegio,cod_profesor,id_objetivo,otro_objetivo,otro_participante,resultado,color,start,end,agendamiento,descripcion) values ('$cod_plan','".$gp_periodo["id"]."', '".$participante."', '$colegio', '$cod_profesor', '$objetivo','$otro_objetivo','$otro_participante','0','#4c00ff', '$start', '$end', '5', '".$_POST["descripcion"]."')";
 
 			$query = $bdd->prepare( $sql );
 			if ($query == false) {
@@ -152,7 +156,7 @@ else {
 
 		}else{
 
-			$sql = "INSERT INTO plan_trabajo(codigo,id_periodo,id_promotor,id_colegio,cod_profesor,id_objetivo,otro_objetivo,resultado,color,start,end,agendamiento,descripcion) values ('$cod_plan','".$gp_periodo["id"]."', '".$participante."', '$colegio', '$cod_profesor', '$objetivo','$otro_objetivo','0','#4c00ff', '$start', '$end', '4', '".$_POST["descripcion"]."')";
+			$sql = "INSERT INTO plan_trabajo(codigo,id_periodo,id_promotor,id_colegio,cod_profesor,id_objetivo,otro_objetivo,otro_participante,resultado,color,start,end,agendamiento,descripcion) values ('$cod_plan','".$gp_periodo["id"]."', '".$participante."', '$colegio', '$cod_profesor', '$objetivo','$otro_objetivo','$otro_participante','0','#4c00ff', '$start', '$end', '4', '".$_POST["descripcion"]."')";
 
 			$query = $bdd->prepare( $sql );
 			if ($query == false) {

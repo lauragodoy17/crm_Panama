@@ -197,8 +197,11 @@
 													    echo '<option value="'.$participante["id"].'">'.$participante["parti"].'</option>';
 													}
 											 	?>
+											 <option value="otro">Otro</option>
 
 										  	</select>
+										<input type="text" name="otro_participante_txt" id="otro_participante_txt"
+										       class="form-control mt-1 d-none" placeholder="Especifique el/los participante(s)">
 									  	</div>
 									</div><br>
 									
@@ -229,9 +232,9 @@
 									 	<?php
 
 									 		if ($_SESSION["tipo"] < 4) {
-									 			$sql = "SELECT id, objetivo FROM objetivos WHERE tipo < 3 ORDER BY objetivo";
+									 			$sql = "SELECT id, objetivo FROM objetivos WHERE tipo < 3 AND objetivo != 'Otro' ORDER BY objetivo";
 									 		}else{
-									 			$sql = "SELECT id, objetivo FROM objetivos WHERE tipo > 1 ORDER BY objetivo";
+									 			$sql = "SELECT id, objetivo FROM objetivos WHERE tipo > 1 AND objetivo != 'Otro' ORDER BY objetivo";
 									 		}
 
 
@@ -501,6 +504,7 @@
 			   		$("#objetivo").removeAttr("required");
 			   		$("#otro_lugar_wrap").addClass("d-none");
 			   		$("#otro_lugar_txt").removeAttr("required").val('');
+			   		$("#otro_participante_txt").addClass("d-none").removeAttr("required").val('');
 			   		$("#otro_chk").prop("checked", false);
 
 				}else {
@@ -527,6 +531,7 @@
 			   		$("#objetivo").removeAttr("required");
 			   		$("#otro_lugar_wrap").addClass("d-none");
 			   		$("#otro_lugar_txt").removeAttr("required").val('');
+			   		$("#otro_participante_txt").addClass("d-none").removeAttr("required").val('');
 			   		$("#otro_chk").prop("checked", false);
 
 				}else {
@@ -550,6 +555,16 @@
 				}
 			}
 
+			$('#parti').on('change', function () {
+				var seleccionados = $(this).val() || [];
+				var $inp = $('#otro_participante_txt');
+				if (seleccionados.indexOf('otro') !== -1) {
+					$inp.removeClass('d-none').attr('required', 'required');
+				} else {
+					$inp.addClass('d-none').removeAttr('required').val('');
+				}
+			});
+
 			$("#otro_chk").click(function(){
 
 				if ($('#otro_chk').prop('checked')) {
@@ -561,6 +576,7 @@
 					$("#objetivo").removeAttr("required");
 					$("#otro_lugar_wrap").removeClass("d-none");
 					$("#otro_lugar_txt").attr("required", "required");
+					$("#otro_participante_txt").addClass("d-none").removeAttr("required").val('');
 					$("#oficina").prop("checked", false);
 					$("#casa").prop("checked", false);
 				} else {
