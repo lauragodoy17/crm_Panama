@@ -174,11 +174,6 @@
                 $badge_txt   = 'Activo';
                 $badge_style = 'background:#d1fae5;color:#059669;';
             }
-
-            // Pensión mensual del período actual
-            $req_pens = $bdd->prepare("SELECT pension FROM pension WHERE cod_colegio=:cod AND id_periodo=:per");
-            $req_pens->execute([':cod' => $colegio['codigo'], ':per' => $periodo]);
-            $pension_row = $req_pens->fetch();
           ?>
 
           <!-- Encabezado del colegio -->
@@ -393,14 +388,15 @@
                             </div>
                           </div>
 
+                          <?php $col_tel_web = $_SESSION['tipo']==6 ? 'col-sm-4' : 'col-sm-6'; ?>
                           <div class="row">
-                            <div class="col-sm-4">
+                            <div class="<?= $col_tel_web ?>">
                               <div class="form-group">
                                 <label>Teléfono <small style="color:red;"> *</small></label>
                                 <input type="text" class="form-control" placeholder="Teléfono" name="telefono_c" value="<?php echo $colegio['telefono']; ?>" required/>
                               </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="<?= $col_tel_web ?>">
                               <div class="form-group">
                                 <label>Página Web</label>
                                 <input type="text" class="form-control" placeholder="Página Web" name="web"  value="<?php echo $colegio['web']; ?>"/>
@@ -425,8 +421,12 @@
                             </div>
                             <div class="col-sm-6">
                               <div class="form-group">
-                                <label>Costo mensual de pensión</label>
-                                <input type="text" class="form-control" placeholder="Costo mensual de pensión" name="pension" value="<?php echo htmlspecialchars($pension_row['pension'] ?? ''); ?>"/>
+                                <label>Propuesta comercial</label>
+                                <select class="custom-select" name="propuesta_comercial">
+                                  <?php $pc_val = $colegio['propuesta_comercial'] ?? 'no'; ?>
+                                  <option value="si" <?= $pc_val === 'si' ? 'selected' : '' ?>>Sí</option>
+                                  <option value="no" <?= $pc_val === 'no' ? 'selected' : '' ?>>No</option>
+                                </select>
                               </div>
                             </div>
                           </div>
@@ -441,6 +441,20 @@
                             $qd_is_otro = $qd_val !== '' && !isset($cargos_qd_map[$qd_val]);
                             $qd_sel = $qd_is_otro ? 'otro' : $qd_val;
                             $qd_otro_val = $qd_is_otro ? htmlspecialchars($qd_val) : '';
+
+                            $req_status = $bdd->prepare("SELECT id_status FROM colegios_status WHERE id_colegio=:cole AND id_periodo=:per");
+                            $req_status->execute([':cole' => $colegio["id"], ':per' => $periodo]);
+                            $cole_status = $req_status->fetch();
+
+                            $status_ops = $bdd->query("SELECT * FROM status_cubrimiento WHERE act=1")->fetchAll();
+
+                            $req_estcli = $bdd->prepare("SELECT id_estado_cliente FROM colegios_estados_clientes WHERE id_colegio=:cole AND id_periodo=:per");
+                            $req_estcli->execute([':cole' => $colegio["id"], ':per' => $periodo]);
+                            $cole_estcli = $req_estcli->fetch();
+
+                            $estcli_ops = $bdd->query("SELECT * FROM estados_cliente WHERE act=1")->fetchAll();
+
+                            $segmento_ops = $bdd->query("SELECT * FROM segmentos WHERE act=1")->fetchAll();
                           ?>
                           <div class="row">
                             <div class="col-sm-6">
@@ -461,24 +475,6 @@
                                        <?= $qd_is_otro ? 'required' : '' ?> />
                               </div>
                             </div>
-                          </div>
-
-                          <?php
-                            $req_status = $bdd->prepare("SELECT id_status FROM colegios_status WHERE id_colegio=:cole AND id_periodo=:per");
-                            $req_status->execute([':cole' => $colegio["id"], ':per' => $periodo]);
-                            $cole_status = $req_status->fetch();
-
-                            $status_ops = $bdd->query("SELECT * FROM status_cubrimiento WHERE act=1")->fetchAll();
-
-                            $req_estcli = $bdd->prepare("SELECT id_estado_cliente FROM colegios_estados_clientes WHERE id_colegio=:cole AND id_periodo=:per");
-                            $req_estcli->execute([':cole' => $colegio["id"], ':per' => $periodo]);
-                            $cole_estcli = $req_estcli->fetch();
-
-                            $estcli_ops = $bdd->query("SELECT * FROM estados_cliente WHERE act=1")->fetchAll();
-
-                            $segmento_ops = $bdd->query("SELECT * FROM segmentos WHERE act=1")->fetchAll();
-                          ?>
-                          <div class="row">
                             <div class="col-sm-6">
                               <div class="form-group">
                                 <label>Segmento <small style="color:red;"> *</small></label>
