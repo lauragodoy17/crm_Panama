@@ -14,7 +14,7 @@ $presupuesto_active  = $current_page === 'colegios_presup.php';
 $atenciones_active   = $current_page === 'lista_atenciones.php';
 $ops_active          = in_array($current_page, ['solicitar_op.php','lista_op.php','clientes_op.php']);
 $opds_active         = in_array($current_page, ['solicitar_orden_pd.php','ver_opds.php','reporte_opd.php']);
-$reportes_active     = in_array($current_page, ['reporte_cubrimiento.php','reporte_visitas.php','reporte_valoriza.php','reporte_valoriza_global.php','reporte_trabajadores.php','reporte_cant_adop.php']);
+$reportes_active     = in_array($current_page, ['reporte_zonificacion.php','reporte_cubrimiento.php','reporte_visitas.php','reporte_valoriza.php','reporte_valoriza_global.php','reporte_trabajadores.php','reporte_cant_adop.php']);
 ?>
 <!--<div class="pre-loader">
 			<div class="pre-loader-box">
@@ -574,9 +574,7 @@ $reportes_active     = in_array($current_page, ['reporte_cubrimiento.php','repor
 									<?php if ($_SESSION["tipo"] != 7 && $_SESSION["tipo"] != 9) { ?>
 										<li class="menu-subgroup-label">Territorial</li>
 										<?php if ($_SESSION["tipo"] != 4) { ?>
-											<?php if (false) { /* Oculto temporalmente para Panamá: Reportes - Zonificación */ ?>
 												<li><a href="reporte_zonificacion.php">Zonificación</a></li>
-											<?php } ?>
 											<li><a href="reporte_cubrimiento.php">Cubrimiento</a></li>
 										<?php } ?>
 										<li><a href="reporte_visitas.php">Visitas</a></li>

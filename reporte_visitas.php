@@ -48,7 +48,7 @@
                   <option value="">Seleccionar</option>
                   <option value="todos">Todos</option>
                   <?php
-                    $sql = "SELECT id, CONCAT(nombres, ' ', apellidos) as promotor FROM usuarios WHERE (tipo=3 || tipo=4 || tipo=1) AND act=1";
+                    $sql = "SELECT id, CONCAT(nombres, ' ', apellidos) as promotor FROM usuarios WHERE (tipo=3 || tipo=4 || tipo=6 || tipo=1 || tipo=10) AND act=1";
                     $req = $bdd->prepare($sql); $req->execute();
                     foreach ($req->fetchAll() as $p)
                       echo '<option value="'.$p['id'].'">'.$p['promotor'].'</option>';
