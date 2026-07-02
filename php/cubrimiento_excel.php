@@ -140,10 +140,27 @@ $coles = $req->fetchAll();
 
 // ── Pre-fetch para eliminar N+1 queries ──────────────────────────
 $cole_ids = array_column($coles, 'id');
-$adj_map = []; $uc_map = []; $est_map = [];
+$gp_map = []; $adj_map = []; $uc_map = []; $est_map = []; $status_map = []; $status2_map = [];
 
 if (!empty($cole_ids)) {
     $ph = implode(',', array_fill(0, count($cole_ids), '?'));
+
+    // Panamá: preescolar = grados 1-3, primaria = 4-9, bachillerato = 10-14 y 18 (ver ajax/tab_poblacion.php)
+    $req_gp_all = $bdd->prepare("
+        SELECT id_colegio,
+            COUNT(CASE WHEN id_grado BETWEEN 1 AND 3 THEN 1 END)  as par_pre,
+            SUM(CASE WHEN id_grado BETWEEN 1 AND 3 THEN alumnos ELSE 0 END) as alm_pre,
+            COUNT(CASE WHEN id_grado BETWEEN 4 AND 9 THEN 1 END)  as par_pri,
+            SUM(CASE WHEN id_grado BETWEEN 4 AND 9 THEN alumnos ELSE 0 END) as alm_pri,
+            COUNT(CASE WHEN id_grado BETWEEN 10 AND 14 OR id_grado = 18 THEN 1 END) as par_bach,
+            SUM(CASE WHEN id_grado BETWEEN 10 AND 14 OR id_grado = 18 THEN alumnos ELSE 0 END) as alm_bach
+        FROM grados_paralelos
+        WHERE id_colegio IN ($ph) AND id_periodo = ? AND alumnos != 0 AND (id_grado BETWEEN 1 AND 14 OR id_grado = 18)
+        GROUP BY id_colegio
+    ");
+    $req_gp_all->execute(array_merge($cole_ids, [$gp_periodo["id"]]));
+    foreach ($req_gp_all->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $gp_map[$row['id_colegio']] = $row;
 
     $req_adj_all = $bdd->prepare("SELECT id_colegio FROM adjuntos WHERE id_colegio IN ($ph) AND id_periodo = ? GROUP BY id_colegio");
     $req_adj_all->execute(array_merge($cole_ids, [$_POST["periodo"]]));
@@ -159,44 +176,27 @@ if (!empty($cole_ids)) {
     $req_est_all->execute(array_merge($cole_ids, [$_POST["periodo"]]));
     foreach ($req_est_all->fetchAll(PDO::FETCH_ASSOC) as $row)
         $est_map[$row['id_colegio']] = $row['estado'];
+
+    // Status del periodo actual: prioridad por FIELD, excluyendo Descartado (4). "Primer valor gana" respeta el orden de prioridad.
+    $req_st_all = $bdd->prepare("SELECT cs.id_colegio, s.status FROM colegios_status cs JOIN status_cubrimiento s ON cs.id_status=s.id WHERE cs.id_colegio IN ($ph) AND cs.id_periodo = ? AND s.id != 4 ORDER BY FIELD(cs.id_status,'6','5','1','2','3','4')");
+    $req_st_all->execute(array_merge($cole_ids, [$gp_periodo["id"]]));
+    foreach ($req_st_all->fetchAll(PDO::FETCH_ASSOC) as $row)
+        if (!isset($status_map[$row['id_colegio']])) $status_map[$row['id_colegio']] = $row['status'];
+
+    // Si no hay status en el periodo actual, se toma el último status conocido no descartado.
+    $req_st2_all = $bdd->prepare("SELECT cs.id_colegio, s.status FROM colegios_status cs JOIN status_cubrimiento s ON cs.id_status=s.id WHERE cs.id_colegio IN ($ph) AND s.id != 4 ORDER BY cs.id_periodo DESC");
+    $req_st2_all->execute($cole_ids);
+    foreach ($req_st2_all->fetchAll(PDO::FETCH_ASSOC) as $row)
+        if (!isset($status2_map[$row['id_colegio']])) $status2_map[$row['id_colegio']] = $row['status'];
 }
 // ── Fin pre-fetch ─────────────────────────────────────────────────
 
 $conta=5;
 foreach($coles as $cole) {
 
-  // Panamá: preescolar = grados 1-3, primaria = 4-9, bachillerato = 10-14 y 18 (ver ajax/tab_poblacion.php)
-  $sql_pre = "SELECT COUNT(alumnos) as paralelos, SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$cole['id']."' AND id_periodo='".$gp_periodo["id"]."' AND alumnos!='0' AND id_grado BETWEEN 1 AND 3";
-  $req_pre = $bdd->prepare($sql_pre);
-  $req_pre->execute();
-  $gp_pre = $req_pre->fetch();
-
-  $sql_pri = "SELECT COUNT(alumnos) as paralelos, SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$cole['id']."' AND id_periodo='".$gp_periodo["id"]."' AND alumnos!='0' AND id_grado BETWEEN 4 AND 9";
-  $req_pri = $bdd->prepare($sql_pri);
-  $req_pri->execute();
-  $gp_pri = $req_pri->fetch();
-
-  $sql_bach = "SELECT COUNT(alumnos) as paralelos, SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$cole['id']."' AND id_periodo='".$gp_periodo["id"]."' AND alumnos!='0' AND (id_grado BETWEEN 10 AND 14 OR id_grado=18)";
-  $req_bach = $bdd->prepare($sql_bach);
-  $req_bach->execute();
-  $gp_bach = $req_bach->fetch();
-
-  $paralelos_global = $gp_pre["paralelos"] + $gp_pri["paralelos"] + $gp_bach["paralelos"];
-  $alumnos_global = $gp_pre["alumnos"] + $gp_pri["alumnos"] + $gp_bach["alumnos"];
-
-  // Status: prioridad por FIELD, si no hay en el periodo actual se toma el último status conocido, si no "Por definir"
-  $sql_st = "SELECT status FROM colegios_status cs JOIN status_cubrimiento s ON cs.id_status=s.id WHERE cs.id_colegio='".$cole["id"]."' AND cs.id_periodo='".$gp_periodo["id"]."' AND s.id != 4 ORDER BY FIELD(cs.id_status,'6','5','1','2','3','4')";
-  $req_st = $bdd->prepare($sql_st);
-  $req_st->execute();
-  $status = $req_st->fetch();
-
-  $status2 = null;
-  if (empty($status)) {
-    $sql_st2 = "SELECT status FROM colegios_status cs JOIN status_cubrimiento s ON cs.id_status=s.id WHERE cs.id_colegio='".$cole["id"]."' AND s.id != 4 ORDER BY cs.id_periodo DESC";
-    $req_st2 = $bdd->prepare($sql_st2);
-    $req_st2->execute();
-    $status2 = $req_st2->fetch();
-  }
+  $gp_row = $gp_map[$cole['id']] ?? ['par_pre'=>0,'alm_pre'=>0,'par_pri'=>0,'alm_pri'=>0,'par_bach'=>0,'alm_bach'=>0];
+  $paralelos_global = $gp_row["par_pre"] + $gp_row["par_pri"] + $gp_row["par_bach"];
+  $alumnos_global   = $gp_row["alm_pre"] + $gp_row["alm_pri"] + $gp_row["alm_bach"];
 
   $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$cole[codigo]");
   $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$cole[colegio]");
@@ -225,22 +225,17 @@ foreach($coles as $cole) {
   $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$cole[ciudad]");
   $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$cole[direccion]");
   $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$cole[telefono]");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$gp_pre[paralelos]");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$gp_pri[paralelos]");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$gp_bach[paralelos]");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$paralelos_global");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", "$gp_pre[alumnos]");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$gp_pri[alumnos]");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$gp_bach[alumnos]");
-  $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$alumnos_global");
+  $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", $gp_row["par_pre"]);
+  $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", $gp_row["par_pri"]);
+  $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", $gp_row["par_bach"]);
+  $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", $paralelos_global);
+  $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", $gp_row["alm_pre"]);
+  $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", $gp_row["alm_pri"]);
+  $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", $gp_row["alm_bach"]);
+  $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", $alumnos_global);
 
-  if (!empty($status)) {
-    $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "$status[status]");
-  }elseif(!empty($status2)){
-    $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "$status2[status]");
-  }else{
-    $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "Por definir");
-  }
+  $status_val = $status_map[$cole['id']] ?? ($status2_map[$cole['id']] ?? 'Por definir');
+  $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", $status_val);
 
   $count_p         = isset($adj_map[$cole['id']]) ? 1 : 0;
   $ultimo_contacto = $uc_map[$cole['id']] ?? '';
