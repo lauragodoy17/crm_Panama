@@ -102,7 +102,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("D4", "$fecha");
 $objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Empresa");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B6", "Asesor");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C6", "Colegio");
-$objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Dane");
+$objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Código interno");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E6", "Zona");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Departamento");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Ciudad");
@@ -137,22 +137,22 @@ if ($_SESSION['tipo']==1 || $_SESSION['tipo']==2 || $_SESSION['tipo']==7) {
     
     if ($_POST['promotor']!=0) {
 
-    $sql ="SELECT z.zona,c.id, c.colegio, c.departamento, c.ciudad, c.dane, c.sub_zona, c.responsable, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, l.id as idlibro, l.libro, l.id_grado,l.id_materia, l.etiqueta, p.precio, p.tasa_compra, p.descuento,p.tasa_compra_d,p.descuento_d, p.pre_definido, p.definido, p.cod_area, p.uni_vr, e.editorial FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_usuario JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id JOIN zonas z ON z.codigo=c.cod_zona  WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_POST['promotor']."'   AND p.probabilidad !=3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00) GROUP BY p.id ORDER BY u.tipo, p.id_usuario, p.id_colegio, l.libro";
+    $sql ="SELECT z.zona,c.id, c.colegio, c.departamento, c.ciudad, c.codigo, c.sub_zona, c.responsable, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, l.id as idlibro, l.libro, l.id_grado,l.id_materia, l.etiqueta, p.precio, p.tasa_compra, p.descuento,p.tasa_compra_d,p.descuento_d, p.pre_definido, p.definido, p.cod_area, p.uni_vr, e.editorial FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_usuario JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id JOIN zonas z ON z.codigo=c.cod_zona  WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_POST['promotor']."'  AND p.fila_zona > 0 AND p.probabilidad !=3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00) GROUP BY p.id ORDER BY u.tipo, p.id_usuario, p.id_colegio, l.libro";
 
- 
+
 
     }else{
-        $sql ="SELECT z.zona,c.id, c.colegio, c.departamento, c.ciudad, c.dane, c.sub_zona, c.responsable, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, l.id as idlibro, l.libro, l.id_grado,l.id_materia, l.etiqueta, p.precio, p.tasa_compra, p.descuento,p.tasa_compra_d,p.descuento_d, p.pre_definido, p.definido, p.cod_area, p.uni_vr, e.editorial FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_usuario JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id JOIN zonas z ON z.codigo=c.cod_zona  WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."'   AND p.probabilidad !=3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00) GROUP BY p.id ORDER BY u.tipo, p.id_usuario, p.id_colegio, l.libro";
-     
+        $sql ="SELECT z.zona,c.id, c.colegio, c.departamento, c.ciudad, c.codigo, c.sub_zona, c.responsable, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, l.id as idlibro, l.libro, l.id_grado,l.id_materia, l.etiqueta, p.precio, p.tasa_compra, p.descuento,p.tasa_compra_d,p.descuento_d, p.pre_definido, p.definido, p.cod_area, p.uni_vr, e.editorial FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_usuario JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id JOIN zonas z ON z.codigo=c.cod_zona  WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."'  AND p.fila_zona > 0 AND p.probabilidad !=3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00) GROUP BY p.id ORDER BY u.tipo, p.id_usuario, p.id_colegio, l.libro";
+
     }
 
 }elseif($_SESSION['tipo']==3) {
 
-    $sql ="SELECT z.zona,c.id, c.colegio, c.departamento, c.ciudad, c.dane, c.sub_zona, c.responsable, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, l.id as idlibro, l.libro, l.id_grado,l.id_materia, l.etiqueta, p.precio, p.tasa_compra, p.descuento,p.tasa_compra_d,p.descuento_d, p.pre_definido, p.definido, p.cod_area, p.uni_vr, e.editorial FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_usuario JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id JOIN zonas z ON z.codigo=c.cod_zona  WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."'   AND p.probabilidad !=3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00) GROUP BY p.id ORDER BY u.tipo, p.id_usuario, p.id_colegio, l.libro";
+    $sql ="SELECT z.zona,c.id, c.colegio, c.departamento, c.ciudad, c.codigo, c.sub_zona, c.responsable, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, l.id as idlibro, l.libro, l.id_grado,l.id_materia, l.etiqueta, p.precio, p.tasa_compra, p.descuento,p.tasa_compra_d,p.descuento_d, p.pre_definido, p.definido, p.cod_area, p.uni_vr, e.editorial FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_usuario JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id JOIN zonas z ON z.codigo=c.cod_zona  WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."'  AND p.fila_zona > 0 AND p.probabilidad !=3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00) GROUP BY p.id ORDER BY u.tipo, p.id_usuario, p.id_colegio, l.libro";
 
 }elseif($_SESSION['tipo']==10) {
 
-    $sql ="SELECT z.zona,c.id, c.colegio, c.departamento, c.ciudad, c.dane, c.sub_zona, c.responsable, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, l.id as idlibro, l.libro, l.id_grado,l.id_materia, l.etiqueta, p.precio, p.tasa_compra, p.descuento,p.tasa_compra_d,p.descuento_d, p.pre_definido, p.definido, p.cod_area, p.uni_vr, e.editorial FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_usuario JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id JOIN zonas z ON z.codigo=c.cod_zona  WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."'  AND (c.cod_zona='".$_SESSION['zona']."' OR c.zona_madre='".$_SESSION['zona']."')  AND p.probabilidad !=3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00) GROUP BY p.id ORDER BY u.tipo, p.id_usuario, p.id_colegio, l.libro";
+    $sql ="SELECT z.zona,c.id, c.colegio, c.departamento, c.ciudad, c.codigo, c.sub_zona, c.responsable, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, l.id as idlibro, l.libro, l.id_grado,l.id_materia, l.etiqueta, p.precio, p.tasa_compra, p.descuento,p.tasa_compra_d,p.descuento_d, p.pre_definido, p.definido, p.cod_area, p.uni_vr, e.editorial FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN usuarios u ON u.id=p.id_usuario JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id JOIN zonas z ON z.codigo=c.cod_zona  WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."'  AND c.cod_zona='".$_SESSION['zona']."'  AND p.fila_zona > 0 AND p.probabilidad !=3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00) GROUP BY p.id ORDER BY u.tipo, p.id_usuario, p.id_colegio, l.libro";
 
 }
 
@@ -268,40 +268,26 @@ foreach ($colegios as$colegio) {
     }
 
    
+    $venta_real = 0;
+
     if ($colegio["definido"] !=0) {
         if ($colegio["tasa_compra_d"] == 0.00) {
 
             $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra"]);
-            
-            $key_precio = $colegio["precio"] . "_" . $colegio["descuento"] . "_" . $alumnos_tasa;
-
-
             $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento"]);
-            $venta_ppto_d = $precio_neto_d * $alumnos_tasa_d;
+            $descuento_d=$colegio["descuento"] * 100;
 
-
-             $descuento_d=$colegio["descuento"] * 100;
-
-
-           
         }else{
-           
+
             $alumnos_tasa_d = floor($alumnos * $colegio["tasa_compra_d"]);
-
-         
             $precio_neto_d = $colegio["precio"] - ($colegio["precio"] * $colegio["descuento_d"]);
-            $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
-               
-            
             $descuento_d=$colegio["descuento_d"] * 100;
-            
-           
-            $venta_ppto_d=$precio_neto_d * $alumnos_tasa_d;
 
-            $venta_real= $precio_neto_d * $colegio["uni_vr"];
         }
 
-        
+        // Se calculan siempre, sin importar qué tasa se haya usado arriba (antes solo se calculaba venta_real en la rama del "else", dejando valores de la fila anterior en las demás)
+        $venta_ppto_d = $precio_neto_d * $alumnos_tasa_d;
+        $venta_real = $precio_neto_d * $colegio["uni_vr"];
 
     }
    
@@ -353,7 +339,7 @@ foreach ($colegios as$colegio) {
         $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$colegio[responsable]");
     }
 	
-	$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$colegio[dane]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$colegio[codigo]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$colegio[colegio]");
 
     $sql_dep="SELECT departamento FROM departamentos WHERE id='".$colegio['departamento']."' ";
@@ -417,25 +403,25 @@ foreach ($colegios as$colegio) {
 $objSpreadsheet->getActiveSheet()->getStyle("N7:N$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
     $objSpreadsheet->getActiveSheet()->getStyle("Q7:Q$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
     $objSpreadsheet->getActiveSheet()->getStyle("S7:S$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
     $objSpreadsheet->getActiveSheet()->getStyle("U7:U$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );	
 	
 function excelColumnRange($start, $end) {
