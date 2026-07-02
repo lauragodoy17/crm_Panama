@@ -173,7 +173,7 @@ foreach($coles as $cole) {
   $alumnos_global = $gp_pre["alumnos"] + $gp_pri["alumnos"] + $gp_bach["alumnos"];
 
   // Status: prioridad por FIELD, si no hay en el periodo actual se toma el último status conocido, si no "Por definir"
-  $sql_st = "SELECT status FROM colegios_status cs JOIN status_cubrimiento s ON cs.id_status=s.id WHERE cs.id_colegio='".$cole["id"]."' AND cs.id_periodo='".$gp_periodo["id"]."' ORDER BY FIELD(cs.id_status,'6','5','1','2','3','4')";
+  $sql_st = "SELECT status FROM colegios_status cs JOIN status_cubrimiento s ON cs.id_status=s.id WHERE cs.id_colegio='".$cole["id"]."' AND cs.id_periodo='".$gp_periodo["id"]."' AND s.id != 4 ORDER BY FIELD(cs.id_status,'6','5','1','2','3','4')";
   $req_st = $bdd->prepare($sql_st);
   $req_st->execute();
   $status = $req_st->fetch();
