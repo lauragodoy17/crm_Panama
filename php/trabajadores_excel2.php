@@ -30,10 +30,10 @@ include("../conexion/bdd.php");
 
 $objSpreadsheet = new Spreadsheet();
 $objSpreadsheet->getProperties()->setCreator("Ing. Alejandro Rangel");
-$objSpreadsheet->getProperties()->setTitle("Reporte trabajadores");
+$objSpreadsheet->getProperties()->setTitle("Reporte de directorio");
 $objSpreadsheet->createSheet(0);
 $objSpreadsheet->setActiveSheetIndex(0);
-$objSpreadsheet->getActiveSheet()->setTitle("Reporte trabajadores");
+$objSpreadsheet->getActiveSheet()->setTitle("Reporte de directorio");
 $objSpreadsheet->getActiveSheet()->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
 $objSpreadsheet->getActiveSheet()->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_LETTER);
 $objSpreadsheet->getActiveSheet()->getPageSetup()->setFitToPage(true);
@@ -53,6 +53,14 @@ $objSpreadsheet->getActiveSheet()->getPageSetup()->setFitToHeight(0);
 	$objSpreadsheet->getActiveSheet()->SetCellValue("H1", "Correo electrónico");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I1", "Cumpleaños");
 
+$objSpreadsheet->getActiveSheet()->getStyle('A1:I1')->applyFromArray([
+    'fill' => [
+        'fillType' => Fill::FILL_SOLID,
+        'startColor' => [
+            'rgb' => '00FF84'
+        ]
+    ]
+]);
 
 $sql_periodo="SELECT id FROM periodos ORDER BY id DESC";
 
@@ -62,7 +70,7 @@ $gp_periodo = $req_periodo->fetch();
 
 
 
-	$sql = "SELECT t.nombre, t.telefono,t.email,t.cumpleaños,m.materia, ca.cargo, c.colegio, z.zona, u.nombres,u.apellidos FROM trabajadores_colegios t JOIN colegios c ON t.id_colegio=c.id JOIN cargos ca ON t.cargo=ca.id JOIN zonas z ON c.cod_zona=z.codigo JOIN usuarios u ON z.codigo=u.cod_zona LEFT JOIN materias m ON m.id=t.area WHERE t.nombre !='' GROUP BY t.nombre, t.cargo ORDER BY z.id";
+	$sql = "SELECT TRIM(CONCAT(t.nombre,' ',t.apellido)) as nombre, t.telefono,t.email,t.cumpleaños,m.materia, ca.cargo, c.colegio, z.zona, u.nombres,u.apellidos FROM trabajadores_colegios t JOIN colegios c ON t.id_colegio=c.id JOIN cargos ca ON t.cargo=ca.id JOIN zonas z ON c.cod_zona=z.codigo JOIN usuarios u ON z.codigo=u.cod_zona LEFT JOIN materias m ON m.id=t.area WHERE t.nombre !='' AND t.activo=1 GROUP BY t.id ORDER BY z.id";
 	$req = $bdd->prepare($sql);
 	$req->execute();
 	$coles = $req->fetchAll();
