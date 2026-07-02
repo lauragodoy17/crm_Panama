@@ -28,10 +28,10 @@ include("../conexion/bdd.php");
 
 $objSpreadsheet = new Spreadsheet();
 $objSpreadsheet->getProperties()->setCreator("Ing. Alejandro Rangel");
-$objSpreadsheet->getProperties()->setTitle("Reporte de cubrimiento");
+$objSpreadsheet->getProperties()->setTitle("Reporte de zonificación");
 $objSpreadsheet->createSheet(0);
 $objSpreadsheet->setActiveSheetIndex(0);
-$objSpreadsheet->getActiveSheet()->setTitle("Reporte de cubrimiento");
+$objSpreadsheet->getActiveSheet()->setTitle("Reporte de zonificación");
 $objSpreadsheet->getActiveSheet()->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
 $objSpreadsheet->getActiveSheet()->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_LETTER);
 $objSpreadsheet->getActiveSheet()->getPageSetup()->setFitToPage(true);
@@ -76,36 +76,35 @@ if ($_POST['promo']!=0) {
 
 $objSpreadsheet->getActiveSheet()->SetCellValue("C1", "Fecha Reporte");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C2", "$fecha");
-$objSpreadsheet->getActiveSheet()->SetCellValue("A4", "Dane");
+$objSpreadsheet->getActiveSheet()->SetCellValue("A4", "Código interno");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B4", "Colegio");
-$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Calendario");
 
 if ($_POST['promo']!=0) {
 
-	if ($usuario["tipo"]==3 || $usuario["tipo"]==1) {
-		$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Empresa");
+	if ($usuario["tipo"]==3 || $usuario["tipo"]==1 || $usuario["tipo"]==10) {
+		$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Empresa");
 	}else{
-		$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Zona / Asesor");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Zona / Asesor");
 	}
 
 }else{
-	$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Usuario");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Usuario");
 }
 
-$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Departamento");
-$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Ciudad");
-$objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Barrio");
-$objSpreadsheet->getActiveSheet()->SetCellValue("H4", "Dirección");
-$objSpreadsheet->getActiveSheet()->SetCellValue("I4", "Teléfono");
-$objSpreadsheet->getActiveSheet()->SetCellValue("J4", "Status");
-$objSpreadsheet->getActiveSheet()->SetCellValue("K4", "Propuesta comercial");
-$objSpreadsheet->getActiveSheet()->getStyle("A1:K1")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Departamento");
+$objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Ciudad");
+$objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Barrio");
+$objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Dirección");
+$objSpreadsheet->getActiveSheet()->SetCellValue("H4", "Teléfono");
+$objSpreadsheet->getActiveSheet()->SetCellValue("I4", "Status");
+$objSpreadsheet->getActiveSheet()->SetCellValue("J4", "Propuesta comercial");
+$objSpreadsheet->getActiveSheet()->getStyle("A1:J1")->getFont()->getColor()->applyFromArray(
 	array(
 	'rgb' => '#251919'
 	)
 );
 
-$objSpreadsheet->getActiveSheet()->getStyle('A4:K4')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A4:J4')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -114,97 +113,71 @@ $objSpreadsheet->getActiveSheet()->getStyle('A4:K4')->applyFromArray([
     ]
 ]);
 
-$sql_periodo="SELECT id, id_calendario FROM periodos WHERE id='".$_POST["periodo"]."'";
-$req_periodo = $bdd->prepare($sql_periodo);
-$req_periodo->execute();
-$gp_periodo = $req_periodo->fetch();
-
 if ($_POST['promo']!=0) {
 
-	if ($usuario["tipo"]!=10) {
-		$sql = "SELECT c.id, c.dane as codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, c.zona_madre, z.zona, c.responsable, ca.calendario, sc.status FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN calendarios ca ON ca.id=c.id_calendario LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo='".$usuario["cod_zona"]."' AND c.id_calendario='".$gp_periodo['id_calendario']."' GROUP BY c.id";
-	}else{
-		$sql = "SELECT c.id, c.dane as codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, c.zona_madre, z.zona, c.responsable, ca.calendario, sc.status FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN calendarios ca ON ca.id=c.id_calendario LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE (z.codigo='".$usuario["cod_zona"]."' OR c.zona_madre='".$usuario["cod_zona"]."') AND c.id_calendario='".$gp_periodo['id_calendario']."' GROUP BY c.id";
-	}
-	
+	$sql = "SELECT c.id, c.codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, z.zona, c.responsable, sc.status FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo='".$usuario["cod_zona"]."' GROUP BY c.id";
+
 }else{
 
-	$sql = "SELECT c.id, c.dane as codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, c.zona_madre, z.zona, c.responsable, ca.calendario, sc.status, CONCAT (u.nombres, ' ',u.apellidos) as promotor FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN calendarios ca ON ca.id=c.id_calendario JOIN usuarios u ON u.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo !='74838' AND c.id_calendario='".$gp_periodo['id_calendario']."' GROUP BY c.id ORDER BY u.id";
+	$sql = "SELECT c.id, c.codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, z.zona, c.responsable, sc.status, CONCAT (u.nombres, ' ',u.apellidos) as promotor FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN usuarios u ON u.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo !='74838' GROUP BY c.id ORDER BY u.id";
 }
 
 	$req = $bdd->prepare($sql);
 	$req->execute();
 	$coles = $req->fetchAll();
 
+// ── Pre-fetch para eliminar N+1 queries ──────────────────────────
+$cole_ids = array_column($coles, 'id');
+$dep_map = []; $adj_map = []; $sz_map = [];
+
+$req_all_dep = $bdd->query("SELECT id, departamento FROM departamentos");
+foreach ($req_all_dep->fetchAll(PDO::FETCH_ASSOC) as $row)
+    $dep_map[$row['id']] = $row['departamento'];
+
+if (!empty($cole_ids)) {
+    $ph = implode(',', array_fill(0, count($cole_ids), '?'));
+    $req_adj_all = $bdd->prepare("SELECT id_colegio FROM adjuntos WHERE id_colegio IN ($ph) AND id_periodo = ? GROUP BY id_colegio");
+    $req_adj_all->execute(array_merge($cole_ids, [$_POST["periodo"]]));
+    foreach ($req_adj_all->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $adj_map[$row['id_colegio']] = true;
+}
+$all_sz_ids = array_values(array_filter(array_unique(array_column($coles, 'sub_zona'))));
+if (!empty($all_sz_ids)) {
+    $ph_sz = implode(',', array_fill(0, count($all_sz_ids), '?'));
+    $req_sz_all = $bdd->prepare("SELECT id, sub_zona FROM sub_zonas WHERE id IN ($ph_sz)");
+    $req_sz_all->execute($all_sz_ids);
+    foreach ($req_sz_all->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $sz_map[$row['id']] = $row['sub_zona'];
+}
+// ── Fin pre-fetch ─────────────────────────────────────────────────
+
 $conta=5;
 foreach($coles as $cole) {
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$cole[codigo]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$cole[colegio]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$cole[calendario]");
 
 	if ($_POST['promo']!=0) {
-		if ($usuario["tipo"]==3 || $usuario["tipo"]==1) {
-		
-			$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$empresa");
-		}elseif ($usuario["tipo"]==10) {
-			if ($cole["zona_madre"]=="") {
-				$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$empresa");
-			}else{
-				$sql_sz="SELECT sub_zona FROM sub_zonas WHERE id='".$cole["sub_zona"]."'";
-
-			    $req_sz = $bdd->prepare($sql_sz);
-
-			    $req_sz->execute();
-
-			    $sub_zona = $req_sz->fetch();
-				$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$sub_zona[sub_zona] / $cole[responsable]");
-			}
-		}
-
-		else{
-
-			$sql_sz="SELECT sub_zona FROM sub_zonas WHERE id='".$cole["sub_zona"]."'";
-
-	    $req_sz = $bdd->prepare($sql_sz);
-
-	    $req_sz->execute();
-
-	    $sub_zona = $req_sz->fetch();
-
-			$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$sub_zona[sub_zona] / $cole[responsable]");
+		if ($usuario["tipo"]==3 || $usuario["tipo"]==1 || $usuario["tipo"]==10) {
+			$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$empresa");
+		}else{
+			$sznombre = $sz_map[$cole["sub_zona"]] ?? '';
+			$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$sznombre / $cole[responsable]");
 		}
 	}else{
-		$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$cole[promotor]");
+		$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$cole[promotor]");
 	}
 
-	
+	$dep_nombre = $dep_map[$cole['departamento']] ?? '';
+	$count_p    = isset($adj_map[$cole['id']]) ? 1 : 0;
 
-	$sql_dep="SELECT departamento FROM departamentos WHERE id='".$cole['departamento']."' ";
-  $req_dep = $bdd->prepare($sql_dep);
-  $req_dep->execute();
-  $dep = $req_dep->fetch();
-
-   $sql = "SELECT id FROM adjuntos WHERE id_colegio='".$cole["id"]."' AND id_periodo='".$_POST["periodo"]."'";
-
-   $req = $bdd->prepare($sql);
-   $req->execute();
-   $count_p = $req->rowCount();
-
-	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$dep[departamento]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$cole[ciudad]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$cole[barrio]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$cole[direccion]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$cole[telefono]");		
-	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$cole[status]");
-
-	if ($count_p < 1) {
-		$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "No");
-	}else{
-		$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "Si");
-	}
-
-
+	$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", $dep_nombre);
+	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$cole[ciudad]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$cole[barrio]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$cole[direccion]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$cole[telefono]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$cole[status]");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", $count_p < 1 ? "No" : "Si");
 
 $conta++;
 }

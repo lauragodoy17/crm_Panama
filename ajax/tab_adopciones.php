@@ -497,7 +497,7 @@
                     <select name="grado_otrod" id="grado_otrod" class="form-control">
                       <option value="">Seleccionar</option>
                       <?php
-                        $sql = "SELECT id, grado FROM grados WHERE id < 15";
+                        $sql = "SELECT id, grado FROM grados WHERE id < 15 OR id = 18";
                         $req = $bdd->prepare($sql); $req->execute();
                         foreach ($req->fetchAll() as $grado)
                           echo '<option value="'.$grado['id'].'">'.$grado['grado'].'</option>';
@@ -555,7 +555,7 @@
                     <select name="grado_otrod" id="grado_otrod<?= $i ?>" class="form-control">
                       <option value="">Seleccionar</option>
                       <?php
-                        $sql = "SELECT id, grado FROM grados WHERE id < 15";
+                        $sql = "SELECT id, grado FROM grados WHERE id < 15 OR id = 18";
                         $req = $bdd->prepare($sql); $req->execute();
                         foreach ($req->fetchAll() as $grado)
                           echo '<option value="'.$grado['id'].'">'.$grado['grado'].'</option>';
@@ -1726,11 +1726,24 @@
                 
     });
 
-    $('#libro_ed').on('change',function(){
-        $value=$("#materiad").val()+"/"+$("#gradod").val()+"/"+$(this).val()+"/"+$("#grado_otrod").val();
+    function actualizarLibsAod() {
+        $value=$("#materiad").val()+"/"+$("#gradod").val()+"/"+$("#libro_ed").val()+"/"+$("#grado_otrod").val();
         $("#libs_aod").val($value);
-                              
+    }
+
+    $('#libro_ed').on('change',function(){
+        // Cuando el libro viene de la búsqueda libre (Inglés / Plan Lector), el
+        // curso NO se toma del grado por defecto del libro: se asigna aparte,
+        // porque el mismo libro puede usarse en un curso distinto según el colegio.
+        if ($(this).find('option:selected').data('libre')) {
+            $('#gradod').val('17');
+            $(".g_otrod").removeClass("d-none").addClass("show");
+            $("#grado_otrod").attr("required","required");
+        }
+        actualizarLibsAod();
     });
+
+    $('#grado_otrod').on('change', actualizarLibsAod);
 
     var m = 1;
     $("#agregar_aod").click(function(){
@@ -1821,11 +1834,21 @@
                   
         });
 
-        $('#libro_ed<?php echo $i; ?>').on('change',function(){
-          $value=$("#materiad<?php echo $i; ?>").val()+"/"+$("#gradod<?php echo $i; ?>").val()+"/"+$(this).val()+"/"+$("#grado_otrod<?php echo $i; ?>").val();
+        function actualizarLibsAod<?php echo $i; ?>() {
+          $value=$("#materiad<?php echo $i; ?>").val()+"/"+$("#gradod<?php echo $i; ?>").val()+"/"+$("#libro_ed<?php echo $i; ?>").val()+"/"+$("#grado_otrod<?php echo $i; ?>").val();
           $("#libs_aod<?php echo $i; ?>").val($value);
-                   
+        }
+
+        $('#libro_ed<?php echo $i; ?>').on('change',function(){
+          if ($(this).find('option:selected').data('libre')) {
+              $('#gradod<?php echo $i; ?>').val('17');
+              $(".g_otrod<?php echo $i; ?>").removeClass("d-none").addClass("show");
+              $("#grado_otrod<?php echo $i; ?>").attr("required","required");
+          }
+          actualizarLibsAod<?php echo $i; ?>();
         });
+
+        $('#grado_otrod<?php echo $i; ?>').on('change', actualizarLibsAod<?php echo $i; ?>);
 
       <?php } ?>
  

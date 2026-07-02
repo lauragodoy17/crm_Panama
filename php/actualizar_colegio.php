@@ -26,7 +26,9 @@ if (isset($_POST["colegio"])) {
         return $cargos_h_map[$val] ?? (string)$val;
     };
 
-    $sql = "UPDATE colegios SET colegio='".$_POST["colegio"]."', departamento='".$_POST["departamento"]."', ciudad='".$_POST["ciudad"]."', direccion='".$_POST["direccion"]."', telefono='".$_POST["telefono_c"]."', web='".$_POST["web"]."', cumpleaños='".$cumple."', responsable='".$_POST["responsable"]."', quien_decide='".$quien_decide_val."', id_segmento='".$_POST["segmento"]."' WHERE codigo='".$_POST["cod_colegio"]."'";
+    $propuesta_comercial_val = ($_POST['propuesta_comercial'] ?? 'no') === 'si' ? 'si' : 'no';
+
+    $sql = "UPDATE colegios SET colegio='".$_POST["colegio"]."', departamento='".$_POST["departamento"]."', ciudad='".$_POST["ciudad"]."', direccion='".$_POST["direccion"]."', telefono='".$_POST["telefono_c"]."', web='".$_POST["web"]."', cumpleaños='".$cumple."', responsable='".$_POST["responsable"]."', propuesta_comercial='".$propuesta_comercial_val."', quien_decide='".$quien_decide_val."', id_segmento='".$_POST["segmento"]."' WHERE codigo='".$_POST["cod_colegio"]."'";
     $req = $bdd->prepare($sql);
     $req->execute();
 
@@ -41,19 +43,6 @@ if (isset($_POST["colegio"])) {
                 'Segmento', $seg_map[$old_colegio['id_segmento']] ?? '', $seg_map[$_POST["segmento"]] ?? '');
         }
     }
-
-    $sql = "SELECT id FROM pension WHERE cod_colegio='".$_POST["cod_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $num = $req->rowCount();
-
-    if ($num < 1) {
-        $sql = "INSERT INTO pension (cod_colegio, id_periodo, pension) VALUES('".$_POST["cod_colegio"]."', '".$_POST["periodo"]."', '".$_POST["pension"]."')";
-    } else {
-        $sql = "UPDATE pension SET pension='".$_POST["pension"]."' WHERE cod_colegio='".$_POST["cod_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
-    }
-    $req = $bdd->prepare($sql);
-    $req->execute();
 
     $req_old_status = $bdd->prepare("SELECT id_status FROM colegios_status WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'");
     $req_old_status->execute();

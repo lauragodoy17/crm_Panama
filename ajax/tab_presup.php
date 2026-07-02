@@ -945,10 +945,24 @@
         })
       });
 
-      $('#libro_e').on('change',function(){
-        $value=$("#materia").val()+"/"+$("#grado").val()+"/"+$(this).val()+"/"+$("#grado_otro").val();
+      function actualizarLibsAo() {
+        $value=$("#materia").val()+"/"+$("#grado").val()+"/"+$("#libro_e").val()+"/"+$("#grado_otro").val();
         $("#libs_ao").val($value);
+      }
+
+      $('#libro_e').on('change',function(){
+        // Cuando el libro viene de la búsqueda libre (Inglés / Plan Lector), el
+        // curso NO se toma del grado por defecto del libro: se asigna aparte,
+        // porque el mismo libro puede usarse en un curso distinto según el colegio.
+        if ($(this).find('option:selected').data('libre')) {
+            $('#grado').val('17');
+            $(".g_otro").removeClass("d-none").addClass("show");
+            $("#grado_otro").attr("required","required");
+        }
+        actualizarLibsAo();
       });
+
+      $('#grado_otro').on('change', actualizarLibsAo);
 
       var m = 1;
     $("#agregar_ao").click(function(){
@@ -1019,10 +1033,21 @@
           })
         });
 
-        $('#libro_e<?php echo $i; ?>').on('change',function(){
-          $value=$("#materia<?php echo $i; ?>").val()+"/"+$("#grado<?php echo $i; ?>").val()+"/"+$(this).val()+"/"+$("#grado_otro<?php echo $i; ?>").val();
+        function actualizarLibsAo<?php echo $i; ?>() {
+          $value=$("#materia<?php echo $i; ?>").val()+"/"+$("#grado<?php echo $i; ?>").val()+"/"+$("#libro_e<?php echo $i; ?>").val()+"/"+$("#grado_otro<?php echo $i; ?>").val();
           $("#libs_ao<?php echo $i; ?>").val($value);
+        }
+
+        $('#libro_e<?php echo $i; ?>').on('change',function(){
+          if ($(this).find('option:selected').data('libre')) {
+              $('#grado<?php echo $i; ?>').val('17');
+              $(".g_otro<?php echo $i; ?>").removeClass("d-none").addClass("show");
+              $("#grado_otro<?php echo $i; ?>").attr("required","required");
+          }
+          actualizarLibsAo<?php echo $i; ?>();
         });
+
+        $('#grado_otro<?php echo $i; ?>').on('change', actualizarLibsAo<?php echo $i; ?>);
 
       <?php } ?>
 

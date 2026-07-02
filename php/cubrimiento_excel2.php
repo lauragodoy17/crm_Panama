@@ -101,13 +101,17 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("M4", "Alumnos primaria");
 $objSpreadsheet->getActiveSheet()->SetCellValue("N4", "Alumnos bachillerato");
 $objSpreadsheet->getActiveSheet()->SetCellValue("O4", "Alumnos global");
 $objSpreadsheet->getActiveSheet()->SetCellValue("P4", "Status");
-$objSpreadsheet->getActiveSheet()->getStyle("A1:P1")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->SetCellValue("Q4", "Propuesta comercial");
+$objSpreadsheet->getActiveSheet()->SetCellValue("R4", "Segmento");
+$objSpreadsheet->getActiveSheet()->SetCellValue("S4", "Estado del cliente");
+$objSpreadsheet->getActiveSheet()->SetCellValue("T4", "Fecha de último contacto");
+$objSpreadsheet->getActiveSheet()->getStyle("A1:T1")->getFont()->getColor()->applyFromArray(
   array(
   'rgb' => '#251919'
   )
 );
 
-$objSpreadsheet->getActiveSheet()->getStyle('A4:P4')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A4:T4')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -116,11 +120,35 @@ $objSpreadsheet->getActiveSheet()->getStyle('A4:P4')->applyFromArray([
     ]
 ]);
 
-$sql="SELECT c.id, c.codigo, UPPER(c.colegio) as colegio, c.ciudad, c.direccion, c.telefono, c.sub_zona, c.responsable, d.departamento FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN departamentos d ON d.id=c.departamento WHERE z.codigo='".$usuario["cod_zona"]."' ORDER BY c.codigo";
+$sql="SELECT c.id, c.codigo, UPPER(c.colegio) as colegio, c.ciudad, c.direccion, c.telefono, c.sub_zona, c.responsable, d.departamento, s.segmento FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN departamentos d ON d.id=c.departamento LEFT JOIN segmentos s ON c.id_segmento=s.id WHERE z.codigo='".$usuario["cod_zona"]."' ORDER BY c.codigo";
 
 $req = $bdd->prepare($sql);
 $req->execute();
 $coles = $req->fetchAll();
+
+// ── Pre-fetch para eliminar N+1 queries ──────────────────────────
+$cole_ids = array_column($coles, 'id');
+$adj_map = []; $uc_map = []; $est_map = [];
+
+if (!empty($cole_ids)) {
+    $ph = implode(',', array_fill(0, count($cole_ids), '?'));
+
+    $req_adj_all = $bdd->prepare("SELECT id_colegio FROM adjuntos WHERE id_colegio IN ($ph) AND id_periodo = ? GROUP BY id_colegio");
+    $req_adj_all->execute(array_merge($cole_ids, [$_POST["periodo"]]));
+    foreach ($req_adj_all->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $adj_map[$row['id_colegio']] = true;
+
+    $req_uc_all = $bdd->prepare("SELECT p.id_colegio, MAX(v.fecha) as ultimo_contacto FROM plan_trabajo p JOIN visitas v ON p.id = v.id_plan_trabajo WHERE p.id_colegio IN ($ph) AND p.resultado = 1 GROUP BY p.id_colegio");
+    $req_uc_all->execute($cole_ids);
+    foreach ($req_uc_all->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $uc_map[$row['id_colegio']] = $row['ultimo_contacto'];
+
+    $req_est_all = $bdd->prepare("SELECT ce.id_colegio, e.estado FROM estados_cliente e JOIN colegios_estados_clientes ce ON e.id = ce.id_estado_cliente WHERE ce.id_colegio IN ($ph) AND ce.id_periodo = ?");
+    $req_est_all->execute(array_merge($cole_ids, [$_POST["periodo"]]));
+    foreach ($req_est_all->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $est_map[$row['id_colegio']] = $row['estado'];
+}
+// ── Fin pre-fetch ─────────────────────────────────────────────────
 
 $conta=5;
 foreach($coles as $cole) {
@@ -191,6 +219,15 @@ foreach($coles as $cole) {
   }else{
     $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "Por definir");
   }
+
+  $count_p         = isset($adj_map[$cole['id']]) ? 1 : 0;
+  $ultimo_contacto = $uc_map[$cole['id']] ?? '';
+  $estado_cli      = $est_map[$cole['id']] ?? '';
+
+  $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", $count_p < 1 ? "No" : "Si");
+  $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", "$cole[segmento]");
+  $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", $estado_cli);
+  $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", $ultimo_contacto);
 
 
 $conta++;
