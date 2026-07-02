@@ -107,7 +107,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("A6", "#");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B6", "Empresa");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C6", "Zona");
 $objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Asesor");
-$objSpreadsheet->getActiveSheet()->SetCellValue("E6", "Dane");
+$objSpreadsheet->getActiveSheet()->SetCellValue("E6", "Código interno");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Colegio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Departamento");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H6", "Ciudad");
@@ -137,25 +137,25 @@ if ($_SESSION['tipo']==1 || $_SESSION['tipo']==2 || $_SESSION['tipo']==7) {
     if ($_POST['promotor']!=0) {
 
 
-     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.id_usuario='".$_POST['promotor']."' AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
+     $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.id_usuario='".$_POST['promotor']."' AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
                                   
 
  
 
     }else{
 
-         $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
+         $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
      
     }
 
 }elseif($_SESSION['tipo']==3){
 
-    $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."' GROUP BY c.id ORDER BY p.conse DESC";
+    $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."' GROUP BY c.id ORDER BY p.conse DESC";
 
   
 }else{
 
-     $sql = "SELECT c.id, c.dane, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND (c.cod_zona='".$_SESSION['zona']."' OR c.zona_madre='".$_SESSION['zona']."') GROUP BY c.id ORDER BY p.conse DESC";
+     $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND c.cod_zona='".$_SESSION['zona']."' GROUP BY c.id ORDER BY p.conse DESC";
 }
 
 
@@ -267,15 +267,15 @@ foreach ($colegios as $colegio) {
 
     }
 
-    $t_cant_presup[$colegio["id"]]=array_sum($cant_presup[$colegio["id"]]);
-    $t_valor_presup[$colegio["id"]]=array_sum($valor_presup[$colegio["id"]]);
+    $t_cant_presup[$colegio["id"]]=array_sum($cant_presup[$colegio["id"]] ?? []);
+    $t_valor_presup[$colegio["id"]]=array_sum($valor_presup[$colegio["id"]] ?? []);
 
-  
+
     $t_castigo[$colegio["id"]]       = array_sum($castigo[$colegio["id"]] ?? []);
     $t_valor_adopcion[$colegio["id"]] = array_sum($valor_adopcion[$colegio["id"]] ?? []);
 
-    
-    $t_alms[$colegio["id"]]=array_sum($alms[$colegio["id"]]);
+
+    $t_alms[$colegio["id"]]=array_sum($alms[$colegio["id"]] ?? []);
     
    
 
@@ -291,7 +291,9 @@ foreach ($colegios as $colegio) {
     $conse=$colegio["year"]."-".$colegio["conse"];
     $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$conse");
     if ($colegio["tipouser"]!=6) {
-        list($empresa,$n_zona) = explode("/", $colegio["zona"]);
+        $zona_partes = array_pad(explode("/", $colegio["zona"] ?? ''), 2, '');
+        $empresa = $zona_partes[0];
+        $n_zona = $zona_partes[1];
         $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$empresa");
         $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$n_zona");
         $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$colegio[promotor]");
@@ -307,7 +309,7 @@ foreach ($colegios as $colegio) {
         $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$colegio[responsable]");
     }
     
-    $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$colegio[dane]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$colegio[codigo]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$colegio[colegio]");
 
     $sql_dep="SELECT departamento FROM departamentos WHERE id='".$colegio['departamento']."' ";
@@ -360,19 +362,25 @@ foreach ($colegios as $colegio) {
 $objSpreadsheet->getActiveSheet()->getStyle("K7:K$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
-        );
-
-$objSpreadsheet->getActiveSheet()->getStyle("L7:L$conta")
-          ->getNumberFormat()
-          ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
 $objSpreadsheet->getActiveSheet()->getStyle("M7:M$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
+        );
+
+$objSpreadsheet->getActiveSheet()->getStyle("N7:N$conta")
+          ->getNumberFormat()
+          ->setFormatCode(
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
+        );
+
+$objSpreadsheet->getActiveSheet()->getStyle("O7:O$conta")
+          ->getNumberFormat()
+          ->setFormatCode(
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
     
