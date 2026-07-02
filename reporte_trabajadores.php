@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Inkpulse - Reporte trabajadores colegios</title>
+  <title>Inkpulse - Reporte de directorio</title>
   <link rel="apple-touch-icon" sizes="180x180" href="vendors/images/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="vendors/images/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="vendors/images/favicon-16x16.png" />
@@ -23,7 +23,7 @@
       <div class="page-header">
         <div class="row align-items-center">
           <div class="col-md-8 col-sm-12">
-            <div class="title"><h4>Reporte trabajadores colegio</h4></div>
+            <div class="title"><h4>Reporte de directorio</h4></div>
           </div>
         </div>
       </div>
@@ -31,11 +31,11 @@
       <div class="sm-section">
         <div class="sm-section-head">
           <span class="sm-sec-icon"><i class="bi bi-people"></i></span>
-          <span class="sm-section-title">Contactos de colegios — General</span>
+          <span class="sm-section-title">Directorio de colegios — General</span>
         </div>
         <div class="sm-section-body">
           <p style="font-size:13px; color:#6b7280; margin-bottom:16px;">
-            Exporta el listado completo de contactos registrados en todos los colegios.
+            Exporta el listado completo del directorio de contactos registrados en todos los colegios.
           </p>
           <div class="sm-footer">
             <a href="php/trabajadores_excel2.php" class="btn btn-primary">

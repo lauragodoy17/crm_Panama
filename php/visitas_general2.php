@@ -107,7 +107,7 @@ $hasta=$_POST["hasta"]." "."23:59:59";
 
 
 	
-$sql = "SELECT p.id as planid, p.resultado,p.cod_profesor,p.id_objetivo, c.id as cid, UPPER(c.colegio) as colegio, p.start FROM plan_trabajo p JOIN colegios c ON p.id_colegio=c.id  WHERE p.id_promotor='".$_SESSION["id"]."' AND p.start BETWEEN '".$desde."' AND '".$hasta."' ORDER BY start ASC";
+$sql = "SELECT p.id as planid, p.resultado,p.cod_profesor,p.id_objetivo, c.id as cid, UPPER(c.colegio) as colegio, p.start FROM plan_trabajo p LEFT JOIN colegios c ON p.id_colegio=c.id  WHERE p.id_promotor='".$_SESSION["id"]."' AND p.start BETWEEN '".$desde."' AND '".$hasta."' ORDER BY start ASC";
 $req = $bdd->prepare($sql);
 $req->execute();
 $planes = $req->fetchAll();
@@ -200,7 +200,11 @@ foreach($planes as $plan) {
 		$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "");
 	}
 		
-	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$objetivo[objetivo]");
+	if (!empty($objetivo["objetivo"])) {
+		$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$objetivo[objetivo]");
+	}else{
+		$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "");
+	}
 	if ($plan["resultado"]==1) {
 		$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "Ejecutada");
 	}

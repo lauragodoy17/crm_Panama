@@ -185,17 +185,17 @@ foreach ($colegios as $colegio) {
 
 
     if ($_POST['promotor']!=0) {
-        $sql ="SELECT p.tasa_compra,p.tasa_compra_d, p.descuento, p.descuento_d, p.definido, p.cod_area, p.id_colegio, SUM(p.uni_vr) AS uni_vr FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id WHERE p.id_libro='".$colegio["id"]."' AND p.definido=1 AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_POST['promotor']."' AND p.probabilidad !=3 GROUP BY p.id_colegio;";
+        $sql ="SELECT p.tasa_compra,p.tasa_compra_d, p.descuento, p.descuento_d, p.definido, p.cod_area, p.id_colegio, SUM(p.uni_vr) OVER () AS uni_vr FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id WHERE p.id_libro='".$colegio["id"]."' AND p.definido=1 AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_POST['promotor']."' AND p.probabilidad !=3 GROUP BY p.id_colegio;";
     }else{
 
         if (!isset($_POST['desde']) ) {
 
-            $sql ="SELECT p.tasa_compra,p.tasa_compra_d, p.descuento, p.descuento_d, p.definido, p.cod_area, p.id_colegio, SUM(p.uni_vr) AS uni_vr FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id WHERE p.id_libro='".$colegio["id"]."' AND p.definido=1 AND p.id_periodo='".$_POST['periodo']."' AND p.probabilidad !=3 GROUP BY p.id_colegio;";
+            $sql ="SELECT p.tasa_compra,p.tasa_compra_d, p.descuento, p.descuento_d, p.definido, p.cod_area, p.id_colegio, SUM(p.uni_vr) OVER () AS uni_vr FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id WHERE p.id_libro='".$colegio["id"]."' AND p.definido=1 AND p.id_periodo='".$_POST['periodo']."' AND p.probabilidad !=3 GROUP BY p.id_colegio;";
 
 
         }else{
 
-            $sql ="SELECT p.tasa_compra,p.tasa_compra_d, p.descuento, p.descuento_d, p.definido, p.cod_area, p.id_colegio, SUM(p.uni_vr) AS uni_vr FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id WHERE p.id_libro='".$colegio["id"]."' AND p.definido=1 AND p.id_periodo='".$_POST['periodo']."' AND p.probabilidad !=3 AND p.conse BETWEEN '".$_POST["desde"]."' AND '".$_POST["hasta"]."' GROUP BY p.id_colegio;";
+            $sql ="SELECT p.tasa_compra,p.tasa_compra_d, p.descuento, p.descuento_d, p.definido, p.cod_area, p.id_colegio, SUM(p.uni_vr) OVER () AS uni_vr FROM presupuestos p JOIN libros l ON p.id_libro=l.id JOIN editoriales e ON l.editorial=e.id WHERE p.id_libro='".$colegio["id"]."' AND p.definido=1 AND p.id_periodo='".$_POST['periodo']."' AND p.probabilidad !=3 AND p.conse BETWEEN '".$_POST["desde"]."' AND '".$_POST["hasta"]."' GROUP BY p.id_colegio;";
 
 
         }
@@ -270,13 +270,13 @@ foreach ($colegios as $colegio) {
 $objSpreadsheet->getActiveSheet()->getStyle("C7:C$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
 $objSpreadsheet->getActiveSheet()->getStyle("F7:F$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
 

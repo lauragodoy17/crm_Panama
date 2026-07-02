@@ -14,7 +14,7 @@ $presupuesto_active  = $current_page === 'colegios_presup.php';
 $atenciones_active   = $current_page === 'lista_atenciones.php';
 $ops_active          = in_array($current_page, ['solicitar_op.php','lista_op.php','clientes_op.php']);
 $opds_active         = in_array($current_page, ['solicitar_orden_pd.php','ver_opds.php','reporte_opd.php']);
-$reportes_active     = in_array($current_page, ['reporte_zonificacion.php','reporte_cubrimiento.php','reporte_visitas.php','reporte_atenciones.php','calendar_ti.php','reporte_valoriza.php','reporte_valoriza_global.php','reporte_trabajadores.php','reporte_cant_adop.php','reporte_muestreo_f.php','reporte_pedidos.php','reporte_devoluciones.php']);
+$reportes_active     = in_array($current_page, ['reporte_cubrimiento.php','reporte_visitas.php','reporte_valoriza.php','reporte_valoriza_global.php','reporte_trabajadores.php','reporte_cant_adop.php']);
 ?>
 <!--<div class="pre-loader">
 			<div class="pre-loader-box">
@@ -336,6 +336,7 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 							</li>
 						<?php }?>
 						
+						<?php if (false) { /* Oculto temporalmente para Panamá: Muestreo */ ?>
 						<?php if ($_SESSION["tipo"] !=5  && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=8) {?>
 							<li><div class="sidebar-small-cap proc-sec">Procesos</div></li>
 							<li class="dropdown <?= $muestreo_active ? 'show' : '' ?>">
@@ -385,7 +386,9 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 							</li>
 
 						<?php } ?>
+						<?php } /* fin oculto Panamá: Muestreo */ ?>
 
+						<?php if (false) { /* Oculto temporalmente para Panamá: Pedidos y Devoluciones */ ?>
 						<?php if ($_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=5) {?>
 
 							<li class="dropdown <?= $pedidos_active ? 'show' : '' ?>" id="pedidos">
@@ -448,7 +451,9 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 							</li>
 
 						<?php } ?>
+						<?php } /* fin oculto Panamá: Pedidos y Devoluciones */ ?>
 
+						<?php if (false) { /* Oculto temporalmente para Panamá: Pedidos sin adopción */ ?>
 						<?php if ($_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
 
 							<li class="dropdown <?= $pedidos_sa_active ? 'show' : '' ?>">
@@ -482,7 +487,9 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 							</li>
 
 						<?php } ?>
+						<?php } /* fin oculto Panamá: Pedidos sin adopción */ ?>
 
+						<?php if (false) { /* Oculto temporalmente para Panamá: Presupuesto */ ?>
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==3 || $_SESSION["tipo"] ==10) {?>
 						<li><div class="sidebar-small-cap gest-sec">Gestión</div></li>
 						<li>
@@ -492,7 +499,9 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 							</a>
 						</li>
 						<?php }?>
+						<?php } /* fin oculto Panamá: Presupuesto */ ?>
 
+						<?php if (false) { /* Oculto temporalmente para Panamá: Atenciones */ ?>
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==7 || $_SESSION["tipo"] ==9 ) {?>
 							<li class="dropdown <?= $atenciones_active ? 'show' : '' ?>">
 								<a href="javascript:;" class="dropdown-toggle <?= $atenciones_active ? 'active' : '' ?>">
@@ -508,7 +517,9 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 								</ul>
 							</li>
 						<?php } ?>
+						<?php } /* fin oculto Panamá: Atenciones */ ?>
 
+						<?php if (false) { /* Oculto temporalmente para Panamá: Órdenes de Pedido */ ?>
 						<?php if ($_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=6 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
 							<li class="dropdown <?= $ops_active ? 'show' : '' ?>">
 								<a href="javascript:;" class="dropdown-toggle <?= $ops_active ? 'active' : '' ?>">
@@ -527,7 +538,9 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 								</ul>
 							</li>
 						<?php } ?>
+						<?php } /* fin oculto Panamá: Órdenes de Pedido */ ?>
 
+						<?php if (false) { /* Oculto temporalmente para Panamá: Órdenes de Producción */ ?>
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==8) {?>
 							<li class="dropdown <?= $opds_active ? 'show' : '' ?>">
 								<a href="javascript:;" class="dropdown-toggle <?= $opds_active ? 'active' : '' ?>">
@@ -547,6 +560,7 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 								</ul>
 							</li>
 						<?php } ?>
+						<?php } /* fin oculto Panamá: Órdenes de Producción */ ?>
 
 						<?php if ($_SESSION["tipo"] !=8) {?>
 							<li><div class="sidebar-small-cap anal-sec">Análisis</div></li>
@@ -560,12 +574,15 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 									<?php if ($_SESSION["tipo"] != 7 && $_SESSION["tipo"] != 9) { ?>
 										<li class="menu-subgroup-label">Territorial</li>
 										<?php if ($_SESSION["tipo"] != 4) { ?>
-											<li><a href="reporte_zonificacion.php">Zonificación</a></li>
+											<?php if (false) { /* Oculto temporalmente para Panamá: Reportes - Zonificación */ ?>
+												<li><a href="reporte_zonificacion.php">Zonificación</a></li>
+											<?php } ?>
 											<li><a href="reporte_cubrimiento.php">Cubrimiento</a></li>
 										<?php } ?>
 										<li><a href="reporte_visitas.php">Visitas</a></li>
 									<?php } ?>
 
+									<?php if (false) { /* Oculto temporalmente para Panamá: Reportes - Clientes (Atenciones/Calendario consultorías) */ ?>
 									<?php if (in_array($_SESSION["tipo"], [1,2,3,4,5,7,9])) { ?>
 										<li class="menu-subgroup-label">Clientes</li>
 										<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) { ?>
@@ -575,11 +592,14 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 											<li><a href="calendar_ti.php">Calendario consultorías</a></li>
 										<?php } ?>
 									<?php } ?>
+									<?php } ?>
 
+									<?php if (false) { /* Oculto temporalmente para Panamá: Reportes - Muestreo */ ?>
 									<?php if ($_SESSION["tipo"] != 10 && $_SESSION["tipo"] != 4) { ?>
 										<li class="menu-subgroup-label">Muestreo</li>
 										<li><a href="reporte_muestreo_f.php?tp=1">Muestreos solicitados</a></li>
 										<li><a href="reporte_muestreo_f.php?tp=2">Muestreos entregados</a></li>
+									<?php } ?>
 									<?php } ?>
 
 									<?php if ($_SESSION["tipo"] != 4) { ?>
@@ -588,19 +608,23 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 										<li><a href="reporte_valoriza_global.php">Valorización global</a></li>
 										<?php if ($_SESSION["tipo"] != 10) { ?>
 											<li><a href="reporte_cant_adop.php">Cantidad adopciones</a></li>
-											<li><a href="reporte_trabajadores.php">Contactos</a></li>
+											<li><a href="reporte_trabajadores.php">Directorio</a></li>
 										<?php } ?>
+										<?php if (false) { /* Oculto temporalmente para Panamá: Reportes - Pedidos y Devoluciones */ ?>
 										<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2) { ?>
 											<li><a href="reporte_pedidos.php">Pedidos</a></li>
 											<li><a href="reporte_devoluciones.php">Devoluciones</a></li>
 										<?php } ?>
+										<?php } ?>
 									<?php } ?>
 
+									<?php if (false) { /* Oculto temporalmente para Panamá: Reportes - Órdenes de Pedido */ ?>
 									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2) { ?>
 										<li class="menu-subgroup-label">Órdenes de Pedido</li>
 										<li><a href="php/oppend_excel.php">Pendientes</a></li>
 										<li><a href="php/opaten_excel.php">Atendidas</a></li>
 										<li><a href="php/opanu_excel.php">Anuladas</a></li>
+									<?php } ?>
 									<?php } ?>
 
 								</ul>

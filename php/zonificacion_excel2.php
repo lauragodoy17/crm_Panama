@@ -154,7 +154,7 @@ foreach($coles as $cole) {
   $req_dep->execute();
   $dep = $req_dep->fetch();
 
-  $sql = "SELECT id FROM adjuntos WHERE id_colegio='".$cole["id"]."' AND id_periodo='".$_POST["periodo"]."' AND tipo=1";
+  $sql = "SELECT id FROM adjuntos WHERE id_colegio='".$cole["id"]."' AND id_periodo='".$_POST["periodo"]."'";
 
   $req = $bdd->prepare($sql);
   $req->execute();
