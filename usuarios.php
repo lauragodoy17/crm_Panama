@@ -26,8 +26,6 @@ $req_tipos = $bdd->prepare($sql_tipos);
 $req_tipos->execute();
 $tipos = $req_tipos->fetchAll();
 
-$tipos_todos = $bdd->query("SELECT id, tipo FROM tipos_usuario ORDER BY id")->fetchAll();
-
 $sql_paises = "SELECT id, pais FROM paises WHERE id = 2";
 $req_paises = $bdd->prepare($sql_paises);
 $req_paises->execute();
@@ -244,7 +242,7 @@ $paises = $req_paises->fetchAll();
                 <td><input type="password" name="clave" placeholder="Sin cambios" minlength="6" form="<?= $form_id ?>" autocomplete="new-password"></td>
                 <td>
                   <select name="tipo" form="<?= $form_id ?>" required>
-                    <?php foreach ($tipos_todos as $tipo): ?>
+                    <?php foreach ($tipos as $tipo): ?>
                       <option value="<?= $tipo["id"] ?>" <?= $tipo["id"] == $usuario["tipo"] ? 'selected' : '' ?>><?= htmlspecialchars($tipo["tipo"]) ?></option>
                     <?php endforeach; ?>
                   </select>
@@ -412,7 +410,7 @@ $(document).ready(function () {
     table.search(this.value).draw();
   });
 
-  $('.btn-delete-usuario').on('click', function () {
+  $('#usuarios-table').on('click', '.btn-delete-usuario', function () {
     if ($(this).is('[disabled]')) return;
     var formId = $(this).data('form');
     var nombre = $(this).data('nombre');

@@ -423,7 +423,7 @@ $(document).ready(function () {
     table.search(this.value).draw();
   });
 
-  $('.btn-delete-libro').on('click', function () {
+  $('#libros-table').on('click', '.btn-delete-libro', function () {
     var formId = $(this).data('form');
     var titulo = $(this).data('titulo');
     inkConfirm({
