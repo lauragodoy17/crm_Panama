@@ -510,6 +510,8 @@
             $libro_p["id_grado"] = 17;
         }
 
+        $id_real_libro = $libro_p["id"];
+
         if ($libro_p["id_grado"] != 17) {
             $sql_presup = "SELECT id, precio, tasa_compra, descuento, pre_aprob, aprobado, probabilidad FROM presupuestos WHERE id_libro='".$libro_p["id"]."' AND id_periodo='".$_GET["periodo"]."' AND id_colegio='".$_GET["colegio"]."'";
         } else {
@@ -658,6 +660,7 @@
         if ($gp_periodo["f_cierre"] > date("Y-m-d")) {
             echo "<button class='pr-btn-del pr-btn-row-del' type='button'
                     data-pid='".$libro_p["pid"]."'
+                    data-libro='".$id_real_libro."'
                     data-codigo='".htmlspecialchars($_GET["codigo"])."'
                     data-periodo='".htmlspecialchars($_GET["periodo"])."'>
                     <i class='fa fa-trash-o'></i></button>";
@@ -1145,6 +1148,7 @@
     $(document).on('click', '.pr-btn-row-del', function() {
         var $btn    = $(this);
         var pid     = $btn.data('pid');
+        var libro   = parseInt($btn.data('libro'));
         var codigo  = $btn.data('codigo');
         var periodo = $btn.data('periodo');
 
@@ -1154,6 +1158,8 @@
                 type: 'POST',
                 data: { 'b_presup[]': pid, codigo: codigo, periodo: periodo },
                 complete: function() {
+                    var idx = librosYaEnPresup.indexOf(libro);
+                    if (idx !== -1) librosYaEnPresup.splice(idx, 1);
                     $btn.closest('tr').fadeOut(300, function(){ $(this).remove(); });
                     prToast('Libro eliminado correctamente', 'ok');
                 }
