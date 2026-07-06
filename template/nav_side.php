@@ -15,6 +15,7 @@ $atenciones_active   = $current_page === 'lista_atenciones.php';
 $ops_active          = in_array($current_page, ['solicitar_op.php','lista_op.php','clientes_op.php']);
 $opds_active         = in_array($current_page, ['solicitar_orden_pd.php','ver_opds.php','reporte_opd.php']);
 $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','reporte_cubrimiento.php','reporte_visitas.php','reporte_valoriza.php','reporte_valoriza_global.php','reporte_trabajadores.php','reporte_cant_adop.php']);
+$libros_active       = $current_page === 'libros.php';
 ?>
 <!--<div class="pre-loader">
 			<div class="pre-loader-box">
@@ -561,6 +562,16 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 							</li>
 						<?php } ?>
 						<?php } /* fin oculto Panamá: Órdenes de Producción */ ?>
+
+						<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["tipo"] == 7) {?>
+							<li><div class="sidebar-small-cap gest-sec">Gestión</div></li>
+							<li>
+								<a href="libros.php" class="dropdown-toggle no-arrow <?= $libros_active ? 'active' : '' ?>">
+									<span class="micon bi bi-book"></span
+									><span class="mtext">Libros</span>
+								</a>
+							</li>
+						<?php }?>
 
 						<?php if ($_SESSION["tipo"] !=8) {?>
 							<li><div class="sidebar-small-cap anal-sec">Análisis</div></li>
