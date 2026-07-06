@@ -565,7 +565,7 @@ $usuarios_active     = $current_page === 'usuarios.php';
 						<?php } /* fin oculto Panamá: Órdenes de Producción */ ?>
 
 						<?php if ($_SESSION["tipo"] == 1) {?>
-							<li><div class="sidebar-small-cap gest-sec">Gestión</div></li>
+							<li><div class="sidebar-small-cap admin-sec">Administrativo</div></li>
 							<li>
 								<a href="libros.php" class="dropdown-toggle no-arrow <?= $libros_active ? 'active' : '' ?>">
 									<span class="micon bi bi-book"></span
