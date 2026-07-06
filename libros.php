@@ -2,7 +2,12 @@
 require_once("php/aut.php");
 require_once("conexion/bdd.php");
 
-$puede_gestionar = ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2);
+if (($_SESSION["autentificado"] ?? '') === "SI" && ($_SESSION["tipo"] ?? null) != 1) {
+    header("Location: index.php");
+    exit;
+}
+
+$puede_gestionar = ($_SESSION["tipo"] == 1);
 
 $sql = "SELECT l.id, l.isbn, l.libro, l.id_materia, l.id_grado, l.pri_sec, l.precio, l.presupuesto, m.materia, g.grado
         FROM libros l
@@ -393,7 +398,14 @@ $(document).ready(function () {
           }
           return data;
         }
-      }
+      },
+      { targets: 0, width: '11%' },
+      { targets: 1, width: '30%' },
+      { targets: 2, width: '17%' },
+      { targets: 3, width: '13%' },
+      { targets: 4, width: '9%' },
+      { targets: 5, width: '8%' },
+      { targets: 6, width: '12%' },
     ],
     language: {
       lengthMenu:   "Mostrar _MENU_ registros",

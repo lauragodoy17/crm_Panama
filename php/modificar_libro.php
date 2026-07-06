@@ -2,7 +2,7 @@
 require_once("aut.php");
 require_once("../conexion/bdd.php");
 
-if (($_SESSION["tipo"] != 1 && $_SESSION["tipo"] != 2) || !isset($_POST["id_libro"])) {
+if ($_SESSION["tipo"] != 1 || !isset($_POST["id_libro"])) {
     header("Location: ../libros.php");
     exit;
 }

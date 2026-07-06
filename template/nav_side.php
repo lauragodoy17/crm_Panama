@@ -563,7 +563,7 @@ $libros_active       = $current_page === 'libros.php';
 						<?php } ?>
 						<?php } /* fin oculto Panamá: Órdenes de Producción */ ?>
 
-						<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["tipo"] == 7) {?>
+						<?php if ($_SESSION["tipo"] == 1) {?>
 							<li><div class="sidebar-small-cap gest-sec">Gestión</div></li>
 							<li>
 								<a href="libros.php" class="dropdown-toggle no-arrow <?= $libros_active ? 'active' : '' ?>">
