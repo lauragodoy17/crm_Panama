@@ -106,7 +106,7 @@
                                               <th>Zona</th>
                                               <th>Responsable</th>
                                             <?php } ?>
-                                            <th>Departamento</th>
+                                            <th>Provincia</th>
                                             <th>Ciudad</th>
                                             <th>Dirección</th>
                                             <th>Barrio</th>

@@ -288,7 +288,7 @@
                           <div class="row">
                             <div class="col-sm-6">
                               <div class="form-group">
-                                <label>Departamento <small style="color:red;"> *</small></label>
+                                <label>Provincia <small style="color:red;"> *</small></label>
                                 <select class="custom-select2" name="departamento" required>
                                   <option value="">Seleccione...</option>
                                   

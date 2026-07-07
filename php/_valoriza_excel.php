@@ -104,7 +104,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("B6", "Responsable");
 $objSpreadsheet->getActiveSheet()->SetCellValue("C6", "Colegio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Dane");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E6", "Zona");
-$objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Departamento");
+$objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Provincia");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Ciudad");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H6", "Editorial");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I6", "Etiqueta");

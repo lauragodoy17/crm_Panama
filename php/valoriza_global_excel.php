@@ -109,7 +109,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("C6", "Zona");
 $objSpreadsheet->getActiveSheet()->SetCellValue("D6", "Asesor");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E6", "Código interno");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F6", "Colegio");
-$objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Departamento");
+$objSpreadsheet->getActiveSheet()->SetCellValue("G6", "Provincia");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H6", "Ciudad");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I6", "Población total");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J6", "Cantidad Presupuestada");
