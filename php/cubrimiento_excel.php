@@ -91,7 +91,7 @@ if ($_POST['promo']!=0) {
   $objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Usuario");
 }
 
-$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Departamento");
+$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Provincia");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Ciudad");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Barrio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Paralelos preescolar");

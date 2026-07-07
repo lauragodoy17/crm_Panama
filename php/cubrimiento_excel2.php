@@ -75,7 +75,7 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("B4", "Colegio");
 
 $objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Empresa");
 
-$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Departamento");
+$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Provincia");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Ciudad");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Barrio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Paralelos preescolar");

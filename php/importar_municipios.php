@@ -90,7 +90,7 @@ if ($step === 'importar') {
 
         $mensajes[] = ['success', "Se importaron <strong>$inserted municipios</strong> correctamente."];
         if ($sin_match) {
-            $mensajes[] = ['warning', "Departamentos del CSV sin coincidencia en la BD: <strong>" . implode(', ', array_keys($sin_match)) . "</strong>. Verifica que los nombres coincidan con la tabla <code>departamentos</code>."];
+            $mensajes[] = ['warning', "Provincias del CSV sin coincidencia en la BD: <strong>" . implode(', ', array_keys($sin_match)) . "</strong>. Verifica que los nombres coincidan con la tabla <code>departamentos</code>."];
         }
     }
 }
@@ -247,7 +247,7 @@ if ($tabla_existe && $total_mun > 0) {
         <table class="table table-sm table-bordered prev">
           <thead class="thead-light">
             <tr>
-              <th>Departamento</th>
+              <th>Provincia</th>
               <th>Ciudad actual en colegios</th>
               <th></th>
               <th>Nombre oficial (CSV)</th>

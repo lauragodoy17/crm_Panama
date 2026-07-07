@@ -78,7 +78,7 @@ if ($usuario["tipo"]==3 || $usuario["tipo"]==10) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Zona / Asesor");
 }
 
-$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Departamento");
+$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "Provincia");
 $objSpreadsheet->getActiveSheet()->SetCellValue("E4", "Ciudad");
 $objSpreadsheet->getActiveSheet()->SetCellValue("F4", "Barrio");
 $objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Dirección");
