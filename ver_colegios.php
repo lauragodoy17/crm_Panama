@@ -224,13 +224,6 @@ if ($show_resp_filter) {
 
       <div class="dp-body">
         <div class="dp-row">
-          <span class="dp-icon" style="background:#eef0ff;color:#4361ee"><i class="bi bi-calendar3"></i></span>
-          <div class="dp-field">
-            <span class="dp-label">Calendario</span>
-            <span class="dp-val" id="dp-calendario">—</span>
-          </div>
-        </div>
-        <div class="dp-row">
           <span class="dp-icon" style="background:#e9f9f0;color:#2ecc71"><i class="bi bi-geo-alt"></i></span>
           <div class="dp-field">
             <span class="dp-label">Ubicación</span>
@@ -444,7 +437,6 @@ if ($show_resp_filter) {
                 $('#dp-avatar').text(ini);
                 $('#dp-nombre').text(d.colegio || '—');
                 $('#dp-dane').text(d.codigo || '—');
-                $('#dp-calendario').text(d.calendario || '—');
                 $('#dp-direccion').text(d.direccion ? d.direccion + (d.ciudad ? ', ' + d.ciudad : '') : '—');
                 $('#dp-telefono').text(d.telefono || '—');
                 $('#dp-segmento').text(d.segmento || '—');
