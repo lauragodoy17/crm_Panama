@@ -227,7 +227,7 @@ if ($show_resp_filter) {
                     <?php endif; ?>
                     <th>Provincia</th>
                     <th>Ciudad</th>
-                    <th>Dirección</th>
+                    <th>Ubicación</th>
                     <th>Periodo</th>
                     <th>Acciones</th>
                   </tr>
@@ -266,7 +266,7 @@ if ($show_resp_filter) {
         <div class="dp-row">
           <span class="dp-icon" style="background:#e9f9f0;color:#2ecc71"><i class="bi bi-geo-alt"></i></span>
           <div class="dp-field">
-            <span class="dp-label">Dirección</span>
+            <span class="dp-label">Ubicación</span>
             <span class="dp-val" id="dp-direccion">—</span>
           </div>
         </div>
