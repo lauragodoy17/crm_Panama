@@ -34,30 +34,6 @@ if ($_SESSION['tipo'] == 3) {
     $filtro_prueba_depto = $_SESSION['tipo'] != 1 ? "WHERE LOWER(departamento) NOT LIKE '%prueba%'" : "";
     $depto_list = $bdd->query("SELECT id, departamento FROM departamentos $filtro_prueba_depto ORDER BY departamento")->fetchAll(PDO::FETCH_ASSOC);
 }
-if ($_SESSION['tipo'] != 3) {
-    // Usar municipios si ya fue importada para mostrar nombres oficiales sin duplicados
-    $usa_municipios = false;
-    try { $bdd->query("SELECT 1 FROM municipios LIMIT 1"); $usa_municipios = true; } catch (Exception $e) {}
-
-    if ($usa_municipios) {
-        $ciudades_list = $bdd->query("
-            SELECT DISTINCT m.nombre AS ciudad
-            FROM municipios m
-            WHERE EXISTS (
-                SELECT 1 FROM colegios
-                WHERE departamento = m.id_departamento
-                  AND ciudad = m.nombre
-                  AND $where_stats
-            )
-            ORDER BY m.nombre
-            LIMIT 300
-        ")->fetchAll(PDO::FETCH_ASSOC);
-    } else {
-        $filtro_prueba_ciudad = $_SESSION['tipo'] != 1 ? "AND LOWER(ciudad) NOT LIKE '%prueba%'" : "";
-        $ciudades_list = $bdd->query("SELECT DISTINCT ciudad FROM colegios WHERE $where_stats AND ciudad != '' AND ciudad IS NOT NULL $filtro_prueba_ciudad ORDER BY ciudad LIMIT 300")->fetchAll(PDO::FETCH_ASSOC);
-    }
-}
-
 $show_zona_filter = ($_SESSION['tipo'] != 3 && ($_SESSION['tipo']==1 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5 || $_SESSION['zona']=='5656'));
 if ($show_zona_filter) {
     $filtro_prueba_zona = $_SESSION['tipo'] != 1 ? "WHERE LOWER(sub_zona) NOT LIKE '%prueba%'" : "";
@@ -172,15 +148,6 @@ if ($show_resp_filter) {
               <?php endforeach; ?>
             </select>
 
-            <?php if ($_SESSION['tipo'] != 3): ?>
-            <select class="ft-select" id="ft-ciudad">
-              <option value="">Todas las ciudades</option>
-              <?php foreach ($ciudades_list as $ciu): ?>
-              <option value="<?= htmlspecialchars($ciu['ciudad']) ?>"><?= htmlspecialchars($ciu['ciudad']) ?></option>
-              <?php endforeach; ?>
-            </select>
-            <?php endif; ?>
-
             <?php if ($show_zona_filter): ?>
             <select class="ft-select" id="ft-zona">
               <option value="">Todas las zonas</option>
@@ -256,13 +223,6 @@ if ($show_resp_filter) {
       </div>
 
       <div class="dp-body">
-        <div class="dp-row">
-          <span class="dp-icon" style="background:#eef0ff;color:#4361ee"><i class="bi bi-calendar3"></i></span>
-          <div class="dp-field">
-            <span class="dp-label">Calendario</span>
-            <span class="dp-val" id="dp-calendario">—</span>
-          </div>
-        </div>
         <div class="dp-row">
           <span class="dp-icon" style="background:#e9f9f0;color:#2ecc71"><i class="bi bi-geo-alt"></i></span>
           <div class="dp-field">
@@ -358,7 +318,6 @@ if ($show_resp_filter) {
                 url: "php/colegios_tabla.php",
                 data: function(d) {
                     d.depto_filter  = $('#ft-depto').val();
-                    d.ciudad_filter = $('#ft-ciudad').val();
                     <?php if ($show_zona_filter): ?>
                     d.zona_filter   = $('#ft-zona').val();
                     <?php endif; ?>
@@ -439,24 +398,7 @@ if ($show_resp_filter) {
         $('#ft-btn-clear').on('click', function () {
             $('#ft-depto, #ft-zona, #ft-resp').val('');
             $('#ft-input-search').val('');
-            $('#ft-ciudad').html('<option value="">Todas las ciudades</option>');
             table.api().search('').draw();
-        });
-
-        // Cargar ciudades al seleccionar departamento
-        $('#ft-depto').on('change', function () {
-            var depto = $(this).val();
-            $('#ft-ciudad').html('<option value="">Todas las ciudades</option>');
-            if (!depto) return;
-
-            $.ajax({
-                url: 'ajax/ciudades_por_depto.php',
-                type: 'POST',
-                data: { departamento: depto },
-                success: function (resp) {
-                    $('#ft-ciudad').append(resp);
-                }
-            });
         });
 
         // Navegación al detalle del colegio
@@ -495,7 +437,6 @@ if ($show_resp_filter) {
                 $('#dp-avatar').text(ini);
                 $('#dp-nombre').text(d.colegio || '—');
                 $('#dp-dane').text(d.codigo || '—');
-                $('#dp-calendario').text(d.calendario || '—');
                 $('#dp-direccion').text(d.direccion ? d.direccion + (d.ciudad ? ', ' + d.ciudad : '') : '—');
                 $('#dp-telefono').text(d.telefono || '—');
                 $('#dp-segmento').text(d.segmento || '—');

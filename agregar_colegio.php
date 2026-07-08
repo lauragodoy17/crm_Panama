@@ -6,6 +6,14 @@
   $zona_actual = $req_zona->fetch();
 
   $requiere_responsable = ($_SESSION['tipo'] == 6);
+  $es_admin = ($_SESSION['tipo'] == 1);
+
+  $empresas_distribuidoras = [];
+  if ($es_admin) {
+    $req_emp = $bdd->prepare("SELECT codigo, zona FROM zonas WHERE zona NOT LIKE '%Eureka%' AND zona NOT LIKE '%ALEJANDRO%' ORDER BY zona");
+    $req_emp->execute();
+    $empresas_distribuidoras = $req_emp->fetchAll();
+  }
 ?>
 <!DOCTYPE html>
 <html>
@@ -188,9 +196,44 @@
                       </div>
                     </div>
                   </div>
+
+                  <?php if ($es_admin): ?>
+                  <hr class="my-3" />
+                  <div class="cc-card-title"><i class="bi bi-diagram-3"></i> Asignación de zona</div>
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="empresa">Empresa <small style="color:red">*</small></label>
+                        <select name="empresa" id="empresa" class="form-control custom-select2">
+                          <option value="">Seleccionar empresa...</option>
+                          <option value="1">EUREKA</option>
+                          <?php foreach ($empresas_distribuidoras as $emp): ?>
+                            <option value="<?php echo htmlspecialchars($emp['codigo']); ?>"><?php echo htmlspecialchars($emp['zona']); ?></option>
+                          <?php endforeach; ?>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="zona_asignada">Zona <small style="color:red">*</small></label>
+                        <select name="zona_asignada" id="zona_asignada" class="form-control custom-select2">
+                          <option value="">Seleccionar zona...</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-4 d-none" id="col-responsable-admin">
+                      <div class="form-group">
+                        <label for="responsable_admin">Responsable <small style="color:red">*</small></label>
+                        <input type="text" name="responsable_admin" id="responsable_admin" class="form-control" placeholder="Nombre del responsable" />
+                      </div>
+                    </div>
+                  </div>
+                  <?php endif; ?>
                 </div>
 
+                <?php if (!$es_admin): ?>
                 <input type="hidden" name="cod_zona" value="<?php echo htmlspecialchars($_SESSION['zona']); ?>" />
+                <?php endif; ?>
 
                 <!-- ── Acciones ── -->
                 <div class="cc-actions">
@@ -229,6 +272,10 @@
                   <li id="sr-ciudad"  class="d-none"><span class="cc-sl-label">Ciudad</span><span class="cc-sl-val" id="sv-ciudad">—</span></li>
                   <li id="sr-dir"     class="d-none"><span class="cc-sl-label">Ubicación</span><span class="cc-sl-val" id="sv-dir">—</span></li>
                   <li id="sr-tel"     class="d-none"><span class="cc-sl-label">Teléfono</span><span class="cc-sl-val" id="sv-tel">—</span></li>
+                  <?php if ($es_admin): ?>
+                  <li id="sr-empresa" class="d-none"><span class="cc-sl-label">Empresa</span><span class="cc-sl-val" id="sv-empresa">—</span></li>
+                  <li id="sr-zona"    class="d-none"><span class="cc-sl-label">Zona</span><span class="cc-sl-val" id="sv-zona">—</span></li>
+                  <?php endif; ?>
                   <li id="sr-resp"    class="d-none"><span class="cc-sl-label">Responsable</span><span class="cc-sl-val" id="sv-resp">—</span></li>
                   <li id="sr-web"     class="d-none"><span class="cc-sl-label">Página web</span><span class="cc-sl-val" id="sv-web">—</span></li>
                   <li id="sr-cumple"  class="d-none"><span class="cc-sl-label">Cumpleaños</span><span class="cc-sl-val" id="sv-cumple">—</span></li>
@@ -238,7 +285,11 @@
               <!-- Consejos -->
               <div class="cc-card">
                 <div class="cc-card-title"><i class="bi bi-lightbulb"></i> Consejos</div>
+                <?php if ($es_admin): ?>
+                <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> Selecciona la empresa y la zona a la que quedará asignado el colegio.</div>
+                <?php else: ?>
                 <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> El colegio se asignará automáticamente a tu zona actual.</div>
+                <?php endif; ?>
                 <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> El código del colegio se genera automáticamente al crearlo.</div>
                 <div class="cc-tip"><i class="bi bi-check-circle-fill"></i> Los campos marcados con <span style="color:red">*</span> son obligatorios.</div>
               </div>
@@ -263,6 +314,7 @@
     var currentStep = 1;
     var totalSteps  = 2;
     var requiereResponsable = <?php echo $requiere_responsable ? 'true' : 'false'; ?>;
+    var esAdmin = <?php echo $es_admin ? 'true' : 'false'; ?>;
 
     // ── Navegar pasos ────────────────────────────────────────────────────────
     function goTo(step) {
@@ -316,6 +368,13 @@
         if (!$('#direccion').val().trim())   { alert('La ubicación es obligatoria.'); $('#direccion').focus(); return false; }
         if (!$('#telefono').val().trim())    { alert('El teléfono es obligatorio.'); $('#telefono').focus(); return false; }
         if (requiereResponsable && !$('#responsable').val().trim()) { alert('El responsable es obligatorio.'); $('#responsable').focus(); return false; }
+        if (esAdmin) {
+          if (!$('#empresa').val())          { alert('Selecciona la empresa a la que se asignará el colegio.'); return false; }
+          if (!$('#zona_asignada').val())    { alert('Selecciona la zona a la que se asignará el colegio.'); return false; }
+          if ($('#empresa').val() !== '1' && !$('#responsable_admin').val().trim()) {
+            alert('El responsable es obligatorio.'); $('#responsable_admin').focus(); return false;
+          }
+        }
       }
       return true;
     }
@@ -339,7 +398,12 @@
       set('sr-ciudad',  'sv-ciudad',  $('#ciudad').val().trim());
       set('sr-dir',     'sv-dir',     $('#direccion').val().trim());
       set('sr-tel',     'sv-tel',     $('#telefono').val().trim());
-      set('sr-resp',    'sv-resp',    $('#responsable').val() ? $('#responsable').val().trim() : '');
+      if (esAdmin) {
+        set('sr-empresa', 'sv-empresa', $('#empresa option:selected').val() ? $('#empresa option:selected').text() : '');
+        set('sr-zona',    'sv-zona',    $('#zona_asignada option:selected').val() ? $('#zona_asignada option:selected').text() : '');
+      }
+      var respVal = $('#responsable').length ? $('#responsable').val().trim() : ($('#responsable_admin').val() || '').trim();
+      set('sr-resp',    'sv-resp',    respVal);
       set('sr-web',     'sv-web',     $('#web').val().trim());
       set('sr-cumple',  'sv-cumple',  $('#cumple_colegio').val().trim());
 
@@ -357,6 +421,42 @@
     // ── Select2 en provincia ─────────────────────────────────────────────────
     if ($.fn.select2) {
       $('#departamento').select2({ width: '100%', placeholder: 'Seleccionar provincia...' });
+      if (esAdmin) {
+        $('#empresa').select2({ width: '100%', placeholder: 'Seleccionar empresa...' });
+        $('#zona_asignada').select2({ width: '100%', placeholder: 'Seleccionar zona...' });
+      }
+    }
+
+    // ── Empresa → Zona (asignación, solo admin) ────────────────────────────────
+    if (esAdmin) {
+      $('#empresa').on('change', function () {
+        var valor = $(this).val();
+
+        if (valor === '1') {
+          $('#col-responsable-admin').addClass('d-none');
+          $('#responsable_admin').removeAttr('required');
+        } else {
+          $('#col-responsable-admin').toggleClass('d-none', !valor);
+          if (valor) $('#responsable_admin').attr('required', 'required');
+        }
+
+        if (!valor) {
+          $('#zona_asignada').html('<option value="">Seleccionar zona...</option>').trigger('change');
+          return;
+        }
+
+        $.ajax({
+          url: 'ajax/buscar_zona.php',
+          type: 'POST',
+          data: { empresa: valor },
+          success: function (resp) {
+            $('#zona_asignada').html(resp).trigger('change');
+          },
+          error: function () {
+            alert('No se pudieron cargar las zonas de la empresa seleccionada.');
+          }
+        });
+      });
     }
 
   });

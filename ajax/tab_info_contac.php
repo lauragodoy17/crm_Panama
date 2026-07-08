@@ -160,16 +160,16 @@ function ic_initials($n, $a) {
             </div>
             <div class="col-sm-3">
               <div class="form-group">
-                <label>Correo <small style="color:red">*</small></label>
+                <label>Correo</label>
                 <input type="email" class="form-control form-control-sm" name="correo_adm"
-                       value="<?= htmlspecialchars($adm['email']) ?>" required />
+                       value="<?= htmlspecialchars($adm['email']) ?>" />
               </div>
             </div>
             <div class="col-sm-3">
               <div class="form-group">
-                <label>Teléfono <small style="color:red">*</small></label>
+                <label>Teléfono</label>
                 <input type="text" class="form-control form-control-sm" name="telefono_adm"
-                       value="<?= htmlspecialchars($adm['telefono']) ?>" required />
+                       value="<?= htmlspecialchars($adm['telefono']) ?>" />
               </div>
             </div>
             <div class="col-sm-3">
@@ -302,16 +302,16 @@ function ic_initials($n, $a) {
             </div>
             <div class="col-sm-3">
               <div class="form-group">
-                <label>Correo <small style="color:red">*</small></label>
+                <label>Correo</label>
                 <input type="email" class="form-control form-control-sm" name="correo_profe"
-                       value="<?= htmlspecialchars($profe['email']) ?>" required />
+                       value="<?= htmlspecialchars($profe['email']) ?>" />
               </div>
             </div>
             <div class="col-sm-3">
               <div class="form-group">
-                <label>Teléfono <small style="color:red">*</small></label>
+                <label>Teléfono</label>
                 <input type="text" class="form-control form-control-sm" name="telefono_profe"
-                       value="<?= htmlspecialchars($profe['telefono']) ?>" required />
+                       value="<?= htmlspecialchars($profe['telefono']) ?>" />
               </div>
             </div>
             <div class="col-sm-3">
@@ -382,14 +382,14 @@ function ic_initials($n, $a) {
               <div class="row">
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <label>Correo <small style="color:red">*</small></label>
-                    <input type="email" class="form-control" placeholder="Correo" name="correo_adm" id="correo_adm" required />
+                    <label>Correo</label>
+                    <input type="email" class="form-control" placeholder="Correo" name="correo_adm" id="correo_adm" />
                   </div>
                 </div>
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <label>Teléfono <small style="color:red">*</small></label>
-                    <input type="text" class="form-control" placeholder="Teléfono" name="telefono_adm" id="telefono_adm" required />
+                    <label>Teléfono</label>
+                    <input type="text" class="form-control" placeholder="Teléfono" name="telefono_adm" id="telefono_adm" />
                   </div>
                 </div>
                 <div class="col-sm-4">
@@ -506,14 +506,14 @@ function ic_initials($n, $a) {
               <div class="row">
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <label>Correo <small style="color:red">*</small></label>
-                    <input type="email" class="form-control" placeholder="Correo" name="correo_profe" id="correo_profe" required />
+                    <label>Correo</label>
+                    <input type="email" class="form-control" placeholder="Correo" name="correo_profe" id="correo_profe" />
                   </div>
                 </div>
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <label>Teléfono <small style="color:red">*</small></label>
-                    <input type="text" class="form-control" placeholder="Teléfono" name="telefono_profe" id="telefono_profe" required />
+                    <label>Teléfono</label>
+                    <input type="text" class="form-control" placeholder="Teléfono" name="telefono_profe" id="telefono_profe" />
                   </div>
                 </div>
                 <div class="col-sm-4">
