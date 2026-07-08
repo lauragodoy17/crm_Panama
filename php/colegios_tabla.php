@@ -34,9 +34,9 @@ $joinSQL = "
     LEFT JOIN zonas         z  ON z.codigo   = c.cod_zona
     LEFT JOIN sub_zonas     sz ON sz.id      = c.sub_zona
     LEFT JOIN (
-        SELECT cod_zona, CONCAT(nombres,' ',apellidos) AS promotor
+        SELECT cod_zona, CONCAT(nombres,' ',apellidos) AS promotor, tipo
         FROM usuarios
-        WHERE tipo IN (1,3)
+        WHERE tipo IN (1,3,10)
         GROUP BY cod_zona
     ) u ON u.cod_zona = c.cod_zona
 ";
@@ -114,6 +114,7 @@ $selectSQL = "SELECT c.id, c.codigo, c.dane, c.colegio, c.direccion,
                      z.zona          AS zona_full,
                      sz.sub_zona     AS subzona_nombre,
                      u.promotor      AS promotor_nombre,
+                     u.tipo          AS promotor_tipo,
                      c.responsable   AS responsable_raw";
 
 $stmt = $bdd->prepare("$selectSQL $joinSQL $searchSQL $orderSQL LIMIT :lstart, :llength");
@@ -128,21 +129,20 @@ $data = [];
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $colegio) {
 
-    // Empresa y zona (zonas.zona puede venir como "EMPRESA/ZONA" o solo nombre)
-    if ($_SESSION['tipo'] == 1 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 10 || $_SESSION["tipo"] == 5 || $_SESSION['zona'] == '5656') {
-        $zona_full = $colegio['zona_full'] ?? '';
-        if (strpos($zona_full, '/') !== false) {
-            [$empresa, $zona_name] = array_map('trim', explode('/', $zona_full, 2));
+    // Empresa y zona: si el responsable de la zona es promotor Eureka/admin/coordinador
+    // (tipo 3, 1 o 10), zonas.zona viene como "EMPRESA/ZONA"; si no, es distribuidor
+    // y la zona real está en sub_zonas (misma lógica que colegio.php).
+    if ($_SESSION['tipo'] == 1 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 10 || $_SESSION["tipo"] == 5 || $_SESSION['zona'] == '5656' || $_SESSION['tipo'] == 6) {
+        if ($colegio['promotor_tipo'] == 3 || $colegio['promotor_tipo'] == 1 || $colegio['promotor_tipo'] == 10) {
+            $partes = array_pad(array_map('trim', explode('/', $colegio['zona_full'] ?? '', 2)), 2, '');
+            $colegio['empresa']     = $partes[0];
+            $colegio['zona']        = $partes[1] ?: $partes[0];
+            $colegio['responsable'] = $colegio['promotor_nombre'] ?: '—';
         } else {
-            $empresa   = $zona_full;
-            $zona_name = $colegio['subzona_nombre'] ?? '';
+            $colegio['empresa']     = $colegio['zona_full'] ?? '—';
+            $colegio['zona']        = $colegio['subzona_nombre'] ?? '—';
+            $colegio['responsable'] = $colegio['responsable_raw'] ?: '—';
         }
-        $colegio['empresa']     = $empresa;
-        $colegio['zona']        = $colegio['subzona_nombre'] ?? '';
-        $colegio['responsable'] = $colegio['promotor_nombre'] ?: ($colegio['responsable_raw'] ?? '');
-    } elseif ($_SESSION['tipo'] == 6) {
-        $colegio['zona']        = $colegio['subzona_nombre'] ?? '';
-        $colegio['responsable'] = $colegio['promotor_nombre'] ?: ($colegio['responsable_raw'] ?? '');
     }
 
     $colegio['departamento'] = $colegio['depto_nombre'] ?? '';

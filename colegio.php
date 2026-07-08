@@ -123,16 +123,23 @@
             $req->execute();
             $colegio = $req->fetch();
 
-            $sql_promo = "SELECT u.id, CONCAT(u.nombres,' ',u.apellidos) as promotor, u.tipo, z.zona FROM usuarios u JOIN zonas z ON u.cod_zona=z.codigo WHERE cod_zona='".$colegio["cod_zona"]."'";
+            $sql_promo = "SELECT u.id, CONCAT(u.nombres,' ',u.apellidos) as promotor, u.tipo, z.zona FROM usuarios u JOIN zonas z ON u.cod_zona=z.codigo WHERE u.cod_zona='".$colegio["cod_zona"]."'";
             $req_promo = $bdd->prepare($sql_promo);
             $req_promo->execute();
             $promotor = $req_promo->fetch();
+
+            if (!$promotor) {
+              $req_zona = $bdd->prepare("SELECT zona FROM zonas WHERE codigo='".$colegio["cod_zona"]."'");
+              $req_zona->execute();
+              $zona_row = $req_zona->fetch();
+              $promotor = ['tipo' => null, 'zona' => $zona_row['zona'] ?? '', 'promotor' => null];
+            }
 
             if (isset($_POST["periodo"])) { $periodo = $_POST["periodo"]; }
             else { $periodo = $_GET["periodo"]; }
 
             // Empresa / zona
-            if ($promotor['tipo']==3 || $promotor['tipo']==1) {
+            if ($promotor['tipo']==3 || $promotor['tipo']==1 || $promotor['tipo']==10) {
               $partes      = array_pad(array_map('trim', explode("/", $promotor["zona"], 2)), 2, '');
               $emp_nombre  = $partes[0];
               $zona_nombre = $partes[1] ?: $partes[0];
@@ -140,10 +147,10 @@
               $req_sz = $bdd->prepare("SELECT sub_zona FROM sub_zonas WHERE id='".$colegio["sub_zona"]."'");
               $req_sz->execute();
               $sub_zona    = $req_sz->fetch();
-              $emp_nombre  = $promotor['promotor'] ?? '—';
+              $emp_nombre  = $promotor['promotor'] ?? ($promotor['zona'] ?: '—');
               $zona_nombre = $sub_zona['sub_zona'] ?? '—';
             }
-            $resp_txt = ($promotor['tipo']==3 || $promotor['tipo']==1) ? ($promotor['promotor'] ?? '—') : ($colegio['responsable'] ?: '—');
+            $resp_txt = ($promotor['tipo']==3 || $promotor['tipo']==1 || $promotor['tipo']==10) ? ($promotor['promotor'] ?? '—') : ($colegio['responsable'] ?: '—');
 
             // Iniciales avatar
             $words_av = array_filter(explode(' ', $colegio['colegio']), fn($w) => strlen($w) > 2);
