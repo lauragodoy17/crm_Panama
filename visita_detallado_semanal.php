@@ -147,7 +147,7 @@
 
             <h6>Descripción: <?php echo $visita["descripcion"] ?></h6><br>
             <?php 
-              $sql_profesor = "SELECT t.nombre,t.cargo,t.area,t.nivel_academico, c.cargo as nombrecargo FROM trabajadores_colegios t JOIN cargos c ON t.cargo=c.id WHERE t.id='".$visita["id_profesor"]."'";
+              $sql_profesor = "SELECT t.nombre,t.apellido,t.cargo,t.area,t.nivel_academico, c.cargo as nombrecargo FROM trabajadores_colegios t JOIN cargos c ON t.cargo=c.id WHERE t.id='".$visita["id_profesor"]."'";
 
                 $req_profesor = $bdd->prepare($sql_profesor);
                 $req_profesor->execute();
@@ -166,7 +166,7 @@
                 
               <table class="table table-bordered table-hover">
                 <tr>
-                  <td>Nombre: <?php echo $profesor['nombre']; ?></td>
+                  <td>Nombre: <?php echo $profesor['nombre'].' '.$profesor['apellido']; ?></td>
                   <td>Cargo: <?php echo $profesor['nombrecargo']; ?></td>
                 </tr>
               </table>
@@ -178,7 +178,7 @@
                 
               <table class="table table-bordered table-hover">
                 <tr>
-                  <td>Nombre: <?php echo $profesor['nombre']; ?></td>
+                  <td>Nombre: <?php echo $profesor['nombre'].' '.$profesor['apellido']; ?></td>
                   <td>Cargo: Coordinador académico</td>
                 </tr>
               </table>
@@ -194,7 +194,7 @@
 
                 <table class="table table-bordered table-hover">
                   <tr>
-                    <td>Nombre: <?php echo $profesor['nombre']; ?></td>
+                    <td>Nombre: <?php echo $profesor['nombre'].' '.$profesor['apellido']; ?></td>
                     <td>Jefe de area: <?php echo $materia["materia"]; ?></td>
                   </tr>
                 </table>
@@ -209,7 +209,7 @@
 
                 <table class="table table-bordered table-hover">
                   <tr>
-                    <td>Nombre: <?php echo $profesor['nombre']; ?></td>
+                    <td>Nombre: <?php echo $profesor['nombre'].' '.$profesor['apellido']; ?></td>
                   </tr>
                   <tr>
                     <td>Grado: <?php echo $profesor['nivel_academico']; ?></td>
