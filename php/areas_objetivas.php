@@ -84,8 +84,8 @@
 				$req_lib_h->execute([':id' => $lib]);
 				$lib_h_row = $req_lib_h->fetch();
 				$lib_h_nombre = $lib_h_row ? $lib_h_row['libro'] : "Libro #$lib";
-				registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
-					'Nuevo libro adoptado', '', $lib_h_nombre);
+				registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Presupuesto',
+					'Nuevo libro agregado', '', $lib_h_nombre);
 
 				if ($grado== 15 || $grado ==16 ) {
 					$sq_l2 = "SELECT id FROM libros WHERE pri_sec='".$lib."'";

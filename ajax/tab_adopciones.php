@@ -847,7 +847,7 @@
                                             $('#precio_n".$libro2["id"]."').val(precio_neto);
                                             
                                             
-                                            var precio_padre=parseInt($('#precio_padre".$libro2["id"]."').val());
+                                            var precio_padre=parseFloat(($('#precio_padre".$libro2["id"]."').val()+'').replace(',', '.'));
 
                                             $('#presupuesto_d".$libro2["id"]."').val(".$libro2["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+precio_padre);
 
@@ -904,7 +904,7 @@
                                             $('#precio_n".$libro2["id"]."').val(precio_neto);
 
 
-                                            var precio_padre=parseInt($('#precio_padre".$libro2["id"]."').val());
+                                            var precio_padre=parseFloat(($('#precio_padre".$libro2["id"]."').val()+'').replace(',', '.'));
 
                                             $('#presupuesto_d".$libro2["id"]."').val(".$libro2["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+precio_padre);
 
@@ -960,7 +960,7 @@
                                             $('#precio_n".$libro2["id"]."').val(precio_neto);
 
 
-                                            var precio_padre=parseInt($('#precio_padre".$libro2["id"]."').val());
+                                            var precio_padre=parseFloat(($('#precio_padre".$libro2["id"]."').val()+'').replace(',', '.'));
 
                                             $('#presupuesto_d".$libro2["id"]."').val(".$libro2["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+precio_padre);
 
@@ -1295,7 +1295,7 @@
 
                                             $('#venta_ps_d".$libro_p["id"]."').val(vp);
 
-                                            var precio_padre=parseInt($('#precio_padre".$libro_p["id"]."').val());
+                                            var precio_padre=parseFloat(($('#precio_padre".$libro_p["id"]."').val()+'').replace(',', '.'));
 
 
                                             $('#presupuesto_d".$libro_p["id"]."').val(".$libro_p["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+precio_padre);
@@ -1346,7 +1346,7 @@
                                             $('#venta_ps_d".$libro_p["id"]."').val(vp);
 
 
-                                            var precio_padre=parseInt($('#precio_padre".$libro_p["id"]."').val());
+                                            var precio_padre=parseFloat(($('#precio_padre".$libro_p["id"]."').val()+'').replace(',', '.'));
 
 
                                             $('#presupuesto_d".$libro_p["id"]."').val(".$libro_p["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+precio_padre);
@@ -1397,7 +1397,7 @@
                                             $('#venta_ps_d".$libro_p["id"]."').val(vp);
 
 
-                                            var precio_padre=parseInt($('#precio_padre".$libro_p["id"]."').val());
+                                            var precio_padre=parseFloat(($('#precio_padre".$libro_p["id"]."').val()+'').replace(',', '.'));
 
 
                                             $('#presupuesto_d".$libro_p["id"]."').val(".$libro_p["id"]."+'/'+tasa_c+'/'+descuento+'/'+pvp+'/'+precio_padre);
