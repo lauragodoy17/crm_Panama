@@ -26,7 +26,7 @@ if (isset($_GET['order'][0]['column'])) {
 if ($_SESSION["tipo"]!=3 && $_SESSION["tipo"]!=6 && $_SESSION["tipo"]!=10 ) {
 
     
-        $searchSQL = " WHERE (colegio LIKE :search OR dane LIKE :search) AND cod_zona !=0 AND id > 2";
+        $searchSQL = " WHERE (colegio LIKE :search OR dane LIKE :search) AND cod_zona !=0 AND colegio NOT IN ('Oficina','Trabajo en casa')";
         $params[':search'] = "%" . $searchValue . "%";
     
 

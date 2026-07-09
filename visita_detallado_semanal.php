@@ -156,7 +156,7 @@
              ?>
 
             <div class="row">
-              <?php if ($visita["id_colegio"] != 1) { ?>
+              <?php if (!in_array($colegio['colegio'], ['Oficina', 'Trabajo en casa'])) { ?>
               <h4>Datos del profesor:</h4>
               <?php
                 if ($num_profesor > 0) {

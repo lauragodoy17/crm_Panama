@@ -94,14 +94,14 @@
 							  <div class="modal-body">
 							  		<?php if (!isset($_GET['colegio'])) {
 
-							  			$sql = "SELECT id FROM colegios WHERE id = 1";
+							  			$sql = "SELECT id FROM colegios WHERE colegio = 'Oficina'";
 
 										$req = $bdd->prepare($sql);
 										$req->execute();
 
 										$ofi = $req->fetch();
 
-										$sql = "SELECT id FROM colegios WHERE id = 2";
+										$sql = "SELECT id FROM colegios WHERE colegio = 'Trabajo en casa'";
 
 										$req = $bdd->prepare($sql);
 										$req->execute();
@@ -143,11 +143,11 @@
 										  		<option value="">Selecciona</option>
 										  		<?php 
 											 		if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==4 || $_SESSION["id"] == 10 || $_SESSION["zona"] == '5656') {
-														$sql = "SELECT id,colegio, dane, ciudad FROM colegios WHERE id > 2";
+														$sql = "SELECT id,colegio, dane, ciudad FROM colegios WHERE colegio NOT IN ('Oficina','Trabajo en casa')";
 													}
 													else {
 
-														$sql = "SELECT id,colegio, dane, ciudad FROM colegios WHERE cod_zona='".$_SESSION["zona"]."' AND id > 2";
+														$sql = "SELECT id,colegio, dane, ciudad FROM colegios WHERE cod_zona='".$_SESSION["zona"]."' AND colegio NOT IN ('Oficina','Trabajo en casa')";
 													}
 
 													$req = $bdd->prepare($sql);
