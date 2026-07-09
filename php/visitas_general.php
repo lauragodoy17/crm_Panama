@@ -143,14 +143,14 @@ $hasta=$_POST["hasta"]." "."23:59:59";
 
 	if ($_POST["promo"] =="todos") {
 		
-		$sql = "SELECT p.id as planid, p.resultado,p.cod_profesor,p.id_objetivo, c.id as cid, UPPER(c.colegio) as colegio, p.start, CONCAT(u.nombres,' ',u.apellidos) as promotor FROM plan_trabajo p LEFT JOIN colegios c ON p.id_colegio=c.id LEFT JOIN usuarios u ON p.id_promotor=u.id WHERE p.start BETWEEN '".$desde."' AND '".$hasta."' ORDER BY start ASC";
+		$sql = "SELECT p.id as planid, p.resultado,p.cod_profesor,p.id_profesor,p.id_objetivo, c.id as cid, UPPER(c.colegio) as colegio, p.start, CONCAT(u.nombres,' ',u.apellidos) as promotor FROM plan_trabajo p LEFT JOIN colegios c ON p.id_colegio=c.id LEFT JOIN usuarios u ON p.id_promotor=u.id WHERE p.start BETWEEN '".$desde."' AND '".$hasta."' ORDER BY start ASC";
 		$req = $bdd->prepare($sql);
 		$req->execute();
 		$planes = $req->fetchAll();
 
 	}else{
 
-		$sql = "SELECT p.id as planid, p.resultado,p.cod_profesor,p.id_objetivo, c.id as cid, UPPER(c.colegio) as colegio, p.start FROM plan_trabajo p LEFT JOIN colegios c ON p.id_colegio=c.id  WHERE p.id_promotor='".$_POST["promo"]."' AND p.start BETWEEN '".$desde."' AND '".$hasta."' ORDER BY start ASC";
+		$sql = "SELECT p.id as planid, p.resultado,p.cod_profesor,p.id_profesor,p.id_objetivo, c.id as cid, UPPER(c.colegio) as colegio, p.start FROM plan_trabajo p LEFT JOIN colegios c ON p.id_colegio=c.id  WHERE p.id_promotor='".$_POST["promo"]."' AND p.start BETWEEN '".$desde."' AND '".$hasta."' ORDER BY start ASC";
 		$req = $bdd->prepare($sql);
 		$req->execute();
 		$planes = $req->fetchAll();
@@ -170,7 +170,7 @@ foreach($planes as $plan) {
 		$visitas = $req->fetch();
 	}
 
-	$sql_profe = "SELECT t.nombre, t.codigo, t.cargo as id_cargo, t.area, c.cargo FROM trabajadores_colegios t JOIN cargos c ON c.id=t.cargo WHERE codigo='".$plan["cod_profesor"]."' AND codigo!=''";
+	$sql_profe = "SELECT t.nombre, t.codigo, t.cargo as id_cargo, t.area, c.cargo FROM trabajadores_colegios t JOIN cargos c ON c.id=t.cargo WHERE t.id='".$plan["id_profesor"]."'";
 	$req_profe = $bdd->prepare($sql_profe);
 	$req_profe->execute();
 	$profe = $req_profe->fetch();
