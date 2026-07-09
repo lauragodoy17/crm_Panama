@@ -128,6 +128,7 @@
 
               $participantes = $req_parti->fetchAll();
 
+              $partics = '';
               foreach($participantes as $participante) {
 
                 $tipo_noti = explode(" ", $participante["tipo"]);
@@ -232,88 +233,10 @@
                 </table>
               <?php }
               }else{?>
-                          <!--<form action="php/crear_profesor.php" method="POST">
-                            <div class="col-sm-4">
-                  <div class="form-group">
-                    <label for="profesor" class="control-label no-padding-right">Nombre Profesor<small style="color:red;"> *</small></label>
-                     <input type="text" required name="profesor" id="profesor" class="form-control" placeholder="">
-                  </div>
-                </div>
-                <div class="col-sm-4">
-                  <div class="form-group">
-                    <label for="telefono_p" class="control-label no-padding-right">Teléfono<small style="color:red;"> *</small></label>
-                    <input type="tel" name="telefono_p" id="telefono_p" class="form-control" placeholder="" required>
-                  </div>
-
-                </div>
-                
-              <div class="col-sm-4">
-                <label for="email_p" class="control-label no-padding-right">Email</label>
-                  <input type="text" name="email_p" id="email_p" class="form-control" placeholder="" >
-              </div>
-                <br>
-                <input type="hidden" name="id_colegio" value="<?php echo $colegio['id'] ?>">
-                <input type="hidden" name="cod_colegio" value="<?php echo $colegio['codigo'] ?>">
-                <div class="otro_p">
-              <div class="row profesor">
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="materia_p"> Materia:<small style="color:red;"> *</small></label>
-              
-                    <select name="materia[]" id="materia_p" class="form-control materia" required>
-                      <option value="">Seleccionar</option>
-                        <?php 
-                          $sql = "SELECT id, materia FROM materias";
-              
-                          $req = $bdd->prepare($sql);
-                          $req->execute();
-                          $materias = $req->fetchAll();
-              
-                          foreach($materias as $materia) {
-                              $id = $materia['id'];
-                              $nom = $materia['materia'];
-                              echo '<option value="'.$id.'">'.$nom.'</option>';
-                          }
-                        ?>
-                    </select>
-                      
-                  </div>
-              
-                </div>
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label class="control-label no-padding-right" for="grado_p"> Grado:<small style="color:red;"> *</small></label>
-              
-                    <select name="grado[]" id="grado_p" class="form-control materia" required>
-                                  <option value="">Seleccionar</option>
-                        <?php 
-                          $sql = "SELECT id, grado FROM grados";
-              
-                          $req = $bdd->prepare($sql);
-                          $req->execute();
-                          $grados = $req->fetchAll();
-              
-                          foreach($grados as $grado) {
-                              $id = $grado['id'];
-                              $nom = $grado['grado'];
-                              echo '<option value="'.$id.'">'.$nom.'</option>';
-                          }
-                        ?>
-                    </select>
-                      
-                  </div>
-                  
-                </div>
-              </div>
-            </div>
-            <a id="agregar_materia" style="cursor: pointer;">Agregar materia +</a>
-            <input type="hidden" name="evento" value="<?php echo $_GET["evento"];?>">
-            <center><button class="btn btn-primary">Guardar profesor</button></center>
-                          </form>
-                         <?php } ?>
+              <p class="text-muted">No hay profesor asignado a esta visita.</p>
+              <?php }
+              } ?>
             </div><br>
-            <?php } ?>-->
-          </div><br>
             <div class="row">
               <center><h5>Objetivo de la Visita: <?php echo $objetivo["objetivo"] ?></h5></center>
 
