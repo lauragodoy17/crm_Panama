@@ -249,7 +249,7 @@
                       <option value="">Selecciona un colegio</option>
                       <?php
                         if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==2 || $_SESSION["tipo"]==2) {
-                          $sql = "SELECT id,colegio FROM colegios WHERE colegio like'%".$colegio."%' AND id > 2";
+                          $sql = "SELECT id,colegio FROM colegios WHERE colegio like'%".$colegio."%' AND colegio NOT IN ('Oficina','Trabajo en casa')";
                         } elseif ($_SESSION["tipo"]==3) {
                           $sql = "SELECT id,colegio FROM colegios WHERE colegio like'%".$colegio."%' AND cod_zona='".$_SESSION["zona"]."'";
                         } else {
