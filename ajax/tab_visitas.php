@@ -2,21 +2,45 @@
   require_once("../php/aut.php");
   include("../conexion/bdd.php");
 
-  $sql = "SELECT pt.id, pt.start, pt.end, pt.resultado,
+  $sql = "SELECT pt.id, pt.codigo, pt.start, pt.end, pt.resultado,
                  o.objetivo,
                  CONCAT(u.nombres, ' ', u.apellidos) AS promotor,
                  z.zona,
-                 v.observaciones, v.fecha_llegada, v.fecha AS fecha_salida, v.efectiva
+                 v.observaciones, v.fecha_llegada, v.fecha AS fecha_salida, v.efectiva,
+                 t.nombre AS prof_nombre, t.apellido AS prof_apellido, c.cargo AS prof_cargo
           FROM plan_trabajo pt
           LEFT JOIN objetivos o ON o.id = pt.id_objetivo
           LEFT JOIN usuarios  u ON u.id = pt.id_promotor
           LEFT JOIN zonas     z ON z.codigo = u.cod_zona
           LEFT JOIN visitas   v ON v.id_plan_trabajo = pt.id
+          LEFT JOIN trabajadores_colegios t ON t.id = pt.id_profesor
+          LEFT JOIN cargos    c ON c.id = t.cargo
           WHERE pt.id_colegio = '".$_GET['colegio']."'
           ORDER BY pt.start DESC";
   $req = $bdd->prepare($sql);
   $req->execute();
   $visitas = $req->fetchAll();
+
+  $sql_parti = $bdd->prepare(
+    "SELECT CONCAT(u.nombres, ' ', u.apellidos) AS parti, t.tipo
+     FROM usuarios u
+     JOIN plan_trabajo p ON u.id = p.id_promotor
+     JOIN tipos_notifi t ON t.id = p.agendamiento
+     WHERE p.codigo = :codigo
+     GROUP BY p.codigo, u.id"
+  );
+
+  foreach ($visitas as &$v) {
+    $sql_parti->execute([':codigo' => $v['codigo']]);
+    $nombres = [];
+    foreach ($sql_parti->fetchAll() as $p) {
+      $tipo_noti = explode(' ', $p['tipo']);
+      $estado = isset($tipo_noti[1]) ? ucfirst($tipo_noti[1]) : $p['tipo'];
+      $nombres[] = $p['parti'] . ' (' . $estado . ')';
+    }
+    $v['participantes'] = implode(', ', $nombres);
+  }
+  unset($v);
 
   $anios = [];
   foreach ($visitas as $v) {
@@ -164,6 +188,10 @@
             'llegada'    => $visita['fecha_llegada'] ? date('d/m/Y H:i', strtotime($visita['fecha_llegada'])) : '—',
             'salida'     => $visita['fecha_salida'] ? date('d/m/Y H:i', strtotime($visita['fecha_salida'])) : '—',
             'observaciones' => $visita['observaciones'] ?: 'Sin observaciones registradas',
+            'participantes' => $visita['participantes'] ?: 'Sin participantes adicionales',
+            'profesor'   => $visita['prof_nombre']
+              ? trim($visita['prof_nombre'].' '.$visita['prof_apellido']).' ('.$visita['prof_cargo'].')'
+              : 'Sin profesor asignado',
           ];
         ?>
         <tr class="vis-row" data-anio="<?= $anio_row ?>">
@@ -217,6 +245,14 @@
       <div class="vis-modal-val" id="vis-m-promotor">—</div>
     </div>
     <div class="vis-modal-row">
+      <div class="vis-modal-label">Participantes</div>
+      <div class="vis-modal-val" id="vis-m-participantes">—</div>
+    </div>
+    <div class="vis-modal-row">
+      <div class="vis-modal-label">Profesor</div>
+      <div class="vis-modal-val" id="vis-m-profesor">—</div>
+    </div>
+    <div class="vis-modal-row">
       <div class="vis-modal-label">Llegada / Salida</div>
       <div class="vis-modal-val" id="vis-m-horas">—</div>
     </div>
@@ -250,6 +286,8 @@
     $('#vis-m-objetivo').text(d.objetivo);
     $('#vis-m-resultado').text(d.resultado);
     $('#vis-m-promotor').text(d.promotor);
+    $('#vis-m-participantes').text(d.participantes);
+    $('#vis-m-profesor').text(d.profesor);
     $('#vis-m-horas').text(d.llegada + '  →  ' + d.salida);
     $('#vis-m-obs').text(d.observaciones);
     $('#vis-overlay').addClass('open');
