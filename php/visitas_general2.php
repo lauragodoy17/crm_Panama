@@ -126,10 +126,11 @@ foreach($planes as $plan) {
 		$visitas = $req->fetch();
 	}
 
-	$sql_profe = "SELECT t.nombre, t.codigo, t.cargo as id_cargo, t.area, c.cargo FROM trabajadores_colegios t JOIN cargos c ON c.id=t.cargo WHERE t.id='".$plan["id_profesor"]."'";
+	$sql_profe = "SELECT t.nombre, t.apellido, t.codigo, t.cargo as id_cargo, t.area, c.cargo FROM trabajadores_colegios t JOIN cargos c ON c.id=t.cargo WHERE t.id='".$plan["id_profesor"]."'";
 	$req_profe = $bdd->prepare($sql_profe);
 	$req_profe->execute();
 	$profe = $req_profe->fetch();
+	$profe_nombre = trim(($profe["nombre"] ?? '').' '.($profe["apellido"] ?? ''));
 
 	$sql_objetivo = "SELECT objetivo FROM objetivos WHERE id='".$plan["id_objetivo"]."'";
 	$req_objetivo = $bdd->prepare($sql_objetivo);
@@ -149,8 +150,8 @@ foreach($planes as $plan) {
 			$cargo= $profe["cargo"]." ".$area["materia"];
 
 		}elseif ($profe["id_cargo"]==6) {
-			
-			$sql_area = "SELECT m.materia FROM materias m JOIN grados_materias gm ON m.id=gm.id_materia WHERE gm.cod_profesor='".$profe["codigo"]."'";
+
+			$sql_area = "SELECT materia FROM materias WHERE id='".$profe["area"]."'";
 			$req_area = $bdd->prepare($sql_area);
 			$req_area->execute();
 
@@ -189,8 +190,8 @@ foreach($planes as $plan) {
 		$objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$status[status]");
 	}
 		
-	if (!empty($profe["nombre"])) {
-		$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$profe[nombre]");
+	if (!empty($profe_nombre)) {
+		$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", $profe_nombre);
 	}else{
 		$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "");
 	}
