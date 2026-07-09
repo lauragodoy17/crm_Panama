@@ -31,6 +31,10 @@
                 die ('Erreur execute');
             }
 
+            $nuevo_id = $bdd->lastInsertId();
+            $bdd->prepare("UPDATE trabajadores_colegios SET codigo=:codigo WHERE id=:id")
+                ->execute([':codigo' => $nuevo_id, ':id' => $nuevo_id]);
+
             registrar_historial($bdd, $_POST['id_colegio'], $id_usuario_h, 'Información de contacto',
                 'Nuevo contacto administrativo', '', "$nombre $apellido");
         }
