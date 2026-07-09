@@ -484,8 +484,8 @@
                             </div>
                             <div class="col-sm-6">
                               <div class="form-group">
-                                <label>Segmento <small style="color:red;"> *</small></label>
-                                <select class="custom-select" name="segmento" required>
+                                <label>Segmento</label>
+                                <select class="custom-select" name="segmento">
                                   <option value="">Seleccione...</option>
                                   <?php foreach ($segmento_ops as $segmento):
                                     $sel = $segmento["id"]==$colegio["id_segmento"] ? ' selected' : '';
