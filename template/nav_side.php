@@ -18,6 +18,7 @@ $reportes_active     = in_array($current_page, ['reporte_zonificacion.php','repo
 $libros_active       = $current_page === 'libros.php';
 $usuarios_active     = $current_page === 'usuarios.php';
 $zonas_active        = $current_page === 'zonas.php';
+$periodos_active     = $current_page === 'periodos.php';
 ?>
 <!--<div class="pre-loader">
 			<div class="pre-loader-box">
@@ -583,6 +584,12 @@ $zonas_active        = $current_page === 'zonas.php';
 								<a href="zonas.php" class="dropdown-toggle no-arrow <?= $zonas_active ? 'active' : '' ?>">
 									<span class="micon bi bi-geo-alt"></span
 									><span class="mtext">Zonas</span>
+								</a>
+							</li>
+							<li>
+								<a href="periodos.php" class="dropdown-toggle no-arrow <?= $periodos_active ? 'active' : '' ?>">
+									<span class="micon bi bi-calendar-range"></span
+									><span class="mtext">Períodos</span>
 								</a>
 							</li>
 						<?php }?>
