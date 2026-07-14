@@ -1,7 +1,7 @@
 <?php
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
-ini_set('display_startup_errors', 1);
+ini_set('display_startup_errors', 0);
 
 error_reporting(E_ALL);
 
@@ -98,7 +98,7 @@ $drawing->setWorksheet($objSpreadsheet->getActiveSheet());
 
 	$req = $bdd->prepare($sql);
 	$req->execute();
-	$usuario = $req->fetch();
+	$usuario = $req->fetch() ?: ["nombres" => "", "apellidos" => ""];
 
 	$nombre_completo=$usuario["nombres"]." ".$usuario["apellidos"];
 

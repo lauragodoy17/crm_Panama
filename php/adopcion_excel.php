@@ -1,7 +1,7 @@
 <?php
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
-ini_set('display_startup_errors', 1);
+ini_set('display_startup_errors', 0);
 
 error_reporting(E_ALL);
 
@@ -117,7 +117,7 @@ $drawing->setWorksheet($objSpreadsheet->getActiveSheet());
 
 	$req = $bdd->prepare($sql);
 	$req->execute();
-	$usuario = $req->fetch();
+	$usuario = $req->fetch() ?: ["nombres" => "", "apellidos" => "", "tipo" => null];
 
 	$nombre_completo=$usuario["nombres"]." ".$usuario["apellidos"];
 
@@ -361,6 +361,7 @@ foreach($adopciones as $adopcion) {
 	if (($go['id_grado_otro'] ?? null) == 0) {
 
 		$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$adopcion[grado]");
+		$grade_label_map[$adopcion["id_grado"]] = $adopcion["grado"];
 		if ($adopcion["id_grado"] < 4) {
 			$p_pre[]=$tasa_compra;
 		}elseif ($adopcion["id_grado"] > 3 && $adopcion["id_grado"] < 9) {
@@ -517,6 +518,7 @@ foreach($adopciones as $adopcion) {
 		$go1 = $req_go1->fetch();
 
 		$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$go1[grado]");
+		$grade_label_map[$go["id_grado_otro"]] = $go1["grado"];
 		if ($go["id_grado_otro"] < 4) {
 			$p_pre[]=$tasa_compra;
 		}elseif ($go["id_grado_otro"] > 3 && $go["id_grado_otro"] < 9) {
@@ -781,7 +783,7 @@ if (isset($t_alumnos_g4)) {
 	$t_venta_real_g4=number_format(array_sum($t_venta_real_g4),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "1 (Primero)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[4] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g4");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g4");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g4");
@@ -803,7 +805,7 @@ if (isset($t_alumnos_g5)) {
 	$t_venta_real_g5=number_format(array_sum($t_venta_real_g5),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "2 (Segundo)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[5] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g5");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g5");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g5");
@@ -826,7 +828,7 @@ if (isset($t_alumnos_g6)) {
 	$t_venta_real_g6=number_format(array_sum($t_venta_real_g6),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "3 (Tercero)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[6] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g6");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g6");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g6");
@@ -849,7 +851,7 @@ if (isset($t_alumnos_g7)) {
 	$t_venta_real_g7=number_format(array_sum($t_venta_real_g7),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "4 (Cuarto)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[7] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g7");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g7");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g7");
@@ -872,7 +874,7 @@ if (isset($t_alumnos_g8)) {
 	$t_venta_real_g8=number_format(array_sum($t_venta_real_g8),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "5 (Quinto)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[8] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g8");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g8");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g8");
@@ -895,7 +897,7 @@ if (isset($t_alumnos_g9)) {
 	$t_venta_real_g9=number_format(array_sum($t_venta_real_g9),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "6 (Sexto)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[9] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g9");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g9");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g9");
@@ -918,7 +920,7 @@ if (isset($t_alumnos_g10)) {
 	$t_venta_real_g10=number_format(array_sum($t_venta_real_g10),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "7 (Séptimo)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[10] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g10");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g10");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g10");
@@ -941,7 +943,7 @@ if (isset($t_alumnos_g11)) {
 	$t_venta_real_g11=number_format(array_sum($t_venta_real_g11),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "8 (Octavo)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[11] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g11");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g11");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g11");
@@ -964,7 +966,7 @@ if (isset($t_alumnos_g12)) {
 	$t_venta_real_g12=number_format(array_sum($t_venta_real_g12),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "9 (Noveno)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[12] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g12");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g12");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g12");
@@ -987,7 +989,7 @@ if (isset($t_alumnos_g13)) {
 	$t_venta_real_g13=number_format(array_sum($t_venta_real_g13),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "10 (Décimo)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[13] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g13");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g13");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g13");
@@ -1010,7 +1012,7 @@ if (isset($t_alumnos_g14)) {
 	$t_venta_real_g14=number_format(array_sum($t_venta_real_g14),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "11 (Once)");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[14] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g14");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g14");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g14");
@@ -1033,7 +1035,7 @@ if (isset($t_alumnos_g1)) {
 	$t_venta_real_g1=number_format(array_sum($t_venta_real_g1),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "Pre jardín");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[1] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g1");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g1");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g1");
@@ -1056,7 +1058,7 @@ if (isset($t_alumnos_g2)) {
 	$t_venta_real_g2=number_format(array_sum($t_venta_real_g2),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "Jardín");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[2] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g2");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g2");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g2");
@@ -1078,7 +1080,7 @@ if (isset($t_alumnos_g3)) {
 	$t_venta_real_g3=number_format(array_sum($t_venta_real_g3),2,",", ".");
 
 	$objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "TOTAL GRADO");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "Transición");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $grade_label_map[3] ?? '');
 	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$t_alumnos_g3");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$t_compradores_g3");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$t_descuento_g3");
