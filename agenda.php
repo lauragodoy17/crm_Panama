@@ -596,7 +596,7 @@
 				$.getJSON('ajax/profesores_colegio.php', { id_colegio: idColegio }, function (profes) {
 					$sel.empty();
 					if (!profes.length) {
-						$sel.append($('<option>', { value: '', text: 'Sin profesores registrados' }));
+						$sel.append($('<option>', { value: '', text: 'Sin profesores ni directivos registrados' }));
 					} else {
 						$sel.append($('<option>', { value: '', text: 'Seleccione...' }));
 						$.each(profes, function (i, p) {
