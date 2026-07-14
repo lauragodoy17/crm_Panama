@@ -784,7 +784,7 @@
                                     <option value="">Seleccione</option>
                                       <?php
 
-                                        $sql = "SELECT * FROM materias WHERE id < 16";
+                                        $sql = "SELECT * FROM materias";
 
                                         $req = $bdd->prepare($sql);
                                         $req->execute();
@@ -871,7 +871,7 @@
                                           
                                             <?php
 
-                                              $sql = "SELECT * FROM materias WHERE id < 16";
+                                              $sql = "SELECT * FROM materias";
 
                                               $req = $bdd->prepare($sql);
                                               $req->execute();
@@ -937,7 +937,7 @@
                                             
                                               <?php
 
-                                                $sql = "SELECT * FROM materias WHERE id < 16";
+                                                $sql = "SELECT * FROM materias";
 
                                                 $req = $bdd->prepare($sql);
                                                 $req->execute();

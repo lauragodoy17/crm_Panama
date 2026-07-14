@@ -217,7 +217,7 @@ function ic_initials($n, $a) {
   $profes->execute([$_GET["colegio"]]);
   $profes = $profes->fetchAll();
 
-  $materias_q = $bdd->prepare("SELECT * FROM materias WHERE id < 16");
+  $materias_q = $bdd->prepare("SELECT * FROM materias");
   $materias_q->execute();
   $materias_all = $materias_q->fetchAll();
   $materias_map = array_column($materias_all, 'materia', 'id');
