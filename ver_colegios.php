@@ -34,6 +34,9 @@ if ($_SESSION['tipo'] == 3) {
     $filtro_prueba_depto = $_SESSION['tipo'] != 1 ? "WHERE LOWER(departamento) NOT LIKE '%prueba%'" : "";
     $depto_list = $bdd->query("SELECT id, departamento FROM departamentos $filtro_prueba_depto ORDER BY departamento")->fetchAll(PDO::FETCH_ASSOC);
 }
+$filtro_prueba_ciudad = $_SESSION['tipo'] != 1 ? "AND LOWER(ciudad) NOT LIKE '%prueba%'" : "";
+$ciudad_list = $bdd->query("SELECT DISTINCT ciudad FROM colegios WHERE $where_stats AND ciudad IS NOT NULL AND ciudad != '' $filtro_prueba_ciudad ORDER BY ciudad")->fetchAll(PDO::FETCH_ASSOC);
+
 $show_zona_filter = ($_SESSION['tipo'] != 3 && ($_SESSION['tipo']==1 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==10 || $_SESSION["tipo"]==5 || $_SESSION['zona']=='5656'));
 if ($show_zona_filter) {
     $filtro_prueba_zona = $_SESSION['tipo'] != 1 ? "WHERE LOWER(sub_zona) NOT LIKE '%prueba%'" : "";
@@ -145,6 +148,13 @@ if ($show_resp_filter) {
               <option value="">Todas las provincias</option>
               <?php foreach ($depto_list as $dep): ?>
               <option value="<?= $dep['id'] ?>"><?= htmlspecialchars($dep['departamento']) ?></option>
+              <?php endforeach; ?>
+            </select>
+
+            <select class="ft-select" id="ft-ciudad">
+              <option value="">Todas las ciudades</option>
+              <?php foreach ($ciudad_list as $c): ?>
+              <option value="<?= htmlspecialchars($c['ciudad']) ?>"><?= htmlspecialchars($c['ciudad']) ?></option>
               <?php endforeach; ?>
             </select>
 
@@ -318,6 +328,7 @@ if ($show_resp_filter) {
                 url: "php/colegios_tabla.php",
                 data: function(d) {
                     d.depto_filter  = $('#ft-depto').val();
+                    d.ciudad_filter = $('#ft-ciudad').val();
                     <?php if ($show_zona_filter): ?>
                     d.zona_filter   = $('#ft-zona').val();
                     <?php endif; ?>
@@ -396,7 +407,7 @@ if ($show_resp_filter) {
 
         // Limpiar filtros
         $('#ft-btn-clear').on('click', function () {
-            $('#ft-depto, #ft-zona, #ft-resp').val('');
+            $('#ft-depto, #ft-zona, #ft-resp, #ft-ciudad').val('');
             $('#ft-input-search').val('');
             table.api().search('').draw();
         });

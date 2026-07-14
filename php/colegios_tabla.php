@@ -66,6 +66,7 @@ $zona_filter   = isset($_GET['zona_filter'])   ? trim($_GET['zona_filter'])     
 $depto_filter  = isset($_GET['depto_filter'])  ? intval($_GET['depto_filter'])            : 0;
 $resp_filter   = isset($_GET['resp_filter'])   ? trim(strip_tags($_GET['resp_filter']))   : '';
 $dir_filter    = isset($_GET['dir_filter'])    ? trim(strip_tags($_GET['dir_filter']))    : '';
+$ciudad_filter = isset($_GET['ciudad_filter']) ? trim(strip_tags($_GET['ciudad_filter'])) : '';
 
 if (!empty($zona_filter)) {
     $searchSQL .= " AND c.sub_zona = :zona_filter";
@@ -86,6 +87,10 @@ if (!empty($resp_filter) && ($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 2)) 
 if (!empty($dir_filter)) {
     $searchSQL .= " AND c.direccion LIKE :dir_filter";
     $params[':dir_filter'] = '%' . $dir_filter . '%';
+}
+if (!empty($ciudad_filter)) {
+    $searchSQL .= " AND c.ciudad = :ciudad_filter";
+    $params[':ciudad_filter'] = $ciudad_filter;
 }
 
 // Total sin filtros (recordsTotal)
