@@ -222,7 +222,7 @@ function ic_initials($n, $a) {
   $materias_all = $materias_q->fetchAll();
   $materias_map = array_column($materias_all, 'materia', 'id');
 
-  $niveles_escolaridad = ['Preescolar', 'Primaria', 'Bachillerato'];
+  $niveles_escolaridad = ['Preescolar', 'Primaria', 'Pre-media', 'Media'];
   ?>
 
   <div class="ic-section">

@@ -41,10 +41,15 @@ $joinSQL = "
     ) u ON u.cod_zona = c.cod_zona
 ";
 
+// Estos perfiles ven todos los colegios (no solo los de su propia zona), así que por defecto se
+// ocultan los que no tienen cod_zona (sin empresa asignada) salvo que se pida explícitamente el
+// filtro "Sin asignar" más abajo.
+$vista_amplia = ($_SESSION['zona'] == '5656' || ($_SESSION["tipo"] != 3 && $_SESSION["tipo"] != 6 && $_SESSION["tipo"] != 10));
+
 // WHERE base según rol (sin búsqueda, para recordsTotal)
 $baseParams = [];
-if ($_SESSION['zona'] == '5656' || ($_SESSION["tipo"] != 3 && $_SESSION["tipo"] != 6 && $_SESSION["tipo"] != 10)) {
-    $baseSQL = " WHERE c.cod_zona != '' AND c.cod_zona != '0' AND c.id > 0";
+if ($vista_amplia) {
+    $baseSQL = " WHERE c.id > 0";
 } elseif ($_SESSION["tipo"] == 10) {
     $baseSQL = " WHERE (c.cod_zona = :zona_base OR c.zona_madre = :zona_base)";
     $baseParams[':zona_base'] = $_SESSION['zona'];
@@ -68,9 +73,16 @@ $resp_filter   = isset($_GET['resp_filter'])   ? trim(strip_tags($_GET['resp_fil
 $dir_filter    = isset($_GET['dir_filter'])    ? trim(strip_tags($_GET['dir_filter']))    : '';
 $ciudad_filter = isset($_GET['ciudad_filter']) ? trim(strip_tags($_GET['ciudad_filter'])) : '';
 
-if (!empty($zona_filter)) {
+if ($zona_filter === 'sin_asignar') {
+    // Colegios sin cod_zona asignado, es decir, sin empresa/zona.
+    $searchSQL .= " AND (c.cod_zona = '' OR c.cod_zona = '0')";
+} elseif (!empty($zona_filter)) {
     $searchSQL .= " AND c.sub_zona = :zona_filter";
     $params[':zona_filter'] = $zona_filter;
+} elseif ($vista_amplia) {
+    // Sin filtro de zona explícito: se mantiene el comportamiento previo de ocultar los
+    // colegios sin cod_zona en la vista general.
+    $searchSQL .= " AND c.cod_zona != '' AND c.cod_zona != '0'";
 }
 if ($depto_filter > 0) {
     $searchSQL .= " AND c.departamento = :depto_filter";
@@ -133,7 +145,12 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $colegio) {
     // (tipo 3, 1 o 10), zonas.zona viene como "EMPRESA/ZONA"; si no, es distribuidor
     // y la zona real está en sub_zonas (misma lógica que colegio.php).
     if ($_SESSION['tipo'] == 1 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 10 || $_SESSION["tipo"] == 5 || $_SESSION['zona'] == '5656' || $_SESSION['tipo'] == 6) {
-        if ($colegio['promotor_tipo'] == 3 || $colegio['promotor_tipo'] == 1 || $colegio['promotor_tipo'] == 10) {
+        if (empty($colegio['cod_zona']) || intval($colegio['cod_zona']) === 0) {
+            // Colegio sin cod_zona: no tiene empresa/zona/responsable asignado.
+            $colegio['empresa']     = 'Sin asignar';
+            $colegio['zona']        = 'Sin asignar';
+            $colegio['responsable'] = '—';
+        } elseif ($colegio['promotor_tipo'] == 3 || $colegio['promotor_tipo'] == 1 || $colegio['promotor_tipo'] == 10) {
             $partes = array_pad(array_map('trim', explode('/', $colegio['zona_full'] ?? '', 2)), 2, '');
             $colegio['empresa']     = $partes[0];
             $colegio['zona']        = $partes[1] ?: $partes[0];
