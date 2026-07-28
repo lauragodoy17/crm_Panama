@@ -129,33 +129,48 @@ $objSpreadsheet->getActiveSheet()->getStyle('A6:O6')->applyFromArray([
     ]
 ]);
 
+// Mismos criterios que usa php/valoriza_excel.php ("valorización libro a libro") para que
+// el valor de presupuesto/adopciones cuadre entre ambos reportes: exige que la línea ya
+// tenga posición asignada en la zona (fila_zona > 0), excluye probabilidad "Perdida" (id=3)
+// y las líneas sin ninguna tasa de compra asignada (ni propia ni de distribuidor). Antes
+// este reporte no aplicaba ninguno de los tres filtros, así que podía sumar líneas que
+// "valorización libro a libro" excluye.
+$condicionesNegocio = " AND p.fila_zona > 0 AND p.probabilidad != 3 AND (p.tasa_compra != 0.00 OR p.tasa_compra_d != 0.00)";
+
 if ($_SESSION['tipo']==1 || $_SESSION['tipo']==2 || $_SESSION['tipo']==7) {
 
 
 
-    
+
     if ($_POST['promotor']!=0) {
 
+        $userFilter = " AND p.id_usuario='".$_POST['promotor']."'";
+     $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."'" . $condicionesNegocio . $userFilter . " GROUP BY c.id ORDER BY p.conse DESC";
 
-     $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE p.id_usuario='".$_POST['promotor']."' AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
-                                  
 
- 
+
 
     }else{
 
-         $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' GROUP BY c.id ORDER BY p.conse DESC";
-     
+        // "Distribuidores" (grupo, sin usuario puntual): mismo criterio por id_usuario que
+        // usa el resto del dashboard. "Todos" (rol vacío) sigue siendo literalmente todos.
+        $userFilter = ($_POST['rol'] ?? '') === 'distribuidor'
+            ? " AND p.id_usuario IN (SELECT id FROM usuarios WHERE tipo = 6)"
+            : "";
+         $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."'" . $condicionesNegocio . $userFilter . " GROUP BY c.id ORDER BY p.conse DESC";
+
     }
 
 }elseif($_SESSION['tipo']==3){
 
-    $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$_SESSION['id']."' GROUP BY c.id ORDER BY p.conse DESC";
+    $userFilter = " AND p.id_usuario='".$_SESSION['id']."'";
+    $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."'" . $condicionesNegocio . $userFilter . " GROUP BY c.id ORDER BY p.conse DESC";
 
-  
+
 }else{
 
-     $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND c.cod_zona='".$_SESSION['zona']."' GROUP BY c.id ORDER BY p.conse DESC";
+    $userFilter = "";
+     $sql = "SELECT c.id, c.codigo, p.sub_zona, p.conse, p.year, c.responsable, c.departamento,c.ciudad, c.colegio, c.direccion, c.barrio,c.telefono, CONCAT(u.nombres, ' ',u.apellidos) as promotor, u.tipo as tipouser, u.id as uid, z.zona FROM colegios c JOIN presupuestos p ON c.id=p.id_colegio JOIN zonas z ON p.cod_zona=z.codigo JOIN usuarios u on u.id=p.id_usuario WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND c.cod_zona='".$_SESSION['zona']."'" . $condicionesNegocio . " GROUP BY c.id ORDER BY p.conse DESC";
 }
 
 
@@ -168,6 +183,69 @@ $req = $bdd->prepare($sql);
 $req->execute();
 $colegios = $req->fetchAll();
 
+// ── Precarga en bloque de todo lo que antes se consultaba por colegio/línea dentro del
+// foreach (N+1 queries: con ~70 colegios y ~1000 líneas de presupuesto, esto llegaba a
+// disparar miles de consultas individuales y el reporte tardaba varios segundos en generar).
+// Se arma cada lookup con UNA sola consulta y se accede por índice en memoria dentro del
+// loop, sin cambiar ningún cálculo ni criterio de negocio respecto a la versión anterior.
+
+// Líneas de presupuesto/adopción de TODOS los colegios filtrados, agrupadas por id_colegio.
+$sql = "SELECT p.id_colegio, p.tasa_compra,p.tasa_compra_d,p.descuento ,p.descuento_d ,p.precio, p.pre_definido, p.definido, p.cod_area, p.uni_vr, l.id as idlibro, l.id_grado FROM presupuestos p JOIN libros l ON p.id_libro=l.id WHERE (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."'" . $condicionesNegocio . $userFilter;
+$req = $bdd->prepare($sql);
+$req->execute();
+$adopcionesPorColegio = [];
+foreach ($req->fetchAll() as $row) {
+    $adopcionesPorColegio[$row['id_colegio']][] = $row;
+}
+
+// Valor manual de venta real capturado en recursos, por colegio.
+$sql = "SELECT id_colegio, venta_real FROM recursos WHERE id_periodo='".$_POST['periodo']."'";
+$req = $bdd->prepare($sql);
+$req->execute();
+$vRealPorColegio = [];
+foreach ($req->fetchAll() as $row) {
+    $vRealPorColegio[$row['id_colegio']] = $row;
+}
+
+// Población (alumnos) por colegio+grado, mismo criterio que la consulta original
+// (SUM(alumnos) filtrando alumnos > 0).
+$sql = "SELECT id_colegio, id_grado, SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_periodo='".$_POST['periodo']."' AND alumnos > 0 GROUP BY id_colegio, id_grado";
+$req = $bdd->prepare($sql);
+$req->execute();
+$alumnosPorColegioGrado = [];
+foreach ($req->fetchAll() as $row) {
+    $alumnosPorColegioGrado[$row['id_colegio']][$row['id_grado']] = $row['alumnos'];
+}
+
+// Resolución de grado por área electiva (colegio + libro + código), misma clave que usaba
+// la consulta original por línea (id_colegio, id_libro_eureka, codigo).
+$sql = "SELECT id_colegio, id_libro_eureka, codigo, id_grado_otro FROM areas_objetivas WHERE id_periodo='".$_POST['periodo']."'";
+$req = $bdd->prepare($sql);
+$req->execute();
+$areaGradoMap = [];
+foreach ($req->fetchAll() as $row) {
+    $areaGradoMap[$row['id_colegio']][$row['id_libro_eureka']][$row['codigo']] = $row['id_grado_otro'];
+}
+
+// Total de muestras/atenciones legalizadas por colegio.
+$sql = "SELECT s.id_colegio, SUM(r.legaliza) as total FROM solicitudes_recursos s JOIN recursos_solicitados r ON s.id=r.id_solicitud WHERE s.id_periodo='".$_POST['periodo']."' AND s.estado='4' GROUP BY s.id_colegio";
+$req = $bdd->prepare($sql);
+$req->execute();
+$atencionesPorColegio = [];
+foreach ($req->fetchAll() as $row) {
+    $atencionesPorColegio[$row['id_colegio']] = $row['total'];
+}
+
+// Catálogos pequeños completos (departamentos, sub-zonas): más barato traerlos enteros una
+// vez que consultarlos uno por uno por cada colegio.
+$departamentoPorId = [];
+foreach ($bdd->query("SELECT id, departamento FROM departamentos")->fetchAll() as $row) {
+    $departamentoPorId[$row['id']] = $row['departamento'];
+}
+$subZonaPorId = [];
+foreach ($bdd->query("SELECT id, sub_zona FROM sub_zonas")->fetchAll() as $row) {
+    $subZonaPorId[$row['id']] = $row['sub_zona'];
+}
 
 $conta=7;
 //$conse=1;
@@ -179,47 +257,34 @@ foreach ($colegios as $colegio) {
 
     $req = $bdd->prepare($sql);
     $req->execute();*/
-  
-
-    $sql = "SELECT p.tasa_compra,p.tasa_compra_d,p.descuento ,p.descuento_d ,p.precio, p.pre_definido, p.definido, p.cod_area, p.uni_vr, l.id as idlibro, l.id_grado FROM presupuestos p JOIN libros l ON p.id_libro=l.id WHERE p.id_colegio='".$colegio["id"]."' AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo='".$_POST['periodo']."' AND p.id_usuario='".$colegio["uid"]."'";
 
 
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $adopciones = $req->fetchAll();
+    // No se filtra por p.id_usuario='".$colegio["uid"]."' (bug anterior): ese "uid" es un
+    // valor arbitrario que MySQL elige entre los distintos asesores que pueden tener línea
+    // de presupuesto para el mismo colegio (GROUP BY c.id sin agregación no garantiza cuál),
+    // así que esa condición descartaba en silencio las líneas de los demás asesores del
+    // colegio. $userFilter ya resuelve correctamente el alcance por usuario/rol (vacío
+    // cuando corresponde ver todos los asesores del colegio, o el id puntual cuando el
+    // reporte está acotado a un asesor específico).
+    $adopciones = $adopcionesPorColegio[$colegio['id']] ?? [];
 
-
-    $sql = "SELECT venta_real FROM recursos WHERE id_colegio='".$colegio["id"]."' AND id_periodo='".$_POST['periodo']."'";
-
-
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $v_real = $req->fetch();
+    $v_real = $vRealPorColegio[$colegio['id']] ?? false;
 
 
     foreach ($adopciones as $adopcion) {
-       
+
         if ($adopcion["id_grado"] != 17  && $adopcion["cod_area"]=="") {
 
-            $sq_gp = "SELECT  SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$colegio["id"]."' AND id_grado='".$adopcion["id_grado"]."' AND id_periodo='".$_POST['periodo']."' AND alumnos > 0";
+            $id_grado_gp = $adopcion["id_grado"];
 
         }else{
 
-       
-            $sql_go = "SELECT id_grado_otro FROM areas_objetivas WHERE id_colegio='".$colegio['id']."' AND id_libro_eureka='".$adopcion["idlibro"]."' AND id_periodo='".$_POST['periodo']."' AND codigo='".$adopcion["cod_area"]."'";
-                
-            $req_go = $bdd->prepare($sql_go);
-            $req_go->execute();
-            $grado_o = $req_go->fetch();
+            $id_grado_o = $areaGradoMap[$colegio['id']][$adopcion["idlibro"]][$adopcion["cod_area"]] ?? 0;
 
-            $id_grado_o = $grado_o['id_grado_otro'] ?? 0;
-
-            $sq_gp = "SELECT  SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio='".$colegio["id"]."' AND id_grado='".$id_grado_o."' AND id_periodo='".$_POST['periodo']."' AND alumnos > 0";
+            $id_grado_gp = $id_grado_o;
         }
 
-        $req_gp = $bdd->prepare($sq_gp);
-        $req_gp->execute();
-        $gp = $req_gp->fetch();
+        $gp = ['alumnos' => $alumnosPorColegioGrado[$colegio['id']][$id_grado_gp] ?? 0];
 
         if ($adopcion["pre_definido"] ==1) {
 
@@ -230,7 +295,7 @@ foreach ($colegios as $colegio) {
 
             $cant_presup[$colegio["id"]][]=$alumnos_tasa;
 
-           
+
         }
 
         if ($adopcion["definido"] !=0) {
@@ -238,7 +303,7 @@ foreach ($colegios as $colegio) {
             if ($adopcion["tasa_compra_d"] == 0.00) {
                 $alumnos_tasa_d= floor($gp["alumnos"] * $adopcion["tasa_compra"]);
                 $precio_neto_d=$adopcion["precio"] - ($adopcion["precio"] * $adopcion["descuento"]);
-           
+
             }else{
                 $alumnos_tasa_d= floor($gp["alumnos"] * $adopcion["tasa_compra_d"]);
                 $precio_neto_d=$adopcion["precio"] - ($adopcion["precio"] * $adopcion["descuento_d"]);
@@ -258,10 +323,10 @@ foreach ($colegios as $colegio) {
 
         }
 
-        
-    
-        
-        
+
+
+
+
 
         $alms[$colegio["id"]][]=$gp["alumnos"];
 
@@ -276,17 +341,13 @@ foreach ($colegios as $colegio) {
 
 
     $t_alms[$colegio["id"]]=array_sum($alms[$colegio["id"]] ?? []);
-    
-   
-
-    
 
 
-    $sql = "SELECT SUM(r.legaliza) as total FROM solicitudes_recursos s JOIN recursos_solicitados r ON s.id=r.id_solicitud WHERE s.id_colegio='".$colegio["id"]."' AND s.id_periodo='".$_POST['periodo']."' AND s.estado='4'";
 
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $total = $req->fetch();
+
+
+
+    $total = ['total' => $atencionesPorColegio[$colegio['id']] ?? null];
 
     $conse=$colegio["year"]."-".$colegio["conse"];
     $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$conse");
@@ -299,23 +360,17 @@ foreach ($colegios as $colegio) {
         $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$colegio[promotor]");
     }else{
 
-        $sql_sz="SELECT sub_zona FROM sub_zonas WHERE id='".$colegio["sub_zona"]."'";
-        $req_sz = $bdd->prepare($sql_sz);
-        $req_sz->execute();
-        $sub_zona = $req_sz->fetch();
+        $sub_zona = ['sub_zona' => $subZonaPorId[$colegio["sub_zona"]] ?? ''];
 
         $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$colegio[promotor]");
         $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$sub_zona[sub_zona]");
         $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$colegio[responsable]");
     }
-    
+
     $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$colegio[codigo]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$colegio[colegio]");
 
-    $sql_dep="SELECT departamento FROM departamentos WHERE id='".$colegio['departamento']."' ";
-    $req_dep = $bdd->prepare($sql_dep);
-    $req_dep->execute();
-    $dep = $req_dep->fetch();
+    $dep = ['departamento' => $departamentoPorId[$colegio['departamento']] ?? ''];
 
     $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$dep[departamento]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$colegio[ciudad]");
