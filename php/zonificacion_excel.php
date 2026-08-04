@@ -98,13 +98,14 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("G4", "Dirección");
 $objSpreadsheet->getActiveSheet()->SetCellValue("H4", "Teléfono");
 $objSpreadsheet->getActiveSheet()->SetCellValue("I4", "Status");
 $objSpreadsheet->getActiveSheet()->SetCellValue("J4", "Propuesta comercial");
-$objSpreadsheet->getActiveSheet()->getStyle("A1:J1")->getFont()->getColor()->applyFromArray(
+$objSpreadsheet->getActiveSheet()->SetCellValue("K4", "Estado a cliente");
+$objSpreadsheet->getActiveSheet()->getStyle("A1:K1")->getFont()->getColor()->applyFromArray(
 	array(
 	'rgb' => '#251919'
 	)
 );
 
-$objSpreadsheet->getActiveSheet()->getStyle('A4:J4')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A4:K4')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -115,11 +116,11 @@ $objSpreadsheet->getActiveSheet()->getStyle('A4:J4')->applyFromArray([
 
 if ($_POST['promo']!=0) {
 
-	$sql = "SELECT c.id, c.codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, z.zona, c.responsable, sc.status FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo='".$usuario["cod_zona"]."' GROUP BY c.id";
+	$sql = "SELECT c.id, c.codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, z.zona, c.responsable, sc.status, ecli.estado as estado_cliente FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status LEFT JOIN colegios_estados_clientes ce ON c.id=ce.id_colegio AND ce.id_periodo = '".$_POST["periodo"]."' LEFT JOIN estados_cliente ecli ON ecli.id=ce.id_estado_cliente WHERE z.codigo='".$usuario["cod_zona"]."' GROUP BY c.id";
 
 }else{
 
-	$sql = "SELECT c.id, c.codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, z.zona, c.responsable, sc.status, CONCAT (u.nombres, ' ',u.apellidos) as promotor FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN usuarios u ON u.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status WHERE z.codigo !='74838' GROUP BY c.id ORDER BY u.id";
+	$sql = "SELECT c.id, c.codigo, UPPER(c.colegio) as colegio, c.barrio,c.ciudad, c.departamento, c.direccion,c.telefono, c.sub_zona, z.zona, c.responsable, sc.status, ecli.estado as estado_cliente, CONCAT (u.nombres, ' ',u.apellidos) as promotor FROM colegios c JOIN zonas z ON c.cod_zona=z.codigo JOIN usuarios u ON u.cod_zona=z.codigo LEFT JOIN colegios_status cs ON c.id=cs.id_colegio AND cs.id_periodo = '".$_POST["periodo"]."' LEFT JOIN status_cubrimiento sc ON sc.id=cs.id_status LEFT JOIN colegios_estados_clientes ce ON c.id=ce.id_colegio AND ce.id_periodo = '".$_POST["periodo"]."' LEFT JOIN estados_cliente ecli ON ecli.id=ce.id_estado_cliente WHERE z.codigo !='74838' GROUP BY c.id ORDER BY u.id";
 }
 
 	$req = $bdd->prepare($sql);
@@ -178,6 +179,7 @@ foreach($coles as $cole) {
 	$objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$cole[telefono]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$cole[status]");
 	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", $count_p < 1 ? "No" : "Si");
+	$objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$cole[estado_cliente]");
 
 $conta++;
 }
