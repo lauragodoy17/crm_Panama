@@ -237,6 +237,16 @@
   .adop-footer-form .adop-file-label.has-file { border-color: #16a34a; background: #f0fdf4; color: #15803d; }
   .adop-footer-form input[type="file"] { display: none; }
   .adop-file-name { font-size: 0.79rem; color: #6366f1; margin-top: 5px; font-weight: 600; word-break: break-all; }
+  .adop-file-list { list-style: none; margin: 6px 0 0; padding: 0; }
+  .adop-file-list li {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    font-size: 0.79rem; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0;
+    border-radius: 6px; padding: 5px 8px; margin-bottom: 4px;
+  }
+  .adop-file-list li a { color: #15803d; text-decoration: none; word-break: break-all; }
+  .adop-file-list li a:hover { text-decoration: underline; }
+  .adop-file-list li .adop-file-remove { color: #dc2626; cursor: pointer; flex-shrink: 0; }
+  .adop-file-list li .adop-file-remove:hover { color: #991b1b; }
 
   /* Controles del footer con borde más visible */
   .adop-footer-form select.form-control,
@@ -1545,21 +1555,33 @@
                           }
                           echo '</select></div>';
 
-                          // Documento de adopción (solo para tipos 1, 3, 10)
+                          // Documento(s) de adopción (solo para tipos 1, 3, 10) — se permiten varios archivos
                           if (in_array($_SESSION['tipo'], [1, 3, 10])) {
-                              $arch_existente = ($count > 0 && !empty($recursos['archivo'])) ? $recursos['archivo'] : '';
+                              $arch_lista = [];
+                              if ($count > 0) {
+                                  $sql_arch = $bdd->prepare("SELECT id, archivo FROM recursos_archivos WHERE id_recurso=:id_recurso ORDER BY id ASC");
+                                  $sql_arch->execute([':id_recurso' => $recursos['id']]);
+                                  $arch_lista = $sql_arch->fetchAll();
+                              }
+                              $arch_existente = !empty($arch_lista);
                               $periodo_activo = $_GET["f_cierre"] > date("Y-m-d");
 
                               if ($periodo_activo) {
-                                  // Periodo activo: upload interactivo
+                                  // Periodo activo: upload interactivo, admite múltiples archivos
                                   $arch_label_class = $arch_existente ? ' has-file' : '';
                                   $arch_icon_text   = $arch_existente
-                                      ? '<i class="bi bi-check-circle-fill" style="font-size:1.2rem;"></i><span id="adop-file-text">Documento cargado — clic para reemplazar</span>'
-                                      : '<i class="bi bi-cloud-upload" style="font-size:1.2rem;"></i><span id="adop-file-text">Haz clic para seleccionar un archivo</span>';
-                                  $arch_name_html = $arch_existente
-                                      ? '<p class="adop-file-name" id="adop-file-name">'.htmlspecialchars(basename($arch_existente)).'</p>'
-                                      : '<p class="adop-file-name" id="adop-file-name"></p>';
+                                      ? '<i class="bi bi-check-circle-fill" style="font-size:1.2rem;"></i><span id="adop-file-text">Documentos cargados — clic para agregar más</span>'
+                                      : '<i class="bi bi-cloud-upload" style="font-size:1.2rem;"></i><span id="adop-file-text">Haz clic para seleccionar uno o varios archivos</span>';
                                   $arch_req_badge = $arch_existente ? '' : ' <span style="color:#dc2626">*</span>';
+
+                                  $arch_list_html = '<ul class="adop-file-list" id="adop-file-list-existente">';
+                                  foreach ($arch_lista as $arch_item) {
+                                      $arch_list_html .= '<li>
+                                          <a href="'.htmlspecialchars($arch_item['archivo']).'" target="_blank"><i class="bi bi-file-earmark-check"></i> '.htmlspecialchars(basename($arch_item['archivo'])).'</a>
+                                          <i class="bi bi-x-circle-fill adop-file-remove" title="Eliminar archivo" onclick="eliminarArchivoAdopcion('.intval($arch_item['id']).')"></i>
+                                        </li>';
+                                  }
+                                  $arch_list_html .= '</ul>';
 
                                   echo '<div class="col-sm-4">
                                           <span class="adop-footer-form form-label-sm">
@@ -1568,11 +1590,21 @@
                                           <label class="adop-file-label'.$arch_label_class.'" id="adop-file-label" for="archivo_adopcion">
                                             '.$arch_icon_text.'
                                           </label>
-                                          <input type="file" name="archivo_adopcion" id="archivo_adopcion"
+                                          <input type="file" name="archivo_adopcion[]" id="archivo_adopcion" multiple
                                             accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
-                                          '.$arch_name_html.'
+                                          <p class="adop-file-name" id="adop-file-name"></p>
+                                          '.$arch_list_html.'
                                         </div>';
-                                  echo '<script>var adArchivoGuardado = '.($arch_existente ? 'true' : 'false').';</script>';
+                                  echo '<script>
+                                    var adArchivoGuardado = '.($arch_existente ? 'true' : 'false').';
+                                    function eliminarArchivoAdopcion(idArchivo) {
+                                        if (!confirm("¿Eliminar este archivo del acuerdo de adopción?")) return;
+                                        window.location.href = "php/eliminar_archivo_adopcion.php?id_archivo=" + idArchivo
+                                            + "&colegio=" + '.json_encode($_GET["colegio"]).'
+                                            + "&codigo=" + '.json_encode($_GET["codigo"]).'
+                                            + "&periodo=" + '.json_encode($gp_periodo["id"]).';
+                                    }
+                                  </script>';
                               } else {
                                   // Periodo cerrado: solo lectura
                                   echo '<div class="col-sm-4">
@@ -1580,7 +1612,11 @@
                                             <i class="bi bi-paperclip"></i> Acuerdo de adopción
                                           </span>';
                                   if ($arch_existente) {
-                                      echo '<p class="adop-file-name"><i class="bi bi-file-earmark-check" style="color:#16a34a;margin-right:4px;"></i>'.htmlspecialchars(basename($arch_existente)).'</p>';
+                                      echo '<ul class="adop-file-list">';
+                                      foreach ($arch_lista as $arch_item) {
+                                          echo '<li><a href="'.htmlspecialchars($arch_item['archivo']).'" target="_blank"><i class="bi bi-file-earmark-check"></i> '.htmlspecialchars(basename($arch_item['archivo'])).'</a></li>';
+                                      }
+                                      echo '</ul>';
                                   } else {
                                       echo '<p class="text-muted" style="font-size:.82rem;"><i class="bi bi-dash-circle"></i> Sin documento adjunto</p>';
                                   }
@@ -1992,17 +2028,17 @@
         }
     });
 
-    // ── Campo de archivo: mostrar nombre seleccionado ────────────
+    // ── Campo de archivo: mostrar nombres seleccionados (admite varios) ──
     $('#archivo_adopcion').on('change', function() {
         var $label = $('#adop-file-label');
         var $name  = $('#adop-file-name');
         if (this.files && this.files.length > 0) {
-            var fname = this.files[0].name;
-            $('#adop-file-text').text('Archivo seleccionado');
-            $name.text(fname);
+            var nombres = $.map(this.files, function(f) { return f.name; });
+            $('#adop-file-text').text(this.files.length + ' archivo(s) seleccionado(s)');
+            $name.text(nombres.join(', '));
             $label.addClass('has-file');
         } else {
-            $('#adop-file-text').text('Haz clic para seleccionar un archivo');
+            $('#adop-file-text').text('Haz clic para seleccionar uno o varios archivos');
             $name.text('');
             $label.removeClass('has-file');
         }

@@ -142,24 +142,32 @@
 				
 	}
 
-	// Manejo del archivo de adopción (solo para tipos 1, 3, 10)
-	$archivo_path = '';
-	if (in_array($_SESSION['tipo'], [1, 3, 10]) && isset($_FILES['archivo_adopcion']) && $_FILES['archivo_adopcion']['error'] === UPLOAD_ERR_OK) {
+	// Manejo de los archivos de adopción (solo para tipos 1, 3, 10) — se permiten varios archivos
+	$archivos_subidos = [];
+	if (in_array($_SESSION['tipo'], [1, 3, 10]) && isset($_FILES['archivo_adopcion'])) {
 		$uploads_dir = dirname(__DIR__) . '/uploads/adopciones/';
 		if (!is_dir($uploads_dir)) {
 			mkdir($uploads_dir, 0755, true);
 		}
-		$ext      = strtolower(pathinfo($_FILES['archivo_adopcion']['name'], PATHINFO_EXTENSION));
-		$filename = 'adop_' . intval($_POST['id_colegio']) . '_' . intval($_POST['periodo']) . '_' . time() . '.' . $ext;
-		if (move_uploaded_file($_FILES['archivo_adopcion']['tmp_name'], $uploads_dir . $filename)) {
-			$archivo_path = 'uploads/adopciones/' . $filename;
+		$nombres   = $_FILES['archivo_adopcion']['name'];
+		$tmp_names = $_FILES['archivo_adopcion']['tmp_name'];
+		$errores   = $_FILES['archivo_adopcion']['error'];
+		foreach ($nombres as $idx_arch => $nombre_arch) {
+			if ($errores[$idx_arch] !== UPLOAD_ERR_OK) continue;
+			$ext      = strtolower(pathinfo($nombre_arch, PATHINFO_EXTENSION));
+			$filename = 'adop_' . intval($_POST['id_colegio']) . '_' . intval($_POST['periodo']) . '_' . time() . '_' . $idx_arch . '.' . $ext;
+			if (move_uploaded_file($tmp_names[$idx_arch], $uploads_dir . $filename)) {
+				$archivos_subidos[] = 'uploads/adopciones/' . $filename;
+			}
 		}
 	}
+	$archivo_path = !empty($archivos_subidos) ? $archivos_subidos[0] : '';
 
 	$sql_rec = "SELECT id FROM recursos WHERE id_periodo='".$_POST["periodo"]."' AND id_colegio='".$_POST["id_colegio"]."'";
 
 	$req_rec = $bdd->prepare($sql_rec);
 	$req_rec->execute();
+	$rec_existente = $req_rec->fetch();
 	$num = $req_rec->rowCount();
 
 	if ($num < 1 ) {
@@ -172,7 +180,7 @@
 		$sql_e = "UPDATE recursos SET id_canal='".$_POST["canal"]."', fecha='".date("Y-m-d")."', observaciones='".$_POST["observaciones"]."'".$arch_set." WHERE id_colegio='".$_POST["id_colegio"]."' AND id_periodo='".$_POST["periodo"]."'";
 	}
 
-	
+
 
 	$query_e = $bdd->prepare( $sql_e );
 
@@ -184,6 +192,17 @@
 	if ($sth_e == false) {
 		print_r($query_e->errorInfo());
 		die ('Erreur execute');
+	}
+
+	$id_recurso = $num < 1 ? $bdd->lastInsertId() : $rec_existente['id'];
+
+	if (!empty($archivos_subidos) && $id_recurso) {
+		$sql_arch = $bdd->prepare("INSERT INTO recursos_archivos (id_recurso, archivo) VALUES (:id_recurso, :archivo)");
+		foreach ($archivos_subidos as $archivo_subido) {
+			$sql_arch->execute([':id_recurso' => $id_recurso, ':archivo' => $archivo_subido]);
+		}
+		registrar_historial($bdd, $_POST["id_colegio"], $id_usuario_h, 'Adopciones',
+			'Acuerdo de adopción', '', count($archivos_subidos).' archivo(s) adjuntado(s)');
 	}
 
 
