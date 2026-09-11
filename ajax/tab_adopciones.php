@@ -2045,7 +2045,7 @@
     });
 
     // ── Validar archivo antes de guardar adopciones ──────────────
-    $('#form_definicion').on('submit', function(e) {
+    /*$('#form_definicion').on('submit', function(e) {
         var archivo = $('#archivo_adopcion')[0];
         var tieneNuevo = archivo && archivo.files.length > 0;
         if (!adArchivoGuardado && !tieneNuevo) {
@@ -2057,7 +2057,7 @@
             }, 2500);
             return false;
         }
-    });
+    });*/
 
 </script>
 
