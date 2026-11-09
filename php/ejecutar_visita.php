@@ -89,7 +89,7 @@ require '../lib/PHPMailer/src/SMTP.php';
     			];                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_S	above                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 
 				//Recipients
-				$mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka');
+				$mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka Panamá');
 				$mail->addAddress("felipe.vargas@somoseureka.com.co", 'Usuario');     // Add a recipient
 
 
@@ -105,7 +105,7 @@ require '../lib/PHPMailer/src/SMTP.php';
 				$req->execute();
 				$vendedor = $req->fetch();
 					  
-				$mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
+				$mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka Panamá');
 				$mail->addCC("".$vendedor["correo"]."");
 
 				//$mail->addBCC('bcc@example.com');

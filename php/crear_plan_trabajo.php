@@ -218,10 +218,10 @@ else {
 				$mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_S	above                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 
 				//Recipients
-				$mail->setFrom('crm@eurekalibros.com.co', 'CRM Eureka');
+				$mail->setFrom('crm@eurekalibros.com.co', 'CRM Eureka Panamá');
 				$mail->addAddress($correo["correo"], 'Usuario');     // Add a recipient
 						  
-				$mail->addReplyTo('crm@eurekalibros.com.co', 'CRM Eureka');
+				$mail->addReplyTo('crm@eurekalibros.com.co', 'CRM Eureka Panamá');
 
 				//$mail->addBCC('bcc@example.com');
 

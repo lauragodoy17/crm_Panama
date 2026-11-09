@@ -271,7 +271,6 @@
                         >Adopciones</a
                       >
                     </li>
-                    <?php /* Atenciones a clientes oculto temporalmente
                     <li class="nav-item atenc">
                       <a
                         class="nav-link"
@@ -282,7 +281,6 @@
                         >Atenciones a clientes</a
                       >
                     </li>
-                    */ ?>
                     <li class="nav-item atenc">
                       <a
                         class="nav-link"

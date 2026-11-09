@@ -1,6 +1,8 @@
 <?php
 require_once("php/aut.php");
 require_once("conexion/bdd.php");
+require_once("includes/materializar_atenciones_pendientes.php");
+asegurar_esquema_atenciones($bdd);
 
 $tp = intval($_GET['tp'] ?? 2);
 
@@ -23,10 +25,10 @@ $ac_map = [
 $ac = $ac_map[$tp] ?? ['hdr' => '#374151', 'even' => '#f8fafc', 'hover' => '#f1f5f9', 'accent' => '#6b7280'];
 
 if ($tp == 1) {
-  $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
+  $sql = "SELECT e.estado, s.id, s.id_periodo, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
           s.fecha_entrega, s.conse, s.contab, s.archivo,
           (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
-          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor, s.estado as id_estado
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -35,10 +37,10 @@ if ($tp == 1) {
           JOIN usuarios u ON u.id=s.usuario
           ORDER BY s.id DESC";
 } elseif ($tp == 2) {
-  $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
+  $sql = "SELECT e.estado, s.id, s.id_periodo, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
           s.fecha_entrega, s.conse, s.contab, s.archivo,
           (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
-          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor, s.estado as id_estado
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -47,10 +49,10 @@ if ($tp == 1) {
           JOIN usuarios u ON u.id=s.usuario
           WHERE s.estado=1 ORDER BY s.id DESC";
 } elseif ($tp == 3) {
-  $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
+  $sql = "SELECT e.estado, s.id, s.id_periodo, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
           s.fecha_entrega, s.conse, s.contab, s.archivo,
           (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
-          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor, s.estado as id_estado
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -59,10 +61,10 @@ if ($tp == 1) {
           JOIN usuarios u ON u.id=s.usuario
           WHERE s.estado=2 ORDER BY s.id DESC";
 } elseif ($tp == 4) {
-  $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
+  $sql = "SELECT e.estado, s.id, s.id_periodo, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
           s.fecha_entrega, s.conse, s.contab, s.archivo,
           (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
-          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor, s.estado as id_estado
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -71,10 +73,10 @@ if ($tp == 1) {
           JOIN usuarios u ON u.id=s.usuario
           WHERE s.estado=4 ORDER BY s.id DESC";
 } elseif ($tp == 5) {
-  $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
+  $sql = "SELECT e.estado, s.id, s.id_periodo, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
           s.fecha_entrega, s.conse, s.contab, s.archivo,
           (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
-          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor, s.estado as id_estado
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -83,10 +85,10 @@ if ($tp == 1) {
           JOIN usuarios u ON u.id=s.usuario
           WHERE s.estado=3 ORDER BY s.id DESC";
 } else {
-  $sql = "SELECT e.estado, s.id, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
+  $sql = "SELECT e.estado, s.id, s.id_periodo, s.fecha, CONCAT(t.nombre,' ',t.apellido) as solicitante, ca.cargo,
           s.fecha_entrega, s.conse, s.contab, s.archivo,
           (SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id) as total_legaliza,
-          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor
+          c.colegio, CONCAT(u.nombres,' ',u.apellidos) as promotor, s.estado as id_estado
           FROM solicitudes_recursos s
           JOIN estados_pedidos e ON e.id=s.estado
           LEFT JOIN trabajadores_colegios t ON s.solicitante=t.id
@@ -110,7 +112,23 @@ foreach ($solicitudes as $s) {
     $promotores_uniq[] = $s['promotor'];
   if ($s['estado'] && !in_array($s['estado'], $estados_uniq))
     $estados_uniq[] = $s['estado'];
-  if ($s['total_legaliza'] > 0) $cnt_legal++; else $cnt_no_legal++;
+  // Legalizado si: campo histórico tiene valor, o trazabilidad tiene registro, o legal_cerrado=1
+  $is_legal_cnt = $s['total_legaliza'] > 0;
+  if (!$is_legal_cnt) {
+    try {
+      $r_cnt = $bdd->prepare("SELECT COALESCE(SUM(valor),0) FROM trazabilidad_entregas WHERE id_solicitud=? AND tipo='legalizacion'");
+      $r_cnt->execute([$s['id']]);
+      if ((float)$r_cnt->fetchColumn() > 0) $is_legal_cnt = true;
+    } catch (Exception $e) {}
+  }
+  if (!$is_legal_cnt) {
+    try {
+      $r_cnt = $bdd->prepare("SELECT COALESCE(legal_cerrado,0) FROM solicitudes_recursos WHERE id=?");
+      $r_cnt->execute([$s['id']]);
+      if ((int)$r_cnt->fetchColumn()) $is_legal_cnt = true;
+    } catch (Exception $e) {}
+  }
+  if ($is_legal_cnt) $cnt_legal++; else $cnt_no_legal++;
 }
 sort($promotores_uniq);
 sort($estados_uniq);
@@ -142,6 +160,8 @@ sort($estados_uniq);
     .la-badge-purple { background:#f5f3ff; color:#4c1d95; }
     .la-badge-red    { background:#fee2e2; color:#991b1b; }
     .la-badge-gray   { background:#f1f5f9; color:#475569; }
+    .la-badge-legal-proceso { background:#fef3c7; color:#92400e; margin-top:4px; display:inline-block; }
+    .la-badge-legal-ok      { background:#dcfce7; color:#166534; margin-top:4px; display:inline-block; }
     .la-link { color: <?= $ac['accent'] ?>; font-weight: 600; text-decoration: none; }
     .la-link:hover { text-decoration: underline; }
     #la-count-badge { background: <?= $ac['accent'] ?>; color:#fff; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:20px; }
@@ -292,6 +312,28 @@ sort($estados_uniq);
                 $req_val->execute([$s['id']]);
                 $valor = $req_val->fetchColumn() ?? 0;
 
+                // Estado de legalización: trazabilidad primero, fallback a campo histórico para estados 2 y 4
+                $tot_legal_la = 0;
+                try {
+                  $req_ll = $bdd->prepare("SELECT COALESCE(SUM(valor),0) FROM trazabilidad_entregas WHERE id_solicitud=? AND tipo='legalizacion'");
+                  $req_ll->execute([$s['id']]);
+                  $tot_legal_la = (float)$req_ll->fetchColumn();
+                } catch (Exception $e) {}
+                $legal_cerrado_la = 0;
+                try {
+                  $req_lc = $bdd->prepare("SELECT legal_cerrado FROM solicitudes_recursos WHERE id=?");
+                  $req_lc->execute([$s['id']]);
+                  $legal_cerrado_la = (int)$req_lc->fetchColumn();
+                } catch (Exception $e) {}
+                if ($tot_legal_la <= 0 && !$legal_cerrado_la && in_array((int)($s['id_estado'] ?? 0), [2, 4])) {
+                  $old_leg = (float)($s['total_legaliza'] ?? 0);
+                  if ($old_leg > 0) $tot_legal_la = $old_leg;
+                }
+                if ($legal_cerrado_la)           $legal_badge = 'completo';
+                elseif ($tot_legal_la <= 0)      $legal_badge = null;
+                elseif ($tot_legal_la < $valor)  $legal_badge = 'proceso';
+                else                             $legal_badge = 'completo';
+
                 $e_low = strtolower($s['estado']);
                 $badge_class = match(true) {
                   str_contains($e_low, 'solicit') || str_contains($e_low, 'pendient') => 'la-badge-yellow',
@@ -301,17 +343,34 @@ sort($estados_uniq);
                   default => 'la-badge-gray',
                 };
                 $fecha_raw = substr($s['fecha'], 0, 10);
+
+                $sql_periodo = "SELECT periodo, SUBSTRING(periodo, 3, 2) AS anio_corto
+                  FROM periodos
+                  WHERE id = '".$s['id_periodo']."'";
+
+                $req_periodo = $bdd->prepare($sql_periodo);
+                $req_periodo->execute();
+                $gp_periodo = $req_periodo->fetch();
+
+                $soli_conse=$gp_periodo["anio_corto"]." - ".$s["conse"];
               ?>
-              <?php $fila_legal = ($s['total_legaliza'] > 0) ? '1' : '0'; ?>
+              <?php $fila_legal = ($legal_badge !== null) ? '1' : '0'; ?>
               <tr data-fecha="<?= $fecha_raw ?>" data-promotor="<?= htmlspecialchars($s['promotor']) ?>" data-estado="<?= htmlspecialchars($s['estado']) ?>" data-legal="<?= $fila_legal ?>">
-                <td><a href="vista_solicitud.php?id=<?= $s['id'] ?>" class="la-link vista_soli"><?= htmlspecialchars($s['conse']) ?></a></td>
+                <td><a href="vista_solicitud.php?id=<?= $s['id'] ?>" class="la-link vista_soli"><?= htmlspecialchars($soli_conse) ?></a></td>
                 <td><?= htmlspecialchars($s['fecha']) ?></td>
                 <td><?= htmlspecialchars($s['promotor']) ?></td>
                 <td><?= htmlspecialchars($s['colegio']) ?></td>
                 <td><?= htmlspecialchars($s['solicitante'] . ($s['cargo'] ? ' ('.$s['cargo'].')' : '')) ?></td>
                 <td><?= htmlspecialchars($s['fecha_entrega']) ?></td>
-                <td>$ <?= number_format($valor, 0, ',', '.') ?></td>
-                <td><span class="la-badge <?= $badge_class ?>"><?= htmlspecialchars($s['estado']) ?></span></td>
+                <td>$ <?= number_format($valor, 2, ',', '.') ?></td>
+                <td>
+                  <span class="la-badge <?= $badge_class ?>"><?= htmlspecialchars($s['estado']) ?></span>
+                  <?php if ($legal_badge === 'proceso'): ?>
+                    <br><span class="la-badge la-badge-legal-proceso"><i class="bi bi-hourglass-split"></i> En proceso de legalización</span>
+                  <?php elseif ($legal_badge === 'completo'): ?>
+                    <br><span class="la-badge la-badge-legal-ok"><i class="bi bi-patch-check-fill"></i> Legalización completa</span>
+                  <?php endif; ?>
+                </td>
                 <?php if ($tp == 4): ?>
                   <td><?= $s['contab'] ? 'Sí' : 'No' ?></td>
                 <?php endif; ?>

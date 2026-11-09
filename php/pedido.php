@@ -112,10 +112,10 @@
 		];                                   // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_S	above                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 
 		//Recipients
-		$mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka');
+		$mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka Panamá');
 		$mail->addAddress("felipe.vargas@somoseureka.com.co", 'felipe.vargas@somoseureka.com.co');     // Add a recipient
 			  
-		$mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
+		$mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka Panamá');
 		$mail->addCC("comercial@somoseureka.com.co");
 		//$mail->addCC("oltoledo@hotmail.com");
 		//$mail->addBCC('comercial@eurekalibros.com.co');

@@ -3,7 +3,9 @@ ini_set('display_errors', 1);
 
 ini_set('display_startup_errors', 1);
 
-error_reporting(E_ALL);
+// Sin E_DEPRECATED: la versión de PhpSpreadsheet/ZipStream en lib/ emite avisos "Deprecated" en
+// PHP 8.4+ y, con display_errors=1, se imprimirían dentro del .xlsx dejándolo corrupto.
+error_reporting(E_ALL & ~E_DEPRECATED);
 //include("../lib/ZipStream/src/ZipStream.php");
 include("../lib/autoload-phpspreadsheet.php");
 require_once("../lib/ZipStream/src/Option/Archive.php");
@@ -27,6 +29,14 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 require_once("../php/aut.php");
 include("../conexion/bdd.php");
+require_once("../includes/materializar_atenciones_pendientes.php");
+require_once("../includes/excel_formato.php");
+
+// Si alguna solicitud distribuida en años (ver php/solicitud_recurso.php) tenía una cuota
+// pendiente justo para el período que se está reportando, y ese período ya existe (por eso se
+// puede seleccionar acá), se convierte ahora en una solicitud real antes de armar el reporte.
+materializar_atenciones_pendientes($bdd, (int)$_POST["periodo"]);
+
 $objSpreadsheet = new Spreadsheet();
 $objSpreadsheet->getProperties()->setCreator("Ing. Alejandro Rangel");
 $objSpreadsheet->getProperties()->setTitle("Reporte de cubrimiento");
@@ -66,32 +76,16 @@ $estilo_borde = [
     ]
 ];
 
-//poner imagen
-$drawing = new Drawing();
-$drawing->setName('test_img');
-$drawing->setDescription('test_img');
-$drawing->setPath('../vendors/images/logo_eureka.png'); // Ruta relativa o absoluta a la imagen
-$drawing->setHeight(100); // Puedes ajustar el tamaño si deseas
-$drawing->setCoordinates('A1'); // Posición en la hoja
-$drawing->setWorksheet($objSpreadsheet->getActiveSheet());
-
-$objSpreadsheet->getActiveSheet()->mergeCells('D2:F2');
-$objSpreadsheet->getActiveSheet()->getStyle('D2')->applyFromArray($estilo_negrita);
-$objSpreadsheet->getActiveSheet()->getStyle('D2')->applyFromArray($estilo_centrar);
-$objSpreadsheet->getActiveSheet()->SetCellValue("D2", "REPORTE DE ATENCIONES A CLIENTES");
-
-$sql_periodo="SELECT periodo FROM periodos WHERE id='".$_POST["periodo"]."'";
+$sql_periodo = "SELECT periodo, SUBSTRING(periodo, 3, 2) AS anio_corto
+        FROM periodos
+        WHERE id = '".$_POST["periodo"]."'";
 
 $req_periodo = $bdd->prepare($sql_periodo);
 $req_periodo->execute();
 $gp_periodo = $req_periodo->fetch();
 $fecha=date("Y-m-d");
 
-$objSpreadsheet->getActiveSheet()->getStyle('C4')->applyFromArray($estilo_negrita);
-$objSpreadsheet->getActiveSheet()->getStyle('D4')->applyFromArray($estilo_negrita);
-
-$objSpreadsheet->getActiveSheet()->SetCellValue("C4", "Fecha");
-$objSpreadsheet->getActiveSheet()->SetCellValue("D4", "$fecha");
+excel_encabezado($objSpreadsheet->getActiveSheet(), $bdd, "REPORTE DE ATENCIONES A CLIENTES", "Periodo: $gp_periodo[periodo]");
 
 $objSpreadsheet->getActiveSheet()->SetCellValue("A6", "Consecutivo");
 $objSpreadsheet->getActiveSheet()->SetCellValue("B6", "Usuario");
@@ -112,9 +106,16 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("P6", "Contabilizado");
 $objSpreadsheet->getActiveSheet()->SetCellValue("Q6", "Presupuesto");
 $objSpreadsheet->getActiveSheet()->SetCellValue("R6", "Valor adopción total");
 $objSpreadsheet->getActiveSheet()->SetCellValue("S6", "Venta real");
+$objSpreadsheet->getActiveSheet()->SetCellValue("T6", "Fecha y hora de registro");
+$objSpreadsheet->getActiveSheet()->SetCellValue("U6", "Descuento promedio");
+$objSpreadsheet->getActiveSheet()->SetCellValue("V6", "Porcentaje atención");
+$objSpreadsheet->getActiveSheet()->SetCellValue("W6", "Porcentaje gasto total");
+$objSpreadsheet->getActiveSheet()->SetCellValue("X6", "Falta por Legalizar");
+$objSpreadsheet->getActiveSheet()->SetCellValue("Y6", "Valor total solicitado");
+$objSpreadsheet->getActiveSheet()->SetCellValue("Z6", "Fraccionado por año");
 
 
-$objSpreadsheet->getActiveSheet()->getStyle('A6:S6')->applyFromArray([
+$objSpreadsheet->getActiveSheet()->getStyle('A6:Z6')->applyFromArray([
     'fill' => [
         'fillType' => Fill::FILL_SOLID,
         'startColor' => [
@@ -125,11 +126,11 @@ $objSpreadsheet->getActiveSheet()->getStyle('A6:S6')->applyFromArray([
 
 if ($_POST['promotor']==0) {
 
-	$sql="SELECT s.id,e.estado,s.fecha, s.solicitante, s.estado as idestado, s.contab, s.conse, c.colegio, c.cod_zona, c.id as cid, r.recurso, t.tipo, cat.categoria, r.presupuesto, r.tipo_e, r.valor_e, r.fecha_e, r.legaliza, CONCAT(u.nombres,' ', u.apellidos) AS promotor FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN colegios c ON c.id=s.id_colegio JOIN recursos_solicitados r ON r.id_solicitud=s.id JOIN tipos_recursos t ON t.id=r.tipo JOIN categoria_recursos cat ON cat.id=r.categoria JOIN usuarios u ON u.id=s.usuario WHERE s.id_periodo='".$_POST["periodo"]."' ORDER BY s.id DESC";
+    $sql="SELECT s.id,e.estado,s.fecha, s.solicitante, s.estado as idestado, s.contab, s.conse, s.distribucion_grupo_id, s.distribucion_total_anios, c.colegio, c.cod_zona, c.id as cid, r.id as id_recurso, r.recurso, t.tipo, cat.categoria, r.presupuesto, r.tipo_e, r.valor_e, r.fecha_e, r.legaliza, CONCAT(u.nombres,' ', u.apellidos) AS promotor FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN colegios c ON c.id=s.id_colegio JOIN recursos_solicitados r ON r.id_solicitud=s.id JOIN tipos_recursos t ON t.id=r.tipo JOIN categoria_recursos cat ON cat.id=r.categoria JOIN usuarios u ON u.id=s.usuario WHERE s.id_periodo='".$_POST["periodo"]."' ORDER BY s.id DESC";
 
 }else{
 
-    $sql="SELECT s.id,e.estado,s.fecha, s.solicitante, s.estado as idestado, s.contab, s.conse, c.colegio, c.cod_zona, c.id as cid, r.recurso, t.tipo, cat.categoria, r.presupuesto, r.tipo_e, r.valor_e, r.fecha_e, r.legaliza, CONCAT(u.nombres,' ', u.apellidos) AS promotor FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN colegios c ON c.id=s.id_colegio JOIN recursos_solicitados r ON r.id_solicitud=s.id JOIN tipos_recursos t ON t.id=r.tipo JOIN categoria_recursos cat ON cat.id=r.categoria JOIN usuarios u ON u.cod_zona=c.cod_zona WHERE s.id_periodo='".$_POST["periodo"]."' AND u.id='".$_POST["promotor"]."' ORDER BY `s`.`id` DESC";
+    $sql="SELECT s.id,e.estado,s.fecha, s.solicitante, s.estado as idestado, s.contab, s.conse, s.distribucion_grupo_id, s.distribucion_total_anios, c.colegio, c.cod_zona, c.id as cid, r.id as id_recurso, r.recurso, t.tipo, cat.categoria, r.presupuesto, r.tipo_e, r.valor_e, r.fecha_e, r.legaliza, CONCAT(u.nombres,' ', u.apellidos) AS promotor FROM solicitudes_recursos s JOIN estados_pedidos e ON e.id=s.estado JOIN colegios c ON c.id=s.id_colegio JOIN recursos_solicitados r ON r.id_solicitud=s.id JOIN tipos_recursos t ON t.id=r.tipo JOIN categoria_recursos cat ON cat.id=r.categoria JOIN usuarios u ON u.cod_zona=c.cod_zona WHERE s.id_periodo='".$_POST["periodo"]."' AND u.id='".$_POST["promotor"]."' ORDER BY `s`.`id` DESC";
 
 
 }
@@ -142,119 +143,245 @@ $req = $bdd->prepare($sql);
 $req->execute();
 $solicitudes = $req->fetchAll();
 
+// --- Pre-fetch para evitar N+1 queries en el loop principal ---
+$resource_ids  = array_unique(array_column($solicitudes, 'id_recurso'));
+$unique_zonas  = array_values(array_filter(array_unique(array_column($solicitudes, 'cod_zona'))));
+$unique_tipos  = array_values(array_filter(array_unique(array_column($solicitudes, 'tipo_e'))));
+
+// Trazabilidad de todos los recursos en una sola consulta
+$trazabilidad_map = [];
+if (!empty($resource_ids)) {
+    $ph = implode(',', array_fill(0, count($resource_ids), '?'));
+    $req_t = $bdd->prepare("SELECT id_recurso, tipo, valor, fecha, fecha_registro FROM trazabilidad_entregas WHERE id_recurso IN ($ph) ORDER BY fecha_registro ASC");
+    $req_t->execute($resource_ids);
+    foreach ($req_t->fetchAll() as $row) {
+        $trazabilidad_map[$row['id_recurso']][$row['tipo']][] = $row;
+    }
+}
+
+// Promotores por zona
+$promo_map = [];
+if (!empty($unique_zonas)) {
+    $ph_z = implode(',', array_fill(0, count($unique_zonas), '?'));
+    $req_p = $bdd->prepare("SELECT cod_zona, CONCAT(nombres,' ',apellidos) AS promotor FROM usuarios WHERE cod_zona IN ($ph_z)");
+    $req_p->execute($unique_zonas);
+    foreach ($req_p->fetchAll() as $row) {
+        $promo_map[$row['cod_zona']] = $row['promotor'];
+    }
+}
+
+// Tipos de entrega
+$tipo_e_map = [];
+if (!empty($unique_tipos)) {
+    $ph_t = implode(',', array_fill(0, count($unique_tipos), '?'));
+    $req_te = $bdd->prepare("SELECT id, tipo FROM tipos_recursos WHERE id IN ($ph_t)");
+    $req_te->execute($unique_tipos);
+    foreach ($req_te->fetchAll() as $row) {
+        $tipo_e_map[$row['id']] = $row['tipo'];
+    }
+}
+
+// Totales entregados por colegio (estado=4)
+$totals_map = [];
+$req_totals = $bdd->prepare("SELECT s.id_colegio, SUM(r.valor_e) as total_e FROM solicitudes_recursos s JOIN recursos_solicitados r ON r.id_solicitud=s.id WHERE s.id_periodo=? AND s.estado=4 GROUP BY s.id_colegio");
+$req_totals->execute([$_POST["periodo"]]);
+foreach ($req_totals->fetchAll() as $row) {
+    $totals_map[$row['id_colegio']] = $row['total_e'];
+}
+// --------------------------------------------------------------
 
 // Pre-computar presupuesto, adopción total y venta real por colegio
 $colegios_datos = [];
-$unique_cids = array_unique(array_column($solicitudes, 'cid'));
-foreach ($unique_cids as $cid) {
-    $val_presup = 0;
-    $val_adopcion = 0;
-    $val_venta_real = 0;
+$unique_cids = array_values(array_unique(array_column($solicitudes, 'cid')));
 
-    $req_vr = $bdd->prepare("SELECT venta_real FROM recursos WHERE id_colegio=? AND id_periodo=?");
-    $req_vr->execute([$cid, $_POST["periodo"]]);
-    $v_real = $req_vr->fetch();
+if (!empty($unique_cids)) {
+    $ph_cids = implode(',', array_fill(0, count($unique_cids), '?'));
 
-    $req_books = $bdd->prepare("SELECT p.tasa_compra, p.tasa_compra_d, p.descuento, p.descuento_d, p.precio, p.pre_definido, p.definido, p.cod_area, p.uni_vr, l.id as idlibro, l.id_grado FROM presupuestos p JOIN libros l ON p.id_libro=l.id WHERE p.id_colegio=? AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo=?");
-    $req_books->execute([$cid, $_POST["periodo"]]);
-    $books = $req_books->fetchAll();
+    // venta_real por colegio
+    $vreal_at = [];
+    $req_vr_at = $bdd->prepare("SELECT id_colegio, venta_real FROM recursos WHERE id_colegio IN ($ph_cids) AND id_periodo=?");
+    $req_vr_at->execute(array_merge($unique_cids, [$_POST["periodo"]]));
+    foreach ($req_vr_at->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $vreal_at[$row['id_colegio']] = $row['venta_real'];
 
-    foreach ($books as $book) {
-        if ($book["id_grado"] != 17 && $book["cod_area"] == "") {
-            $req_gp = $bdd->prepare("SELECT SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio=? AND id_grado=? AND id_periodo=? AND alumnos > 0");
-            $req_gp->execute([$cid, $book["id_grado"], $_POST["periodo"]]);
-        } else {
-            $req_go = $bdd->prepare("SELECT id_grado_otro FROM areas_objetivas WHERE id_colegio=? AND id_libro_eureka=? AND id_periodo=? AND codigo=?");
-            $req_go->execute([$cid, $book["idlibro"], $_POST["periodo"], $book["cod_area"]]);
-            $grado_o = $req_go->fetch();
-            $id_grado_o = $grado_o['id_grado_otro'] ?? 0;
-            $req_gp = $bdd->prepare("SELECT SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio=? AND id_grado=? AND id_periodo=? AND alumnos > 0");
-            $req_gp->execute([$cid, $id_grado_o, $_POST["periodo"]]);
-        }
-        $gp = $req_gp->fetch();
-        $alumnos = $gp["alumnos"] ?? 0;
+    // presupuestos + libros por colegio
+    $books_at = [];
+    $req_bk_at = $bdd->prepare("SELECT p.id_colegio, p.tasa_compra, p.tasa_compra_d, p.descuento, p.descuento_d, p.precio, p.pre_definido, p.definido, p.cod_area, p.uni_vr, l.id as idlibro, l.id_grado FROM presupuestos p JOIN libros l ON p.id_libro=l.id WHERE p.id_colegio IN ($ph_cids) AND (p.pre_definido=1 OR p.definido=1) AND p.id_periodo=?");
+    $req_bk_at->execute(array_merge($unique_cids, [$_POST["periodo"]]));
+    foreach ($req_bk_at->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $books_at[$row['id_colegio']][] = $row;
 
-        if ($book["pre_definido"] == 1) {
-            $precio_neto = $book["precio"] - ($book["precio"] * $book["descuento"]);
-            $val_presup += $precio_neto * floor($alumnos * $book["tasa_compra"]);
-        }
-        if ($book["definido"] != 0) {
-            if ($book["tasa_compra_d"] == 0.00) {
-                $alumnos_tasa_d = floor($alumnos * $book["tasa_compra"]);
-                $precio_neto_d  = $book["precio"] - ($book["precio"] * $book["descuento"]);
+    // areas_objetivas por colegio
+    $ao_at = [];
+    $req_ao_at = $bdd->prepare("SELECT id_colegio, id_libro_eureka, codigo, id_grado_otro FROM areas_objetivas WHERE id_colegio IN ($ph_cids) AND id_periodo=?");
+    $req_ao_at->execute(array_merge($unique_cids, [$_POST["periodo"]]));
+    foreach ($req_ao_at->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $ao_at[$row['id_colegio']][$row['id_libro_eureka']][$row['codigo']] = $row['id_grado_otro'];
+
+    // grados_paralelos por colegio+grado
+    $gp_at = [];
+    $req_gp_at = $bdd->prepare("SELECT id_colegio, id_grado, SUM(alumnos) as alumnos FROM grados_paralelos WHERE id_colegio IN ($ph_cids) AND id_periodo=? AND alumnos > 0 GROUP BY id_colegio, id_grado");
+    $req_gp_at->execute(array_merge($unique_cids, [$_POST["periodo"]]));
+    foreach ($req_gp_at->fetchAll(PDO::FETCH_ASSOC) as $row)
+        $gp_at[$row['id_colegio']][$row['id_grado']] = (int)$row['alumnos'];
+
+    foreach ($unique_cids as $cid) {
+        $val_presup = 0;
+        $val_adopcion = 0;
+        $val_venta_real = 0;
+        $descuentos_adoptados = [];
+        $vr_val = $vreal_at[$cid] ?? null;
+
+        foreach ($books_at[$cid] ?? [] as $book) {
+            if ($book["id_grado"] != 17 && $book["cod_area"] == "") {
+                $alumnos = $gp_at[$cid][$book["id_grado"]] ?? 0;
             } else {
-                $alumnos_tasa_d = floor($alumnos * $book["tasa_compra_d"]);
-                $precio_neto_d  = $book["precio"] - ($book["precio"] * $book["descuento_d"]);
+                $id_grado_o = $ao_at[$cid][$book["idlibro"]][$book["cod_area"]] ?? 0;
+                $alumnos = $gp_at[$cid][$id_grado_o] ?? 0;
             }
-            $val_adopcion += $precio_neto_d * $alumnos_tasa_d;
-            if (!is_array($v_real) || !isset($v_real['venta_real']) || $v_real['venta_real'] < 1) {
-                $val_venta_real += $precio_neto_d * $book["uni_vr"];
+
+            if ($book["pre_definido"] == 1) {
+                $precio_neto = $book["precio"] - ($book["precio"] * $book["descuento"]);
+                $val_presup += $precio_neto * floor($alumnos * $book["tasa_compra"]);
+            }
+            if ($book["definido"] != 0) {
+                if ($book["tasa_compra_d"] == 0.00) {
+                    $alumnos_tasa_d = floor($alumnos * $book["tasa_compra"]);
+                    $precio_neto_d  = $book["precio"] - ($book["precio"] * $book["descuento"]);
+                    $descuentos_adoptados[] = (float)$book["descuento"];
+                } else {
+                    $alumnos_tasa_d = floor($alumnos * $book["tasa_compra_d"]);
+                    $precio_neto_d  = $book["precio"] - ($book["precio"] * $book["descuento_d"]);
+                    $descuentos_adoptados[] = (float)$book["descuento_d"];
+                }
+                $val_adopcion += $precio_neto_d * $alumnos_tasa_d;
+                if (!is_numeric($vr_val) || $vr_val < 1) {
+                    $val_venta_real += $precio_neto_d * $book["uni_vr"];
+                }
             }
         }
+        if (is_numeric($vr_val) && $vr_val > 0) {
+            $val_venta_real = $vr_val;
+        }
+        $val_descuento_prom = !empty($descuentos_adoptados)
+            ? array_sum($descuentos_adoptados) / count($descuentos_adoptados)
+            : 0;
+        $colegios_datos[$cid] = ['presupuesto' => $val_presup, 'adopcion' => $val_adopcion, 'venta_real' => $val_venta_real, 'descuento_promedio' => $val_descuento_prom];
     }
-    if (is_array($v_real) && isset($v_real['venta_real']) && $v_real['venta_real'] > 0) {
-        $val_venta_real = $v_real['venta_real'];
-    }
-    $colegios_datos[$cid] = ['presupuesto' => $val_presup, 'adopcion' => $val_adopcion, 'venta_real' => $val_venta_real];
 }
+
+// ── Distribución en años: valor total solicitado + fraccionamiento por año ──────────
+// La "raíz" de una distribución es la solicitud del año 1 (distribucion_grupo_id NULL,
+// distribucion_total_anios>1); una cuota ya materializada de un año siguiente apunta a esa
+// raíz vía distribucion_grupo_id (ver php/solicitud_recurso.php e
+// includes/materializar_atenciones_pendientes.php). Para mostrar el valor total y el
+// fraccionamiento completo hay que sumar 3 fuentes: la solicitud raíz, cualquier cuota ya
+// materializada (ambas son solicitudes_recursos reales, posiblemente en otros períodos) y las
+// cuotas de años futuros que aún no existen como solicitud (atenciones_pendientes_distribucion).
+$root_ids_dist = [];
+foreach ($solicitudes as $s) {
+    $es_dist = !empty($s['distribucion_grupo_id']) || ((int)($s['distribucion_total_anios'] ?? 0) > 1);
+    if ($es_dist) {
+        $root_ids_dist[] = !empty($s['distribucion_grupo_id']) ? (int)$s['distribucion_grupo_id'] : (int)$s['id'];
+    }
+}
+$root_ids_dist = array_values(array_unique($root_ids_dist));
+
+$dist_total_map    = []; // root_id => valor total (todos los años)
+$dist_por_anio_map = []; // root_id => [anio => monto]
+
+if (!empty($root_ids_dist)) {
+    $ph_r = implode(',', array_fill(0, count($root_ids_dist), '?'));
+
+    // Año 1 (raíz) + cuotas ya materializadas: solicitudes reales, cada una con su propio período.
+    $req_fam = $bdd->prepare("SELECT sr.id, sr.id_periodo, sr.distribucion_grupo_id, r.presupuesto
+        FROM solicitudes_recursos sr JOIN recursos_solicitados r ON r.id_solicitud=sr.id
+        WHERE sr.id IN ($ph_r) OR sr.distribucion_grupo_id IN ($ph_r)");
+    $req_fam->execute(array_merge($root_ids_dist, $root_ids_dist));
+    $fam_rows = $req_fam->fetchAll(PDO::FETCH_ASSOC);
+
+    $periodo_ids_fam  = array_values(array_unique(array_column($fam_rows, 'id_periodo')));
+    $anio_periodo_map = [];
+    if (!empty($periodo_ids_fam)) {
+        $ph_p = implode(',', array_fill(0, count($periodo_ids_fam), '?'));
+        $req_per = $bdd->prepare("SELECT id, periodo FROM periodos WHERE id IN ($ph_p)");
+        $req_per->execute($periodo_ids_fam);
+        foreach ($req_per->fetchAll(PDO::FETCH_ASSOC) as $row)
+            $anio_periodo_map[$row['id']] = anio_de_periodo($row['periodo']);
+    }
+
+    foreach ($fam_rows as $row) {
+        $root_id = !empty($row['distribucion_grupo_id']) ? (int)$row['distribucion_grupo_id'] : (int)$row['id'];
+        $anio    = $anio_periodo_map[$row['id_periodo']] ?? null;
+        $monto   = (float)$row['presupuesto'];
+        $dist_total_map[$root_id] = ($dist_total_map[$root_id] ?? 0) + $monto;
+        if ($anio !== null) {
+            $dist_por_anio_map[$root_id][$anio] = ($dist_por_anio_map[$root_id][$anio] ?? 0) + $monto;
+        }
+    }
+
+    // Cuotas de años siguientes que aún no existen como solicitud real.
+    $req_pend = $bdd->prepare("SELECT id_solicitud_origen, anio_objetivo, SUM(monto) as total
+        FROM atenciones_pendientes_distribucion
+        WHERE id_solicitud_origen IN ($ph_r) AND materializado=0
+        GROUP BY id_solicitud_origen, anio_objetivo");
+    $req_pend->execute($root_ids_dist);
+    foreach ($req_pend->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $root_id = (int)$row['id_solicitud_origen'];
+        $anio    = (int)$row['anio_objetivo'];
+        $monto   = (float)$row['total'];
+        $dist_total_map[$root_id] = ($dist_total_map[$root_id] ?? 0) + $monto;
+        $dist_por_anio_map[$root_id][$anio] = ($dist_por_anio_map[$root_id][$anio] ?? 0) + $monto;
+    }
+
+    foreach ($dist_por_anio_map as $rid => $por_anio) {
+        ksort($dist_por_anio_map[$rid]);
+    }
+}
+// --------------------------------------------------------------
 
 $conta=7;
 
 foreach ($solicitudes as $solicitud) {
 
-	$objSpreadsheet->getActiveSheet()->getStyle("I$conta")
+    $objSpreadsheet->getActiveSheet()->getStyle("I$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
     $objSpreadsheet->getActiveSheet()->getStyle("K$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
     $objSpreadsheet->getActiveSheet()->getStyle("O$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
-    $sql="SELECT CONCAT(nombres,' ', apellidos) AS promotor FROM usuarios WHERE cod_zona='".$solicitud["cod_zona"]."'";
-
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $promo_colegio = $req->fetch();
-
-    $sql = "SELECT tipo FROM tipos_recursos WHERE id='".$solicitud["tipo_e"]."'";
-
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $tipo_e = $req->fetch();
-
-    $sql = "SELECT SUM(r.valor_e) as total_e FROM solicitudes_recursos s JOIN recursos_solicitados r ON s.id=r.id_solicitud WHERE s.id_colegio='".$solicitud["cid"]."' AND s.id_periodo='".$_POST["periodo"]."' AND s.estado='4';";
-
-    $req = $bdd->prepare($sql);
-    $req->execute();
-    $total = $req->fetch();
-	
-    if ($solicitud["id"] < 221) {
-        $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$solicitud[id]");
-    }else{
-        $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$solicitud[conse]");
-    }
-	
-	$objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$solicitud[promotor]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$solicitud[colegio]");
+    $promo_colegio = ['promotor' => $promo_map[$solicitud['cod_zona']] ?? ''];
+    $tipo_e        = ['tipo'     => $tipo_e_map[$solicitud['tipo_e']] ?? ''];
+    $total         = ['total_e'  => $totals_map[$solicitud['cid']] ?? 0];
+    
+  
+    $soli_conse=$gp_periodo["anio_corto"]." - ".$solicitud["conse"];
+    $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", "$soli_conse");
+    
+    
+    $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", "$solicitud[promotor]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", "$solicitud[colegio]");
     if (!empty($promo_colegio["promotor"])) {
         $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", "$promo_colegio[promotor]");
     }
-	$objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$solicitud[fecha]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$solicitud[recurso]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$solicitud[tipo]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", "$solicitud[fecha]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "$solicitud[recurso]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", "$solicitud[tipo]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "$solicitud[categoria]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$solicitud[presupuesto]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$solicitud[estado]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$solicitud[presupuesto]");
+    $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", "$solicitud[estado]");
     
     $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", "$total[total_e]");
     
@@ -267,32 +394,187 @@ foreach ($solicitudes as $solicitud) {
     $objSpreadsheet->getActiveSheet()->getStyle("M$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
     );
 
     $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", "$solicitud[valor_e]");
     $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", "$solicitud[fecha_e]");
-	$objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", "$solicitud[legaliza]");
 
-    if ($solicitud["contab"]==0) {
-        $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "No");
-    }else{
-        $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "Si");
+    $datos_cole     = $colegios_datos[$solicitud["cid"]] ?? ['presupuesto' => 0, 'adopcion' => 0, 'venta_real' => 0, 'descuento_promedio' => 0];
+    $fmt_money      = '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)';
+    // Porcentaje atención = columna K (Acumulado) sobre columna S (Venta real).
+    $val_venta_real_pct  = (float)$datos_cole['venta_real'];
+    $porcentaje_atencion = $val_venta_real_pct != 0 ? ((float)$total['total_e']) / $val_venta_real_pct : 0;
+    // Porcentaje gasto total = columna U (Descuento promedio) + columna V (Porcentaje atención).
+    $porcentaje_gasto_total = ((float)$datos_cole['descuento_promedio']) + $porcentaje_atencion;
+    $entregas_traz  = $trazabilidad_map[$solicitud['id_recurso']]['entrega']       ?? [];
+    $legalizaciones = $trazabilidad_map[$solicitud['id_recurso']]['legalizacion']  ?? [];
+    $tot_legal_r    = array_sum(array_column($legalizaciones, 'valor'));
+    if ($tot_legal_r == 0) {
+        $tot_legal_r = (float)$solicitud["legaliza"];
+    }
+    // Falta por legalizar = columna I (Valor) menos columna M (Valor recurso entregado, la suma
+    // de TODAS las entregas/cuotas que se hayan hecho). El valor de M en la rama con sub-filas es
+    // $tot_entrega_r (se calcula más abajo, después de recorrer las cuotas de entrega); por eso
+    // acá se deja el valor por defecto de la rama sin sub-filas y se recalcula dentro del bloque
+    // "if" una vez que $tot_entrega_r ya existe.
+    $falta_legalizar = max(((float)$solicitud["presupuesto"]) - ((float)$solicitud["valor_e"]), 0);
+
+    // Distribución en años: valor total (todos los años) + fraccionamiento, solo para
+    // solicitudes que son raíz o cuota materializada de una distribución (ver precálculo arriba).
+    $es_dist_row = !empty($solicitud['distribucion_grupo_id']) || ((int)($solicitud['distribucion_total_anios'] ?? 0) > 1);
+    $root_id_row = !empty($solicitud['distribucion_grupo_id']) ? (int)$solicitud['distribucion_grupo_id'] : (int)$solicitud['id'];
+    $valor_total_dist = ($es_dist_row && isset($dist_total_map[$root_id_row])) ? $dist_total_map[$root_id_row] : null;
+    $fraccion_dist = '';
+    if ($es_dist_row && !empty($dist_por_anio_map[$root_id_row])) {
+        $partes_dist = [];
+        foreach ($dist_por_anio_map[$root_id_row] as $anio_dist => $monto_dist) {
+            $partes_dist[] = $anio_dist . ': $' . number_format($monto_dist, 2, ',', '.');
+        }
+        $fraccion_dist = implode(' · ', $partes_dist);
     }
 
-    $datos_cole = $colegios_datos[$solicitud["cid"]] ?? ['presupuesto' => 0, 'adopcion' => 0, 'venta_real' => 0];
-    $fmt_money = '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)';
+    if (!empty($entregas_traz) || !empty($legalizaciones)) {
+      // Quitar I, K, M, O, P, Q, R, S de la fila principal (van al total)
+      $main_conta = $conta;
+      $objSpreadsheet->getActiveSheet()->SetCellValue("I$main_conta", "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("K$main_conta", "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("M$main_conta", "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("O$main_conta", "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("P$main_conta", "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("Q$main_conta", "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("R$main_conta", "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("S$main_conta", "");
 
-    $objSpreadsheet->getActiveSheet()->getStyle("Q$conta")->getNumberFormat()->setFormatCode($fmt_money);
-    $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", $datos_cole['presupuesto']);
+      
 
-    $objSpreadsheet->getActiveSheet()->getStyle("R$conta")->getNumberFormat()->setFormatCode($fmt_money);
-    $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", $datos_cole['adopcion']);
+      // Sub-filas de entregas
+      $num_ent = 1;
+      foreach ($entregas_traz as $ent) {
+        $conta++;
+        $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", $soli_conse);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $solicitud["promotor"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", $solicitud["colegio"]);
+        if (!empty($promo_colegio["promotor"]))
+          $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", $promo_colegio["promotor"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", $solicitud["fecha"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "  \u{2514} Entrega #$num_ent  —  " . $solicitud["recurso"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", $solicitud["tipo"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", $solicitud["categoria"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", $solicitud["estado"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", $tipo_e["tipo"] ?? "");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", $ent['fecha']);
+        $objSpreadsheet->getActiveSheet()->getStyle("M$conta")->getNumberFormat()->setFormatCode($fmt_money);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", (float)$ent['valor']);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", $ent['fecha_registro']);
+        $num_ent++;
+      }
 
-    $objSpreadsheet->getActiveSheet()->getStyle("S$conta")->getNumberFormat()->setFormatCode($fmt_money);
-    $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", $datos_cole['venta_real']);
+      // Sub-filas de legalizaciones
+      $num_legal = 1;
+      foreach ($legalizaciones as $leg) {
+        $conta++;
+        $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", $soli_conse);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $solicitud["promotor"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", $solicitud["colegio"]);
+        if (!empty($promo_colegio["promotor"]))
+          $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", $promo_colegio["promotor"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", $solicitud["fecha"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "  \u{2514} Legalización #$num_legal  —  " . $solicitud["recurso"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", $solicitud["tipo"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", $solicitud["categoria"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", $solicitud["estado"]);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", $tipo_e["tipo"] ?? "");
+        $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", $leg['fecha']);
+        $objSpreadsheet->getActiveSheet()->getStyle("O$conta")->getNumberFormat()->setFormatCode($fmt_money);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", (float)$leg['valor']);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("T$conta", $leg['fecha_registro']);
+        $num_legal++;
+      }
 
-	$conta++;
+      // Total entregas para la fila resumen
+      $tot_entrega_r = !empty($entregas_traz)
+        ? array_sum(array_column($entregas_traz, 'valor'))
+        : (float)$solicitud["valor_e"];
+      // Falta por legalizar = columna I (Valor) menos el total real de entregas (todas las cuotas).
+      $falta_legalizar = max(((float)$solicitud["presupuesto"]) - $tot_entrega_r, 0);
+
+      // Fila de total: toda en negrita, con los datos de la solicitud repetidos (como las
+      // sub-filas, pedido por el usuario 2026-10-07) y todos los valores numéricos.
+      $conta++;
+      $objSpreadsheet->getActiveSheet()->getStyle("A$conta:Z$conta")->applyFromArray(['font' => ['bold' => true]]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("A$conta", $soli_conse);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("B$conta", $solicitud["promotor"]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("C$conta", $solicitud["colegio"]);
+      if (!empty($promo_colegio["promotor"]))
+        $objSpreadsheet->getActiveSheet()->SetCellValue("D$conta", $promo_colegio["promotor"]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("E$conta", $solicitud["fecha"]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("F$conta", "  TOTAL  —  " . $solicitud["recurso"]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("G$conta", $solicitud["tipo"]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", $solicitud["categoria"]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("J$conta", $solicitud["estado"]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("L$conta", $tipo_e["tipo"] ?? "");
+      $objSpreadsheet->getActiveSheet()->SetCellValue("N$conta", $solicitud["fecha_e"]);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", $solicitud["contab"] ? "Si" : "No");
+      $objSpreadsheet->getActiveSheet()->getStyle("I$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", $solicitud["presupuesto"]);
+      $objSpreadsheet->getActiveSheet()->getStyle("K$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("K$conta", $total["total_e"]);
+      $objSpreadsheet->getActiveSheet()->getStyle("M$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("M$conta", $tot_entrega_r);
+      $objSpreadsheet->getActiveSheet()->getStyle("O$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", $tot_legal_r);
+      $objSpreadsheet->getActiveSheet()->getStyle("Q$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", $datos_cole['presupuesto']);
+      $objSpreadsheet->getActiveSheet()->getStyle("R$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", $datos_cole['adopcion']);
+      $objSpreadsheet->getActiveSheet()->getStyle("S$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", $datos_cole['venta_real']);
+      $objSpreadsheet->getActiveSheet()->getStyle("U$conta")->getNumberFormat()->setFormatCode('0.00%');
+      $objSpreadsheet->getActiveSheet()->SetCellValue("U$conta", $datos_cole['descuento_promedio']);
+      $objSpreadsheet->getActiveSheet()->getStyle("V$conta")->getNumberFormat()->setFormatCode('0.00%');
+      $objSpreadsheet->getActiveSheet()->SetCellValue("V$conta", $porcentaje_atencion);
+      $objSpreadsheet->getActiveSheet()->getStyle("W$conta")->getNumberFormat()->setFormatCode('0.00%');
+      $objSpreadsheet->getActiveSheet()->SetCellValue("W$conta", $porcentaje_gasto_total);
+      $objSpreadsheet->getActiveSheet()->getStyle("X$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("X$conta", $falta_legalizar);
+      if ($valor_total_dist !== null) {
+        $objSpreadsheet->getActiveSheet()->getStyle("Y$conta")->getNumberFormat()->setFormatCode($fmt_money);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("Y$conta", $valor_total_dist);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("Z$conta", $fraccion_dist);
+      }
+
+    } else {
+      // Sin sub-filas: todo en la fila principal
+      $objSpreadsheet->getActiveSheet()->getStyle("O$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("O$conta", $tot_legal_r);
+      if ($solicitud["contab"]==0) {
+        $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "No");
+      } else {
+        $objSpreadsheet->getActiveSheet()->SetCellValue("P$conta", "Si");
+      }
+      $objSpreadsheet->getActiveSheet()->getStyle("Q$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("Q$conta", $datos_cole['presupuesto']);
+      $objSpreadsheet->getActiveSheet()->getStyle("R$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("R$conta", $datos_cole['adopcion']);
+      $objSpreadsheet->getActiveSheet()->getStyle("S$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("S$conta", $datos_cole['venta_real']);
+      $objSpreadsheet->getActiveSheet()->getStyle("U$conta")->getNumberFormat()->setFormatCode('0.00%');
+      $objSpreadsheet->getActiveSheet()->SetCellValue("U$conta", $datos_cole['descuento_promedio']);
+      $objSpreadsheet->getActiveSheet()->getStyle("V$conta")->getNumberFormat()->setFormatCode('0.00%');
+      $objSpreadsheet->getActiveSheet()->SetCellValue("V$conta", $porcentaje_atencion);
+      $objSpreadsheet->getActiveSheet()->getStyle("W$conta")->getNumberFormat()->setFormatCode('0.00%');
+      $objSpreadsheet->getActiveSheet()->SetCellValue("W$conta", $porcentaje_gasto_total);
+      $objSpreadsheet->getActiveSheet()->getStyle("X$conta")->getNumberFormat()->setFormatCode($fmt_money);
+      $objSpreadsheet->getActiveSheet()->SetCellValue("X$conta", $falta_legalizar);
+      if ($valor_total_dist !== null) {
+        $objSpreadsheet->getActiveSheet()->getStyle("Y$conta")->getNumberFormat()->setFormatCode($fmt_money);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("Y$conta", $valor_total_dist);
+        $objSpreadsheet->getActiveSheet()->SetCellValue("Z$conta", $fraccion_dist);
+      }
+    }
+
+    $conta++;
 
     $total_p[]=$solicitud["presupuesto"];
 
@@ -300,9 +582,9 @@ foreach ($solicitudes as $solicitud) {
        $total_a[]=$solicitud["presupuesto"];
     }
 
-    $total_l[]=$solicitud["legaliza"];
+    $total_l[]=$tot_legal_r;
 
-}	
+}   
 $conta++;
 if (isset($total_p)) {
     $total_p=array_sum($total_p);
@@ -324,13 +606,13 @@ $objSpreadsheet->getActiveSheet()->SetCellValue("H$conta", "Total");
 $objSpreadsheet->getActiveSheet()->getStyle("I$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
 $objSpreadsheet->getActiveSheet()->getStyle("O$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
 if (!empty($total_p)) {
@@ -350,7 +632,7 @@ if (isset($total_a)) {
     $objSpreadsheet->getActiveSheet()->getStyle("I$conta")
           ->getNumberFormat()
           ->setFormatCode(
-          '_("$"* #,##0_);_("$"* \(#,##0\);_("$"* "-"??_);_(@_)'
+          '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)'
         );
 
     $objSpreadsheet->getActiveSheet()->getStyle('G'.$conta)->applyFromArray($estilo_negrita);
@@ -360,22 +642,8 @@ if (isset($total_a)) {
     $objSpreadsheet->getActiveSheet()->SetCellValue("I$conta", "$total_a");
 }
 
-function excelColumnRange($start, $end) {
-    $columns = [];
-    $current = $start;
-    while ($current !== $end) {
-        $columns[] = $current;
-        $current++;
-    }
-    $columns[] = $end;
-    return $columns;
-}
-
 foreach (range('A', 'Z') as $columnID) {
-  $objSpreadsheet->getActiveSheet()->getColumnDimension($columnID)->setAutoSize(true);  
-}
-foreach (excelColumnRange('AA', 'ZZ') as $columnID) {
-  $objSpreadsheet->getActiveSheet()->getColumnDimension($columnID)->setAutoSize(true);  
+    $objSpreadsheet->getActiveSheet()->getColumnDimension($columnID)->setAutoSize(true);
 }
 
 

@@ -77,9 +77,9 @@ try {
             $mail->SMTPSecure  = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port        = 587;
             $mail->SMTPOptions = ['ssl' => ['verify_peer'=>false,'verify_peer_name'=>false,'allow_self_signed'=>true]];
-            $mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka');
+            $mail->setFrom('crm@somoseureka.com.co', 'CRM Eureka Panamá');
             $mail->addAddress('felipe.vargas@somoseureka.com.co');
-            $mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka');
+            $mail->addReplyTo('crm@somoseureka.com.co', 'CRM Eureka Panamá');
             $mail->addCC('comercial@somoseureka.com.co');
             $mail->isHTML(true);
             $mail->CharSet = 'UTF-8';

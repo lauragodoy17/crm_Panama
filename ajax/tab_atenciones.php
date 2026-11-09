@@ -1,6 +1,12 @@
 <?php
   require_once("../php/aut.php");
   include("../conexion/bdd.php");
+  require_once("../includes/materializar_atenciones_pendientes.php");
+
+  // Si alguna solicitud distribuida en años (ver php/solicitud_recurso.php) tenía una cuota
+  // pendiente para este período, y el período ya existe (por eso se está viendo este tab), se
+  // convierte ahora en una solicitud real — sin costo si no hay nada pendiente.
+  materializar_atenciones_pendientes($bdd, (int)$_GET['periodo']);
 
   // ── Métricas para las tarjetas ──────────────────────────────
   $sql_total = "SELECT SUM(r.valor_e) as total FROM solicitudes_recursos s
@@ -26,7 +32,9 @@
 
   $sql_sin_legal = "SELECT COUNT(*) as cnt FROM solicitudes_recursos s
                     WHERE s.id_colegio='".$_GET['colegio']."' AND s.id_periodo='".$_GET['periodo']."'
-                    AND COALESCE((SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id), 0) = 0";
+                    AND COALESCE((SELECT SUM(r.legaliza) FROM recursos_solicitados r WHERE r.id_solicitud = s.id), 0) = 0
+                    AND COALESCE((SELECT SUM(te.valor) FROM trazabilidad_entregas te WHERE te.id_solicitud = s.id AND te.tipo='legalizacion'), 0) = 0
+                    AND COALESCE(s.legal_cerrado, 0) = 0";
   $req_sin_legal = $bdd->prepare($sql_sin_legal); $req_sin_legal->execute();
   $cnt_sin_legal = (int)$req_sin_legal->fetchColumn();
 ?>
@@ -193,6 +201,7 @@
   }
   .at-legal-badge.ok      { background: #dcfce7; color: #15803d; }
   .at-legal-badge.pending { background: #fef3c7; color: #92400e; }
+  .at-legal-badge.proceso { background: #fef3c7; color: #92400e; }
 
   /* ── Botón filtro sin legalizar ─────────────────────────── */
   .at-filter-legal {
@@ -226,7 +235,7 @@
       <div class="at-card-icon purple"><i class="bi bi-cash-stack"></i></div>
       <div>
         <p class="at-card-label">Recurso entregado</p>
-        <p class="at-card-val">$&nbsp;<?= number_format($total['total'] ?? 0, 0, ',', '.') ?></p>
+        <p class="at-card-val">$&nbsp;<?= number_format($total['total'] ?? 0, 2, ',', '.') ?></p>
       </div>
     </div>
     <div class="at-card">
@@ -361,7 +370,7 @@
           <div class="at-section">
             <p class="at-section-title"><i class="bi bi-person-badge"></i> Solicitante</p>
             <div class="row">
-              <div class="form-group col-sm-6 col-12">
+              <div class="form-group col-sm-5 col-12">
                 <label for="solicitante">Solicitante del colegio <span class="at-req">*</span></label>
                 <select name="solicitante" id="solicitante" class="form-control" required>
                   <option value="">Seleccionar persona...</option>
@@ -377,11 +386,27 @@
                 <label for="fecha_entrega">Fecha de entrega <span class="at-req">*</span></label>
                 <input type="date" class="form-control" name="fecha_entrega" id="fecha_entrega" required>
               </div>
-              <div class="form-group col-sm-3 col-6">
+              <div class="form-group col-sm-2 col-6">
                 <label for="reintegro">Reintegro</label>
                 <input type="text" class="form-control" name="reintegro" id="reintegro" autocomplete="off" placeholder="Opcional">
               </div>
+              <div class="form-group col-sm-2 col-6">
+                <label for="distribucion_anios">Distribución en años <span class="at-req">*</span></label>
+                <select name="distribucion_anios" id="distribucion_anios" class="form-control" required>
+                  <option value="1" selected>1 año</option>
+                  <option value="2">2 años</option>
+                  <option value="3">3 años</option>
+                  <option value="4">4 años</option>
+                </select>
+              </div>
             </div>
+            <p style="font-size:11.5px;color:#6b7280;margin:8px 0 0;">
+              <i class="bi bi-info-circle"></i>
+              Si eliges más de 1 año, el presupuesto de cada recurso solicitado se reparte en partes iguales
+              entre este período y los años siguientes. Los años futuros quedan
+              reservados y aparecen solos en su reporte de atenciones cuando ese período llegue a existir
+              (no hace falta crearlo de antemano).
+            </p>
           </div>
 
           <!-- Áreas comprometidas -->
@@ -500,7 +525,7 @@
                   <label for="presupuesto_at">Presupuesto <span class="at-req">*</span></label>
                   <div class="input-group">
                     <div class="input-group-prepend"><span class="input-group-text" style="border-radius:8px 0 0 8px;font-size:13px;border:1.5px solid #d1d5db;border-right:none;background:#f1f5f9">$</span></div>
-                    <input type="number" class="form-control" name="primaria" id="presupuesto_at" autocomplete="off" placeholder="0" style="border-radius:0 8px 8px 0">
+                    <input type="number" step="0.01" min="0" class="form-control" name="primaria" id="presupuesto_at" autocomplete="off" placeholder="0" style="border-radius:0 8px 8px 0">
                   </div>
                 </div>
               </div>
@@ -544,7 +569,7 @@
                     <label>Presupuesto <span class="at-req">*</span></label>
                     <div class="input-group">
                       <div class="input-group-prepend"><span class="input-group-text" style="border-radius:8px 0 0 8px;font-size:13px;border:1.5px solid #d1d5db;border-right:none;background:#f1f5f9">$</span></div>
-                      <input type="number" class="form-control" name="primaria" id="presupuesto_at<?= $i ?>" autocomplete="off" placeholder="0" style="border-radius:0 8px 8px 0">
+                      <input type="number" step="0.01" min="0" class="form-control" name="primaria" id="presupuesto_at<?= $i ?>" autocomplete="off" placeholder="0" style="border-radius:0 8px 8px 0">
                     </div>
                   </div>
                 </div>
@@ -622,17 +647,43 @@
             elseif (strpos($estado_lower, 'rechazad') !== false)  $badge = 'rechazado';
             else                                                   $badge = 'default';
         ?>
-        <?php $es_legal = $sol['total_legaliza'] > 0; ?>
+        <?php
+          // Estado de legalización: trazabilidad primero, fallback a campo histórico para estados 2 y 4
+          $tot_legal_sol  = 0;
+          $tot_presup_sol = (float)($tot2['total'] ?? 0);
+          try {
+            $req_ls = $bdd->prepare("SELECT COALESCE(SUM(valor),0) FROM trazabilidad_entregas WHERE id_solicitud=? AND tipo='legalizacion'");
+            $req_ls->execute([$sol['id']]);
+            $tot_legal_sol = (float)$req_ls->fetchColumn();
+          } catch (Exception $e) {}
+          if ($tot_legal_sol <= 0 && in_array((int)$sol['id_estado'], [2, 4])) {
+            $old_leg = (float)($sol['total_legaliza'] ?? 0);
+            if ($old_leg > 0) $tot_legal_sol = $old_leg;
+          }
+          $legal_cerrado_sol = 0;
+          try {
+            $req_lc = $bdd->prepare("SELECT legal_cerrado FROM solicitudes_recursos WHERE id=?");
+            $req_lc->execute([$sol['id']]);
+            $legal_cerrado_sol = (int)$req_lc->fetchColumn();
+          } catch (Exception $e) {}
+          if ($legal_cerrado_sol)                    $legal_state = 'completo';
+          elseif ($tot_legal_sol <= 0)               $legal_state = 'none';
+          elseif ($tot_legal_sol < $tot_presup_sol)  $legal_state = 'proceso';
+          else                                       $legal_state = 'completo';
+          $es_legal = ($legal_state !== 'none');
+        ?>
         <tr data-legal="<?= $es_legal ? '1' : '0' ?>">
           <td><a href="vista_solicitud.php?id=<?= $sol['id'] ?>" class="at-link vista_soli"><?= htmlspecialchars($num) ?></a></td>
           <td><?= htmlspecialchars($sol['fecha']) ?></td>
           <td><?= htmlspecialchars($sol['solicitante'].' ('.$sol['cargo'].')') ?></td>
           <td><?= htmlspecialchars($sol['fecha_entrega']) ?></td>
-          <td>$ <?= number_format($tot2['total'], 0, ',', '.') ?></td>
+          <td>$ <?= number_format($tot2['total'], 2, ',', '.') ?></td>
           <td><span class="at-badge <?= $badge ?>"><?= htmlspecialchars($sol['estado']) ?></span></td>
           <td>
-            <?php if ($es_legal): ?>
-              <span class="at-legal-badge ok"><i class="bi bi-check-circle-fill"></i> Legalizada</span>
+            <?php if ($legal_state === 'proceso'): ?>
+              <span class="at-legal-badge proceso"><i class="bi bi-hourglass-split"></i> En proceso de legalización</span>
+            <?php elseif ($legal_state === 'completo'): ?>
+              <span class="at-legal-badge ok"><i class="bi bi-patch-check-fill"></i> Legalización completa</span>
             <?php else: ?>
               <span class="at-legal-badge pending"><i class="bi bi-exclamation-circle-fill"></i> Sin legalizar</span>
             <?php endif; ?>

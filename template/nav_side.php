@@ -14,7 +14,7 @@ $presupuesto_active  = $current_page === 'colegios_presup.php';
 $atenciones_active   = $current_page === 'lista_atenciones.php';
 $ops_active          = in_array($current_page, ['solicitar_op.php','lista_op.php','clientes_op.php']);
 $opds_active         = in_array($current_page, ['solicitar_orden_pd.php','ver_opds.php','reporte_opd.php']);
-$reportes_active     = in_array($current_page, ['reporte_zonificacion.php','reporte_cubrimiento.php','reporte_visitas.php','reporte_valoriza.php','reporte_valoriza_global.php','reporte_trabajadores.php','reporte_cant_adop.php']);
+$reportes_active     = in_array($current_page, ['reporte_zonificacion.php','reporte_cubrimiento.php','reporte_visitas.php','reporte_atenciones.php','reporte_valoriza.php','reporte_valoriza_global.php','reporte_trabajadores.php','reporte_cant_adop.php']);
 $libros_active       = $current_page === 'libros.php';
 $usuarios_active     = $current_page === 'usuarios.php';
 $zonas_active        = $current_page === 'zonas.php';
@@ -505,7 +505,6 @@ $periodos_active     = $current_page === 'periodos.php';
 						<?php }?>
 						<?php } /* fin oculto Panamá: Presupuesto */ ?>
 
-						<?php if (false) { /* Oculto temporalmente para Panamá: Atenciones */ ?>
 						<?php if ($_SESSION["tipo"] ==1 || $_SESSION["tipo"] ==2 || $_SESSION["tipo"] ==7 || $_SESSION["tipo"] ==9 ) {?>
 							<li class="dropdown <?= $atenciones_active ? 'show' : '' ?>">
 								<a href="javascript:;" class="dropdown-toggle <?= $atenciones_active ? 'active' : '' ?>">
@@ -521,7 +520,6 @@ $periodos_active     = $current_page === 'periodos.php';
 								</ul>
 							</li>
 						<?php } ?>
-						<?php } /* fin oculto Panamá: Atenciones */ ?>
 
 						<?php if (false) { /* Oculto temporalmente para Panamá: Órdenes de Pedido */ ?>
 						<?php if ($_SESSION["tipo"] !=3 && $_SESSION["tipo"] !=4 && $_SESSION["tipo"] !=6 && $_SESSION["tipo"] !=8 && $_SESSION["tipo"] !=10 && $_SESSION["tipo"] !=5) {?>
@@ -612,15 +610,13 @@ $periodos_active     = $current_page === 'periodos.php';
 										<li><a href="reporte_visitas.php">Visitas</a></li>
 									<?php } ?>
 
-									<?php if (false) { /* Oculto temporalmente para Panamá: Reportes - Clientes (Atenciones/Calendario consultorías) */ ?>
-									<?php if (in_array($_SESSION["tipo"], [1,2,3,4,5,7,9])) { ?>
+									<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) { ?>
 										<li class="menu-subgroup-label">Clientes</li>
-										<?php if ($_SESSION["tipo"] == 1 || $_SESSION["tipo"] == 2 || $_SESSION["tipo"] == 7 || $_SESSION["tipo"] == 9 || $_SESSION["tipo"] == 5) { ?>
-											<li><a href="reporte_atenciones.php">Atenciones a clientes</a></li>
-										<?php } ?>
-										<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==3 || $_SESSION["tipo"]==4 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==5) { ?>
-											<li><a href="calendar_ti.php">Calendario consultorías</a></li>
-										<?php } ?>
+										<li><a href="reporte_atenciones.php">Atenciones a clientes</a></li>
+									<?php } ?>
+									<?php if (false) { /* Oculto temporalmente para Panamá: Calendario consultorías */ ?>
+									<?php if ($_SESSION["tipo"]==1 || $_SESSION["tipo"]==3 || $_SESSION["tipo"]==4 || $_SESSION["tipo"]==7 || $_SESSION["tipo"]==5) { ?>
+										<li><a href="calendar_ti.php">Calendario consultorías</a></li>
 									<?php } ?>
 									<?php } ?>
 
